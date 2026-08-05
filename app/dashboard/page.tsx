@@ -1,23 +1,11 @@
 "use client";
 
 import React from "react";
-import { authClient } from "@/lib/auth-client";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function RegisterPage() {
-	const [name, setName] = React.useState("");
-	const [email, setEmail] = React.useState("");
-	const [password, setPassword] = React.useState("");
+export default function DashboardPage() {
+	const router = useRouter();
 
-	async function handleRegister() {
-		const result = await authClient.signUp.email({
-			name,
-			email,
-			password,
-		});
-
-		console.log(result);
-	}
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen py-2 space-y-10">
 			<h1>Register Page</h1>
@@ -41,7 +29,7 @@ export default function RegisterPage() {
 				onChange={(e) => setPassword(e.target.value)}
 			/>
 			<button onClick={handleRegister}>Register</button>
-			<Link href="/login">Go to Login Page</Link>
+			<button onClick={() => router.push("/login")}>Go to Login Page</button>
 		</div>
 	);
 }

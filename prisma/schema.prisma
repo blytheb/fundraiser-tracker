@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+
+  organizations OrganizationMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Organization {
+  id          String @id @default(cuid())
+  name        String
+  description String?
+
+  members OrganizationMember[]
+  seasons Season[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model OrganizationMember {
+  id String @id @default(cuid())
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  organizationId String
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  role OrganizationRole @default(MEMBER)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, organizationId])
+}
+
+
+enum OrganizationRole {
+  OWNER
+  ADMIN
+  COACH
+  MEMBER
+}
+
+
+model Season {
+  id String @id @default(cuid())
+
+  name String
+  year Int
+
+  organizationId String
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  teams Team[]
+
+  createdAt DateTime @default(now())
+}
+
+
+model Team {
+  id String @id @default(cuid())
+
+  name String
+  division String?
+
+  seasonId String
+  season Season @relation(fields: [seasonId], references: [id])
+
+  players Player[]
+
+  createdAt DateTime @default(now())
+}
+
+
+model Player {
+  id String @id @default(cuid())
+
+  firstName String
+  lastName String
+
+  jerseyNumber Int?
+
+  teamId String
+  team Team @relation(fields: [teamId], references: [id])
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+}
+
+
+model Transaction {
+  id String @id @default(cuid())
+
+  amount Decimal
+  description String?
+
+  type TransactionType
+
+  playerId String
+  player Player @relation(fields: [playerId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+
+enum TransactionType {
+  FUNDRAISER
+  DEPOSIT
+  PAYMENT
+}

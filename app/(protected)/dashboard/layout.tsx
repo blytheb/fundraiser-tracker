@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
 import LogoutButton from "@/components/logout-button";
+import Sidebar from "@/components/sidebar";
 
 export default async function DashboardLayout({
 	children,
@@ -18,11 +19,17 @@ export default async function DashboardLayout({
 	}
 
 	return (
-		<>
-			<nav>
-				<LogoutButton />
-			</nav>
-			{children}
-		</>
+		<div className="flex min-h-screen">
+			<Sidebar />
+			<div>
+				<header>
+					<h1>Fundraiser Tracker</h1>
+					<p>{session.user.email}</p>
+					<LogoutButton />
+				</header>
+
+				<main>{children}</main>
+			</div>
+		</div>
 	);
 }

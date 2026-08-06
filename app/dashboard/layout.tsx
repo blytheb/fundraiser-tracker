@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
+import LogoutButton from "@/components/logout-button";
+
 export default async function DashboardLayout({
 	children,
 }: {
@@ -15,5 +17,12 @@ export default async function DashboardLayout({
 		redirect("/login");
 	}
 
-	return <>{children}</>;
+	return (
+		<>
+			<nav>
+				<LogoutButton />
+			</nav>
+			{children}
+		</>
+	);
 }

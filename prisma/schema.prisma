@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//Better Auth USER
 model User {
   id            String  @id @default(cuid())
   name          String?
@@ -15,115 +15,18 @@ model User {
   emailVerified Boolean @default(false)
   image         String?
 
-  organizations OrganizationMember[]
-
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   sessions  Session[]
   accounts  Account[]
 
+  memberships         OrganizationMember[]
+  walletTransactionis WalletTransaction[]
+
   @@map("user")
 }
 
-model Organization {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-
-  members OrganizationMember[]
-  seasons Season[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model OrganizationMember {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  role OrganizationRole @default(MEMBER)
-
-  createdAt DateTime @default(now())
-
-  @@unique([userId, organizationId])
-}
-
-enum OrganizationRole {
-  OWNER
-  ADMIN
-  COACH
-  MEMBER
-}
-
-model Season {
-  id String @id @default(cuid())
-
-  name String
-  year Int
-
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-
-  teams Team[]
-
-  createdAt DateTime @default(now())
-}
-
-model Team {
-  id String @id @default(cuid())
-
-  name     String
-  division String?
-
-  seasonId String
-  season   Season @relation(fields: [seasonId], references: [id])
-
-  players Player[]
-
-  createdAt DateTime @default(now())
-}
-
-model Player {
-  id String @id @default(cuid())
-
-  firstName String
-  lastName  String
-
-  jerseyNumber Int?
-
-  teamId String
-  team   Team   @relation(fields: [teamId], references: [id])
-
-  transactions Transaction[]
-
-  createdAt DateTime @default(now())
-}
-
-model Transaction {
-  id String @id @default(cuid())
-
-  amount      Decimal
-  description String?
-
-  type TransactionType
-
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-enum TransactionType {
-  FUNDRAISER
-  DEPOSIT
-  PAYMENT
-}
-
+//Better Auth Session
 model Session {
   id        String   @id
   expiresAt DateTime
@@ -140,6 +43,7 @@ model Session {
   @@map("session")
 }
 
+//Better Auth Account
 model Account {
   id                    String    @id
   accountId             String
@@ -160,6 +64,7 @@ model Account {
   @@map("account")
 }
 
+//Better Auth Verification
 model Verification {
   id         String   @id
   identifier String
@@ -170,4 +75,192 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+//declares an organization
+model Organization {
+  id String @id @default(cuid())
+
+  name  String
+  sport String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members OrganizationMember[]
+
+  seasons Season[]
+}
+
+//connects user to organization (can belong to multiple clubs)
+model OrganizationMember {
+  id String @id @default(cuid())
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role OrganizationRole
+
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, userId])
+}
+
+enum OrganizationRole {
+  ADMIN
+  COACH
+  PARENT
+  ATHLETE
+}
+
+//season within an organization
+model Season {
+  id String @id @default(cuid())
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  name String
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  status SeasonStatus
+
+  players     SeasonPlayer[]
+  fundraisers Fundraiser[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum SeasonStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+//players exist forever (not recreated every season)
+model Player {
+  id String @id @default(cuid())
+
+  firstName String
+  lastName  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  seasons SeasonPlayer[]
+}
+
+//player account for specific season
+model SeasonPlayer {
+  id String @id @default(cuid())
+
+  seasonId String
+  season   Season @relation(fields: [seasonId], references: [id])
+
+  playerId String
+  player   Player @relation(fields: [playerId], references: [id])
+
+  division String?
+
+  fundraiserTransactions FundraiserTransaction[]
+  walletTransactions     WalletTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([seasonId, playerId])
+}
+
+//declares a fundraiser
+model Fundraiser {
+  id String @id @default(cuid())
+
+  seasonId String
+  season   Season @relation(fields: [seasonId], references: [id])
+
+  name        String
+  status      FundraiserStatus
+  description String?
+  notes       String?
+
+  distributionMethod FundraiserDistribution
+  transactions       FundraiserTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum FundraiserDistribution {
+  EQUAL
+  CUSTOM
+}
+
+enum FundraiserStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+//tracks fundraiser money
+model FundraiserTransaction {
+  id String @id @default(cuid())
+
+  seasonPlayerId String
+  seasonPlayer   SeasonPlayer @relation(fields: [seasonPlayerId], references: [id])
+
+  fundraiserId String
+  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id])
+
+  type   FundraiserTransactionType
+  amount Decimal                   @db.Decimal(10, 2)
+
+  walletTransactions WalletTransaction[]
+
+  createdAt DateTime @default(now())
+}
+
+enum FundraiserTransactionType {
+  EARNED
+  TRANSFER_TO_WALLET
+  ADJUSTMENT
+}
+
+model WalletTransaction {
+  id     String                @id @default(cuid())
+  type   WalletTransactionType
+  amount Decimal               @db.Decimal(10, 2)
+
+  description   String?
+  paymentMethod PaymentMethod?
+
+  seasonPlayerId String
+  seasonPlayer   SeasonPlayer @relation(fields: [seasonPlayerId], references: [id])
+
+  fundraiserTransactionId String?                @unique
+  fundraiserTransaction   FundraiserTransaction? @relation(fields: [fundraiserTransactionId], references: [id])
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum WalletTransactionType {
+  FUNDRAISER_TRANSFER
+  DEPOSIT
+  PAYMENT
+  REFUND
+  ADJUSTMENT
+}
+
+enum PaymentMethod {
+  CASH
+  CHECK
+  VENMO
+  CREDIT_CARD
 }

@@ -3,15 +3,20 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 export default function LogoutButton() {
 	const router = useRouter();
 
 	async function handleLogout() {
-		await authClient.logout();
+		await authClient.signOut();
 		router.push("/login");
 		router.refresh();
 	}
 
-	return <button onClick={handleLogout}>logout-button</button>;
+	return (
+		<Button variant="outline" onClick={handleLogout}>
+			Log out
+		</Button>
+	);
 }

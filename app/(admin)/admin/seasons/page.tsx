@@ -1,7 +1,14 @@
 import React from "react";
-import NewSeasonDialog from "../../../../components/admin/new-season-dialog";
+import { prisma } from "@/lib/prisma";
+import NewSeasonDialog from "@/components/admin/new-season-dialog";
 
-export default function page() {
+export default async function Seasonspage() {
+	const seasons = await prisma.season.findMany({
+		orderBy: {
+			startDate: "desc",
+		},
+	});
+
 	return (
 		<div className="p-6">
 			<div className="mb-6 flex items-center justify-between">
@@ -15,15 +22,28 @@ export default function page() {
 			</div>
 
 			<div className="rounded-lg border">
-				<div className="grid grid-cols-4 border-b p-4 text-sm font-medium">
-					<span>Seasons</span>
-					<span>Year</span>
-					<span>Status</span>
-					<span>Actions</span>
-				</div>
-				<div className="p-4 text-sm text-muted-foreground">
-					No seasons created yet.
-				</div>
+				{seasons.length === 0 ? (
+					<div className="p-6 text-center text-muted-foreground">
+						No seasons have been created yet.
+					</div>
+				) : (
+					<div className="divide-y">
+						{seasons.map((season) => (
+							<div
+								key={season.id}
+								className="flex items-center justify-between p-4">
+								<div>
+									<h2 className="font-medium">{season.name}</h2>
+									<p className="text-sm text-muted-foreground">
+										{seasons.startDate
+											? `${season.startDate.getFullYear()} · ${season.status}`
+											: `No start date · ${season.status}`}
+									</p>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		</div>
 	);

@@ -1,6 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import NewSeasonDialog from "@/components/admin/new-season-dialog";
+import Link from "next/link";
 
 export default async function Seasonspage() {
 	const seasons = await prisma.season.findMany({
@@ -32,14 +33,16 @@ export default async function Seasonspage() {
 							<div
 								key={season.id}
 								className="flex items-center justify-between p-4">
-								<div>
+								<Link
+									href={`/admin/seasons/${season.id}`}
+									className="block p-4 hover:bg-muted/50">
 									<h2 className="font-medium">{season.name}</h2>
 									<p className="text-sm text-muted-foreground">
 										{seasons.startDate
 											? `${season.startDate.getFullYear()} · ${season.status}`
 											: `No start date · ${season.status}`}
 									</p>
-								</div>
+								</Link>
 							</div>
 						))}
 					</div>

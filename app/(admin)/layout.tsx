@@ -11,7 +11,16 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarFooter,
 } from "@/components/ui/sidebar";
+import {
+	LayoutDashboard,
+	Calendar,
+	Users,
+	HandCoins,
+	Mail,
+} from "lucide-react";
+import LogoutButton from "../../components/logout-button";
 
 export default async function AdminLayout({
 	children,
@@ -34,33 +43,55 @@ export default async function AdminLayout({
 							<SidebarMenu>
 								<SidebarMenuItem>
 									<SidebarMenuButton>
-										<Link href="/admin">Dashboard</Link>
+										<Link href="/admin">
+											<LayoutDashboard />
+											<span>Dashboard</span>
+										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 								<SidebarMenuItem>
 									<SidebarMenuButton>
-										<Link href="/admin/seasons">Seasons</Link>
+										<Link href="/admin/seasons">
+											<Calendar />
+											<span>Seasons</span>
+										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 								<SidebarMenuItem>
 									<SidebarMenuButton>
-										<Link href="/admin/players">Players</Link>
+										<Link href="/admin/players">
+											<Users />
+											<span>Players</span>
+										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 								<SidebarMenuItem>
 									<SidebarMenuButton>
-										<Link href="/admin/fundraisers">Fundraisers</Link>
+										<Link href="/admin/fundraisers">
+											<HandCoins />
+											<span>Fundraisers</span>
+										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 								<SidebarMenuItem>
 									<SidebarMenuButton>
-										<Link href="/admin/invitations">Invitations</Link>
+										<Link href="/admin/invitations">
+											<Mail />
+											<span>Invitations</span>
+										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 							</SidebarMenu>
 						</SidebarGroupContent>
 					</SidebarGroup>
 				</SidebarContent>
+				<SidebarFooter>
+					<SidebarMenu>
+						<SidebarMenuItem>
+							<LogoutButton />
+						</SidebarMenuItem>
+					</SidebarMenu>
+				</SidebarFooter>
 			</Sidebar>
 
 			<main className="flex-1">{children}</main>

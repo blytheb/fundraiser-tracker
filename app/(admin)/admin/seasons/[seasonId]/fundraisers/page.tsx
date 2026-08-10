@@ -28,7 +28,7 @@ export default async function FundraiserPage({
 				<h1 className="text-3xl font-bold tracking-tight">Fundraisers</h1>
 				<p className="text-muted-foreground">Fundraisers for {season.name}</p>
 			</div>
-			<NewFundraiserDialog />
+			<NewFundraiserDialog seasonId={seasonId} />
 			{season.fundraisers.length === 0 ? (
 				<div className="rounded-lg border p-6 text-center text-muted-foreground">
 					No fundraisers have been created for this season yet.

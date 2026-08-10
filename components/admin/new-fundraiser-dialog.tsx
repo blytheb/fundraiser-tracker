@@ -22,8 +22,15 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { createFundraiser } from "@/app/(admin)/admin/seasons/[seasonId]/fundraisers/actions.ts";
 
-export default function NewFundraiserDialog() {
+type NewFundraiserDialogProps = {
+	seasonId: string;
+};
+
+export default function NewFundraiserDialog({
+	seasonId,
+}: NewFundraiserDialogProps) {
 	const [open, setOpen] = useState(false);
 
 	const [name, setName] = useState("");
@@ -34,15 +41,31 @@ export default function NewFundraiserDialog() {
 	const [distributionMethod, setDistributionMethod] = useState("EQUAL");
 
 	async function handleCreate() {
-		console.log({
+		if (!name) {
+			alert("Please enter a fundraiser name");
+			return;
+		}
+		if (!fundraiserDate) {
+			alert("Please enter a fundraiser date");
+			return;
+		}
+
+		await createFundraiser(
+			seasonId,
 			name,
 			description,
 			fundraiserDate,
 			notes,
-			status,
-			distributionMethod,
-		});
+			status as "DRAFT" | "ACTIVE" | "COMPLETED",
+			distributionMethod as "EQUAL" | "CUSTOM",
+		);
 
+		setName("");
+		setDescription("");
+		setFundraiserDate("");
+		setNotes("");
+		setStatus("DRAFT");
+		setDistributionMethod("EQUAL");
 		setOpen(false);
 	}
 	return (

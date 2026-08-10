@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import NewFundraiserDialog from "../../../../../../components/admin/new-fundraiser-dialog";
+import NewFundraiserDialog from "@/components/admin/new-fundraiser-dialog";
 
 export default async function FundraiserPage({
 	params,

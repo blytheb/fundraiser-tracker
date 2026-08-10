@@ -188,6 +188,8 @@ model Fundraiser {
   description String?
   notes       String?
 
+  fundraiserDate DateTime?
+
   distributionMethod FundraiserDistribution
   transactions       FundraiserTransaction[]
 

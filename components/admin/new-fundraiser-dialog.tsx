@@ -15,6 +15,13 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 export default function NewFundraiserDialog() {
 	const [open, setOpen] = useState(false);
@@ -23,6 +30,8 @@ export default function NewFundraiserDialog() {
 	const [description, setDescription] = useState("");
 	const [fundraiserDate, setFundraiserDate] = useState("");
 	const [notes, setNotes] = useState("");
+	const [status, setStatus] = useState("DRAFT");
+	const [distributionMethod, setDistributionMethod] = useState("EQUAL");
 
 	async function handleCreate() {
 		console.log({
@@ -30,6 +39,8 @@ export default function NewFundraiserDialog() {
 			description,
 			fundraiserDate,
 			notes,
+			status,
+			distributionMethod,
 		});
 
 		setOpen(false);
@@ -55,31 +66,61 @@ export default function NewFundraiserDialog() {
 						/>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="name">Description</Label>
+						<Label htmlFor="description">Description</Label>
 						<Textarea
-							id="name"
+							id="description"
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="year">Fundraiser Date</Label>
+						<Label htmlFor="fundraiserDate">Fundraiser Date</Label>
 						<Input
-							id="date"
-							type="number"
+							id="fundraiserDate"
+							type="date"
 							value={fundraiserDate}
 							onChange={(e) => setFundraiserDate(e.target.value)}
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="name">Notes</Label>
+						<Label htmlFor="notes">Notes</Label>
 						<Input
-							id="name"
+							id="notes"
 							value={notes}
 							onChange={(e) => setNotes(e.target.value)}
 						/>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="status">Status</Label>
+						<Select value={status} onValueChange={setStatus}>
+							<SelectTrigger>
+								<SelectValue placeholder="Select status" />
+							</SelectTrigger>
+
+							<SelectContent>
+								<SelectItem value="DRAFT">Draft</SelectItem>
+								<SelectItem value="ACTIVE">Active</SelectItem>
+								<SelectItem value="COMPLETED">Completed</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="distirbutionMethod">Distribution Method</Label>
+						<Select
+							id="distributionMethod"
+							value={distributionMethod}
+							onValueChange={setDistributionMethod}>
+							<SelectTrigger>
+								<SelectValue placeholder="Select distribution method" />
+							</SelectTrigger>
+
+							<SelectContent>
+								<SelectItem value="EQUAL">Equal</SelectItem>
+								<SelectItem value="CUSTOM">Custom</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
 				</div>
 

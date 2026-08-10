@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,8 @@ type NewFundraiserDialogProps = {
 export default function NewFundraiserDialog({
 	seasonId,
 }: NewFundraiserDialogProps) {
+	const router = useRouter();
+
 	const [open, setOpen] = useState(false);
 
 	const [name, setName] = useState("");
@@ -67,6 +70,8 @@ export default function NewFundraiserDialog({
 		setStatus("DRAFT");
 		setDistributionMethod("EQUAL");
 		setOpen(false);
+
+		router.refresh();
 	}
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>

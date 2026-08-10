@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import NewFundraiserDialog from "@/components/admin/new-fundraiser-dialog";
-
-export default async function FundraiserPage({
+import Link from "next/link";
+export default async function FundraiserListPage({
 	params,
 }: {
 	params: Promise<{ seasonId: string }>;
@@ -36,8 +36,34 @@ export default async function FundraiserPage({
 			) : (
 				<div>
 					{season.fundraisers.map((fundraiser) => (
-						<div key={fundraiser.id} className="rounded-lg border p-4">
-							<h2 className="font-medium">{fundraiser.name}</h2>
+						<div
+							key={fundraiser.id}
+							className="flex items-center justify-center rounded-lg border p-4 gap-6">
+							<div className="space-y-1">
+								<Link
+									href={`/admin/seasons/${seasonId}/fundraisers/${fundraiser.id}`}
+									className="font-medium hover:underline">
+									{fundraiser.name}
+								</Link>
+								<p className="text-sm text-muted-foreground">
+									{fundraiser.fundraiserDate.toLocaleDateString()}
+								</p>
+							</div>
+							<div className="flex items-center gap-6">
+								<div>
+									<p className="text-sm text-muted-foreground">Status</p>
+									<p className="font-medium">{fundraiser.status}</p>
+								</div>
+								<div>
+									<p className="text-xs text-muted-foreground">Distribution</p>
+									<p className="font-medium">{fundraiser.distributionMethod}</p>
+								</div>
+
+								<div>
+									<p className="text-xs text-muted-foreground">Raised</p>
+									<p className="font-medium">$0.00</p>
+								</div>
+							</div>
 							{fundraiser.description && (
 								<p className="mt-1 text-sm text-muted-foreground">
 									{fundraiser.description}

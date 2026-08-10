@@ -35,12 +35,12 @@ export default async function FundraiserPage({
 				</div>
 			) : (
 				<div>
-					{seasons.fundraisers.map((fundraiser) => (
+					{season.fundraisers.map((fundraiser) => (
 						<div key={fundraiser.id} className="rounded-lg border p-4">
 							<h2 className="font-medium">{fundraiser.name}</h2>
 							{fundraiser.description && (
 								<p className="mt-1 text-sm text-muted-foreground">
-									{fudnraiser.description}
+									{fundraiser.description}
 								</p>
 							)}
 						</div>

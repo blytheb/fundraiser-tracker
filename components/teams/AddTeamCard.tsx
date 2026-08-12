@@ -1,16 +1,16 @@
 import React from 'react';
 import {CirclePlus} from "lucide-react";
 
-import {
-	Card,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 
 export default function AddTeamCard() {
-  return (
-		<Card className="flex items-center justify-center mx-auto w-full max-w-md overflow-hidden pt-0">
-			<CirclePlus/>
-			<CardTitle>Add a Team</CardTitle>
+	return (
+		<Card className="flex h-[250px] min-h-full w-full cursor-pointer items-center justify-center overflow-hidden">
+			<CardContent className="flex flex-col items-center gap-2">
+				<CirclePlus className="h-10 w-10" />
+
+				<CardTitle>Add a Team</CardTitle>
+			</CardContent>
 		</Card>
 	);
 }

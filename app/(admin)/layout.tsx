@@ -27,10 +27,10 @@ export default async function AdminLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const session = await getSession();
-	if (!session) {
-		redirect("/login");
-	}
+	// const session = await getSession();
+	// if (!session) {
+	// 	redirect("/login");
+	// }
 
 	return (
 		<SidebarProvider>

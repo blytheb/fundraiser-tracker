@@ -6,19 +6,26 @@ import {
 	TableCell,
 	TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 type FundraiserRowProps = {
 	fundraiser: Fundrlaiser;
-}
+};
 
-export default function FundraiserRow({fundraiser}: FundraiserRowProps) {
-  return (
+export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
+	return (
 		<TableRow>
 			<TableCell>{fundraiser.startDate.toLocaleDateString()}</TableCell>
 			<TableCell>
 				<Badge variant="secondary">{fundraiser.status}</Badge>
 			</TableCell>
-			<TableCell>{fundraiser.name}</TableCell>
+			<TableCell>
+				<Link
+					href={`/test/${fundraiser.id}`}
+					className="font-medium hover:underline">
+					{fundraiser.name}
+				</Link>
+			</TableCell>
 			<TableCell>All Teams</TableCell>
 			<TableCell>
 				<div className="flex justify-end gap-1">

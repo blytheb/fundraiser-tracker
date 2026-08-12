@@ -1,5 +1,5 @@
 import React from "react";
-import { TeamList } from "@/components/template/TeamList";
+import { TeamList } from "@/components/teams/TeamList";
 
 export default function test() {
 	return (

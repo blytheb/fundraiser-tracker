@@ -1,6 +1,6 @@
-import type {TeamPlayer} from "@/types/team-player";
+import type { TeamPlayer } from "@/types/team-player";
 
-export const mockTeamPlayers: TeamPlayers[] = [
+export const mockTeamPlayers: TeamPlayer[] = [
 	{
 		id: "team-player-1",
 		playerId: "player-1",

@@ -6,20 +6,20 @@ export const mockPlayers: Player[] = [
 		firstName: "Jane",
 		lastName: "Doe",
 		status: "Active",
-		imageUrl: "https://robohash.org/1",
+		imageUrl: "https://robohash.org/1?set=set2",
 	},
 	{
 		id: "player-2",
 		firstName: "Abby",
 		lastName: "Doe",
 		status: "Active",
-		imageUrl: "https://robohash.org/2",
+		imageUrl: "https://robohash.org/2?set=set2",
 	},
 	{
 		id: "player-3",
 		firstName: "Jacob",
 		lastName: "Doe",
 		status: "Active",
-		imageUrl: "https://robohash.org/3",
+		imageUrl: "https://robohash.org/3?set=set2",
 	},
 ];

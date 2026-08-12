@@ -1,19 +1,24 @@
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Eye, Pencil, Trash2 } from "lucide-react";
+
 import {
 	Table,
 	TableBody,
-	TableCaption,
 	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import {Eye, Pencil, Trash2 } from "lucide-react";
+import PlayerRow from "@/components/players/PlayerRow";
 
-export default function PlayerTable() {
-  return (
+type PlayerTableProps = {
+	players: PlayersWithTeams[];
+};
+
+export default function PlayerTable({ players }: PlayerTableProps) {
+	return (
 		<>
 			<Table>
 				<TableHeader>
@@ -24,85 +29,11 @@ export default function PlayerTable() {
 						<TableHead className="text-right">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
+
 				<TableBody>
-					<TableRow>
-						<TableCell>John</TableCell>
-						<TableCell>Doe</TableCell>
-						<TableCell>
-							<div className="flex gap-1">
-								<Badge variant="secondary">18U Girls</Badge>
-
-								<Badge variant="secondary">16U Girls</Badge>
-							</div>
-						</TableCell>
-						<TableCell className="text-right">
-							<div className="flex justify-end gap-1">
-								<Button variant="ghost" size="icon">
-									<Eye />
-								</Button>
-
-								<Button variant="ghost" size="icon">
-									<Pencil />
-								</Button>
-
-								<Button variant="ghost" size="icon">
-									<Trash2 />
-								</Button>
-							</div>
-						</TableCell>
-					</TableRow>{" "}
-					<TableRow>
-						<TableCell>John</TableCell>
-						<TableCell>Doe</TableCell>
-						<TableCell>
-							<div className="flex gap-1">
-								<Badge variant="secondary">18U Girls</Badge>
-
-								<Badge variant="secondary">16U Girls</Badge>
-							</div>
-						</TableCell>
-						<TableCell className="text-right">
-							<div className="flex justify-end gap-1">
-								<Button variant="ghost" size="icon">
-									<Eye />
-								</Button>
-
-								<Button variant="ghost" size="icon">
-									<Pencil />
-								</Button>
-
-								<Button variant="ghost" size="icon">
-									<Trash2 />
-								</Button>
-							</div>
-						</TableCell>
-					</TableRow>
-					<TableRow>
-						<TableCell>John</TableCell>
-						<TableCell>Doe</TableCell>
-						<TableCell>
-							<div className="flex gap-1">
-								<Badge variant="secondary">18U Girls</Badge>
-
-								<Badge variant="secondary">16U Girls</Badge>
-							</div>
-						</TableCell>
-						<TableCell className="text-right">
-							<div className="flex justify-end gap-1">
-								<Button variant="ghost" size="icon">
-									<Eye />
-								</Button>
-
-								<Button variant="ghost" size="icon">
-									<Pencil />
-								</Button>
-
-								<Button variant="ghost" size="icon">
-									<Trash2 />
-								</Button>
-							</div>
-						</TableCell>
-					</TableRow>
+					{players.map((player) => (
+						<PlayerRow key={player.id} player={player} />
+					))}
 				</TableBody>
 			</Table>
 		</>

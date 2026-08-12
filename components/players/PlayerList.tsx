@@ -4,8 +4,11 @@ import { Plus} from "lucide-react";
 
 import PlayerTable from "@/components/players/PlayerTable";
 
+import { getPlayersWithTeams } from "@/lib/data/players";
 
 export function PlayerList() {
+	const players = getPlayersWithTeams();
+
 	return (
 		<>
 			<div className="p-6">
@@ -16,7 +19,7 @@ export function PlayerList() {
 					</div>
 
 					<Button>
-						<Plus/>
+						<Plus />
 						Add Player
 					</Button>
 				</div>
@@ -27,8 +30,7 @@ export function PlayerList() {
 					</div>
 				</div> */}
 
-				<PlayerTable />
-		
+				<PlayerTable players={players} />
 			</div>
 		</>
 	);

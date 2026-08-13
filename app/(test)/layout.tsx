@@ -1,8 +1,3 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-
-import LogoutButton from "@/components/logout-button";
 import Sidebar from "@/components/sidebar";
 
 export default async function TestLayout({

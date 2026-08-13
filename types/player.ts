@@ -2,7 +2,7 @@ export type Player = {
 	id: string;
 	firstName: string;
 	lastName: string;
-	status: "Active" | "Inactive";
+	status: boolean;
 	imageUrl: string;
 };
 

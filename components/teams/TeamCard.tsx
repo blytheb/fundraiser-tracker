@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
 	Card,
-	CardAction,
 	CardDescription,
 	CardFooter,
 	CardHeader,
@@ -33,14 +32,11 @@ export default function TeamCard({ team }: TeamCardProps) {
 			</div>
 
 			<CardHeader>
-				<CardAction>
-					<Badge variant="secondary" className="bg-green-300">
-						{team.status}
-					</Badge>
-				</CardAction>
+				<Badge variant="secondary" className="bg-green-300">
+					{team.status}
+				</Badge>
 				<CardTitle>{team.name}</CardTitle>
 			</CardHeader>
-			<CardDescription>{team.playerCount} players</CardDescription>
 			<CardFooter>
 				<Button className="w-full">
 					<Link href={`/teams/${team.id}`}>View Team</Link>

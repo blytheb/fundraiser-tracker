@@ -16,16 +16,25 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export default function AddTeamDialog() {
+type AddTeamDialogProps = {
+	onAddTeam: (team: Team) => void;
+};
+
+export default function AddTeamDialog({ onAddTeam }: AddTeamDialogProps) {
 	const [open, setOpen] = useState(false);
 	const [name, setName] = useState("");
-	const [season, setSeason] = useState("");
-	const [playerCount, setPlayerCount] = useState(0);
-	const [imageUrl, setImageUrl] = useState("");
 
 	function handleCreate() {
-		console.log("created team");
+		const id = crypto.randomUUID();
+		const newTeam: Team = {
+			id,
+			name,
+			status: "IN_SEASON",
+			imageUrl: `https://robohash.org/${id}`,
+		};
+		onAddTeam(newTeam);
 		setOpen(false);
+		setName("");
 	}
 
 	return (
@@ -52,27 +61,10 @@ export default function AddTeamDialog() {
 							onChange={(e) => setName(e.target.value)}
 						/>
 					</div>
-					<div className="space-y-2">
-						<Label htmlFor="season">Season</Label>
-						<Input
-							id="season"
-							value={season}
-							onChange={(e) => setSeason(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="playerCount"># of players</Label>
-						<Input
-							id="playerCount"
-							type="Number"
-							value={playerCount}
-							onChange={(e) => setPlayerCount(e.target.value)}
-						/>
-					</div>
 				</div>
 				<DialogFooter>
 					<Button type="button" onClick={handleCreate}>
-						Create Fundraiser
+						Create Team
 					</Button>
 				</DialogFooter>
 			</DialogContent>

@@ -6,27 +6,32 @@ import {
 	TableCell,
 	TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 type PlayerRowProps = {
 	player: PlayerWithTeams;
-}
+};
 
-export default function PlayerRow({player,}: PlayerRowProps) {
-  return (
+export default function PlayerRow({ player }: PlayerRowProps) {
+	return (
 		<TableRow>
 			<TableCell>{player.firstName}</TableCell>
 			<TableCell>{player.lastName}</TableCell>
 			<TableCell>
 				<div className="flex flew-wrap gap-1">
 					{player.teams.map((team) => (
-						<Badge key={team.id} variant="secondary">{team.name}</Badge>
+						<Badge key={team.id} variant="secondary">
+							{team.name}
+						</Badge>
 					))}
 				</div>
 			</TableCell>
 			<TableCell className="text-right">
 				<div className="flex justify-end gap-1">
 					<Button variant="ghost" size="icon">
-						<Eye />
+						<Link href={`/players/${player.id}`}>
+							<Eye />
+						</Link>
 					</Button>
 
 					<Button variant="ghost" size="icon">

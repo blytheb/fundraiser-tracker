@@ -10,6 +10,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 
 import type { Team } from "@/types/team";
 type TeamCardProps = {
@@ -41,7 +42,9 @@ export default function TeamCard({ team }: TeamCardProps) {
 			</CardHeader>
 			<CardDescription>{team.playerCount} players</CardDescription>
 			<CardFooter>
-				<Button className="w-full">View Team</Button>
+				<Button className="w-full">
+					<Link href={`/teams/${team.id}`}>View Team</Link>
+				</Button>
 			</CardFooter>
 		</Card>
 	);

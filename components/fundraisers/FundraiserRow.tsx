@@ -30,7 +30,9 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 			<TableCell>
 				<div className="flex justify-end gap-1">
 					<Button variant="ghost" size="icon">
-						<Eye />
+						<Link href={`/fundraisers/${fundraiser.id}`}>
+							<Eye />
+						</Link>
 					</Button>
 
 					<Button variant="ghost" size="icon">

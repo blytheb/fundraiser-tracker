@@ -1,6 +1,6 @@
 import React from "react";
 import TeamCard from "@/components/teams/TeamCard";
-import AddTeamCard from "@/components/forms/AddTeamCard";
+import AddTeamDialog from "@/components/forms/AddTeamDialog";
 
 import { mockTeams } from "@/lib/mock-data/teams";
 
@@ -26,7 +26,7 @@ export function TeamList() {
 						{mockTeams.map((team) => (
 							<TeamCard key={team.id} team={team} />
 						))}
-						<AddTeamCard />
+						<AddTeamDialog />
 					</div>
 				)}
 			</div>

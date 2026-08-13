@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { mockTeams } from "@/lib/mock-data/teams";
 import { getPlayersByTeamId } from "@/lib/data/players";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
-import EditTeamRosterButton from "@/components/forms/EditTeamRosterButton";
+import EditTeamRosterDialog from "@/components/forms/EditTeamRosterDialog";
 import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
 import SummaryBlock from "@/components/SummaryBlock";
 import TeamRoster from "@/components/teams/TeamRoster";
@@ -47,7 +47,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
 			<div className="pt-6">
 				<div className="flex justify-between">
 					<h2>Roster</h2>
-					<EditTeamRosterButton players={players} />
+					<EditTeamRosterDialog players={players} />
 				</div>
 				<TeamRoster players={players} />
 			</div>

@@ -1,5 +1,5 @@
 import React from "react";
-import AddPlayerButton from "@/components/forms/AddPlayerButton";
+import AddPlayerDialog from "@/components/forms/AddPlayerDialog";
 
 import PlayerTable from "@/components/players/PlayerTable";
 
@@ -17,7 +17,7 @@ export function PlayerList() {
 						<p className="text-muted-foreground">All Menehune players</p>
 					</div>
 
-					<AddPlayerButton />
+					<AddPlayerDialog />
 				</div>
 
 				{/* <div className="rounded-lg border">

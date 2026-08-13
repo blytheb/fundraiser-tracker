@@ -29,8 +29,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
 					<p className="text-muted-foreground">Menehune team</p>
 				</div>
 				<div className="flex gap-2">
-					<SummaryBlock value={players.length} label="Player Count" />
-					<SummaryBlock value={fundraisers.length} label="Fundraiser Count" />
+					<SummaryBlock value={players.length} label="Players" />
+					<SummaryBlock value={fundraisers.length} label="Fundraisers" />
 				</div>
 			</div>
 			<div>

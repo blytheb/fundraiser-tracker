@@ -19,6 +19,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
 
 export default function AddFundraiserButton() {
 	// const router = useRouter();
@@ -37,7 +38,12 @@ export default function AddFundraiserButton() {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger> Add Fundraiser </DialogTrigger>
+			<DialogTrigger>
+				<Button>
+					<Plus />
+					Add Fundraiser
+				</Button>
+			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Create a Fundraiser</DialogTitle>

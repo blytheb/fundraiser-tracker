@@ -1,6 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Plus} from "lucide-react";
+import AddPlayerButton from "@/components/forms/AddPlayerButton";
 
 import PlayerTable from "@/components/players/PlayerTable";
 
@@ -18,10 +17,7 @@ export function PlayerList() {
 						<p className="text-muted-foreground">All Menehune players</p>
 					</div>
 
-					<Button>
-						<Plus />
-						Add Player
-					</Button>
+					<AddPlayerButton />
 				</div>
 
 				{/* <div className="rounded-lg border">

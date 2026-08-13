@@ -1,6 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+
 import AddFundraiserButton from "@/components/forms/AddFundraiserButton";
 
 import FundraiserTable from "@/components/fundraisers/FundraiserTable";
@@ -15,10 +14,6 @@ export function FundraiserList() {
 						<h1 className="text-2xl font-bold">Fundraisers</h1>
 						<p className="text-muted-foreground">All Menehune fundraisers</p>
 					</div>
-					<Button>
-						<Plus />
-						Add Fundraiser
-					</Button>
 
 					<AddFundraiserButton />
 				</div>

@@ -1,6 +1,6 @@
 import type { TeamFundraiser } from "@/types/team-fundraiser";
 
-export const mockTeamFundraiser: TeamFundraiser[] = [
+export const mockTeamFundraisers: TeamFundraiser[] = [
 	{
 		id: "team-fundraiser-1",
 		teamId: "team-1",

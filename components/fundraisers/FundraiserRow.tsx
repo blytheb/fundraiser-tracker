@@ -1,11 +1,8 @@
-import React from 'react';
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import {
-	TableCell,
-	TableRow,
-} from "@/components/ui/table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 
 type FundraiserRowProps = {
@@ -27,6 +24,7 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 				</Link>
 			</TableCell>
 			<TableCell>All Teams</TableCell>
+			<TableCell>${fundraiser.amount}</TableCell>
 			<TableCell>
 				<div className="flex justify-end gap-1">
 					<Button variant="ghost" size="icon">

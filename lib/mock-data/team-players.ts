@@ -31,4 +31,19 @@ export const mockTeamPlayers: TeamPlayer[] = [
 		playerId: "player-3",
 		teamId: "team-1",
 	},
+	{
+		id: "team-player-7",
+		playerId: "player-4",
+		teamId: "team-1",
+	},
+	{
+		id: "team-player-8",
+		playerId: "player-5",
+		teamId: "team-1",
+	},
+	{
+		id: "team-player-9",
+		playerId: "player-6",
+		teamId: "team-1",
+	},
 ];

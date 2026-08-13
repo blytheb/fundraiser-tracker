@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
 	Table,
 	TableBody,
@@ -7,13 +7,13 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import FundraiserRow from "@/components/fundraisers/FundraiserRow";
-import type {Fundraiser} from "@/types/fundraiser";
+import type { Fundraiser } from "@/types/fundraiser";
 
 type FundraiserTableProps = {
 	fundraisers: Fundraiser[];
-}
+};
 
-export default function FundraiserTable({fundraisers} : FundraiserTableProps) {
+export default function FundraiserTable({ fundraisers }: FundraiserTableProps) {
 	return (
 		<>
 			<Table>
@@ -23,6 +23,7 @@ export default function FundraiserTable({fundraisers} : FundraiserTableProps) {
 						<TableHead>Status</TableHead>
 						<TableHead>Fundraiser Name</TableHead>
 						<TableHead>Teams</TableHead>
+						<TableHead>Amount</TableHead>
 						<TableHead className="text-right">Actions</TableHead>
 					</TableRow>
 				</TableHeader>

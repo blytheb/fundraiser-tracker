@@ -15,11 +15,10 @@ export default function FundraiserSmallCard({
 			<div>
 				<div className="flex items-center gap-3">
 					<h1 className="text-2xl font-bold">{fundraiser.name}</h1>
-					<p className="text-muted-foreground">
-						{fundraiser.startDate.toLocaleDateString()}
-					</p>
+					<p className="text-muted-foreground">${fundraiser.amount}</p>
+					<p>{fundraiser.startDate.toLocaleDateString()}</p>
+					<Badge variant="secondary">{fundraiser.status}</Badge>
 				</div>
-				<Badge variant="secondary">{fundraiser.status}</Badge>
 			</div>
 		</div>
 	);

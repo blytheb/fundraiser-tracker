@@ -1,16 +1,16 @@
-import React from 'react';
+import React from "react";
 import Image from "next/image";
-import {Badge} from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 
-import type {Player} from "@/types/player"
+import type { Player } from "@/types/player";
 
 type PlayerSmallCardProps = {
-    player: Player
-}
+	player: Player;
+};
 
-export default function PlayerSmallCard({player}: PlayerSmallCardProps) {
-  return (
-		<div className="mb-6 flex items-center gap-4 border">
+export default function PlayerSmallCard({ player }: PlayerSmallCardProps) {
+	return (
+		<div className="min-h-[100px] min-w-[200px] flex items-center justify-center gap-3 border">
 			<div className="relative size-20 shrink-0 overflow-hidden rounded-lg">
 				<Image
 					src={player.imageUrl}
@@ -20,10 +20,10 @@ export default function PlayerSmallCard({player}: PlayerSmallCardProps) {
 				/>
 			</div>
 
-			<div>
-				<div className="flex items-center gap-3">
-					<h1 className="text-2xl font-bold">{player.firstName}</h1>
-					<p className="text-muted-foreground">{player.lastName}</p>
+			<div className="flex flex-col gap-0.5">
+				<div>
+					<p className="text-smtext-muted-foreground">{player.firstName}</p>
+					<p className="text-2xl font-bold">{player.lastName}</p>
 				</div>
 				<Badge variant="secondary">{player.status}</Badge>
 			</div>

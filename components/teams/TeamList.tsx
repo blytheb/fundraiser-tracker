@@ -15,18 +15,20 @@ export function TeamList() {
 					</div>
 				</div>
 
-				<div className="rounded-lg border">
-					<div className="p-6 text-center text-muted-foreground">
-						No seasons have been created yet.
+				{mockTeams.length === 0 ? (
+					<div className="rounded-lg border">
+						<div className="p-6 text-center text-muted-foreground">
+							No seasons have been created yet.
+						</div>
 					</div>
-				</div>
-
-				<div className="grid grid-cols-1 gap-6 items-stretch sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 ">
-					{mockTeams.map((team) => (
-						<TeamCard key={team.id} team={team} />
-					))}
-					<AddTeamCard />
-				</div>
+				) : (
+					<div className="grid grid-cols-1 gap-6 items-stretch sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 ">
+						{mockTeams.map((team) => (
+							<TeamCard key={team.id} team={team} />
+						))}
+						<AddTeamCard />
+					</div>
+				)}
 			</div>
 		</>
 	);

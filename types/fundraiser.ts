@@ -4,7 +4,8 @@ export type Fundraiser = {
 	description: string;
 	notes: string;
 	startDate: Date;
-	status: "Active" | "Draft" | "Completed" | "Cancelled";
+	amount: number;
+	status: "In Progress" | "Completed";
 	distributionMethod: "Custom" | "Equal";
 	collectionType: "Cash" | "Check" | "Venmo" | "Other";
 	scope: "Team" | "All";

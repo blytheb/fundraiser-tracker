@@ -1,4 +1,5 @@
 import React from "react";
+import { Badge } from "@/components/ui/badge";
 import { mockTeams } from "@/lib/mock-data/teams";
 import { getPlayersByTeamId } from "@/lib/data/players";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
@@ -35,6 +36,14 @@ export default async function TeamPage({ params }: TeamPageProps) {
 				</div>
 			</div>
 			<div>
+				<div className="p-6 text-muted-foreground border">
+					<h1>Trip to Japan</h1>
+					<p>June 1, 2027 - June 9,2027</p>
+					<p>Goal: $1,500 per player</p>
+					<Badge variant="secondary">23054 Days away</Badge>
+				</div>
+			</div>
+			<div className="pt-6">
 				<h2>Roster</h2>
 				{players.length === 0 ? (
 					<div className="rounded-lg border">
@@ -43,9 +52,11 @@ export default async function TeamPage({ params }: TeamPageProps) {
 						</div>
 					</div>
 				) : (
-					players.map((player) => (
-						<PlayerSmallCard key={player.id} player={player} />
-					))
+					<div className="grid grid-cols-1 itesm-stretch sm:grid-cols-3 gap-3">
+						{players.map((player) => (
+							<PlayerSmallCard key={player.id} player={player} />
+						))}
+					</div>
 				)}
 			</div>
 			<div className="pt-6">

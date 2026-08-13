@@ -33,28 +33,4 @@ export const mockTeams: Team[] = [
 		status: "Active",
 		imageUrl: "https://robohash.org/4",
 	},
-	{
-		id: "team-5",
-		name: "14U Girls",
-		season: "2026-2027",
-		playerCount: 11,
-		status: "Active",
-		imageUrl: "https://robohash.org/5",
-	},
-	{
-		id: "team-6",
-		name: "14U Girls",
-		season: "2026-2027",
-		playerCount: 11,
-		status: "Active",
-		imageUrl: "https://robohash.org/6",
-	},
-	{
-		id: "team-7",
-		name: "14U Girls",
-		season: "2026-2027",
-		playerCount: 11,
-		status: "Active",
-		imageUrl: "https://robohash.org/7",
-	},
 ];

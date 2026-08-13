@@ -8,5 +8,4 @@ export type Fundraiser = {
 	status: "In Progress" | "Completed";
 	distributionMethod: "Custom" | "Equal";
 	collectionType: "Cash" | "Check" | "Venmo" | "Other";
-	scope: "Team" | "All";
 };

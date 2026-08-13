@@ -11,7 +11,6 @@ export const mockFundraisers: Fundraiser[] = [
 		status: "Active",
 		distributionMethod: "Equal",
 		collectionType: "Check",
-		scope: "All",
 	},
 	{
 		id: "fundraiser-2",
@@ -23,7 +22,6 @@ export const mockFundraisers: Fundraiser[] = [
 		status: "Draft",
 		distributionMethod: "Equal",
 		collectionType: "Check",
-		scope: "All",
 	},
 	{
 		id: "fundraiser-3",
@@ -35,7 +33,6 @@ export const mockFundraisers: Fundraiser[] = [
 		status: "Completed",
 		distributionMethod: "Equal",
 		collectionType: "Check",
-		scope: "All",
 	},
 	{
 		id: "fundraiser-4",
@@ -47,6 +44,5 @@ export const mockFundraisers: Fundraiser[] = [
 		status: "Cancelled",
 		distributionMethod: "Equal",
 		collectionType: "Check",
-		scope: "All",
 	},
 ];

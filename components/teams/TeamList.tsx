@@ -1,6 +1,6 @@
 import React from "react";
 import TeamCard from "@/components/teams/TeamCard";
-import AddTeamCard from "@/components/teams/AddTeamCard";
+import AddTeamCard from "@/components/forms/AddTeamCard";
 
 import { mockTeams } from "@/lib/mock-data/teams";
 

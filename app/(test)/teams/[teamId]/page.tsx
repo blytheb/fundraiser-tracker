@@ -3,13 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { mockTeams } from "@/lib/mock-data/teams";
 import { getPlayersByTeamId } from "@/lib/data/players";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
-import PlayerSmallCard from "@/components/players/PlayerSmallCard";
+import EditTeamRosterButton from "@/components/forms/EditTeamRosterButton";
 import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
 import SummaryBlock from "@/components/SummaryBlock";
+import TeamRoster from "@/components/teams/TeamRoster";
 
 type TeamPageProps = {
 	params: Promise<{
-		fundraiserId: string;
+		teamId: string;
 	}>;
 };
 
@@ -44,20 +45,11 @@ export default async function TeamPage({ params }: TeamPageProps) {
 				</div>
 			</div>
 			<div className="pt-6">
-				<h2>Roster</h2>
-				{players.length === 0 ? (
-					<div className="rounded-lg border">
-						<div className="p-6 text-center text-muted-foreground">
-							No players have been added to this team yet.
-						</div>
-					</div>
-				) : (
-					<div className="grid grid-cols-1 itesm-stretch sm:grid-cols-3 gap-3">
-						{players.map((player) => (
-							<PlayerSmallCard key={player.id} player={player} />
-						))}
-					</div>
-				)}
+				<div className="flex justify-between">
+					<h2>Roster</h2>
+					<EditTeamRosterButton players={players} />
+				</div>
+				<TeamRoster players={players} />
 			</div>
 			<div className="pt-6">
 				<h2>Fundraisers</h2>

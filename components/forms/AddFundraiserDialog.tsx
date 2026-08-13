@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 
-export default function AddFundraiserButton() {
+export default function AddFundraiserDialog() {
 	// const router = useRouter();
 
 	const [open, setOpen] = useState(false);

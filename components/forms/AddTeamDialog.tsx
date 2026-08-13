@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export default function AddTeamCard() {
+export default function AddTeamDialog() {
 	const [open, setOpen] = useState(false);
 	const [name, setName] = useState("");
 	const [season, setSeason] = useState("");

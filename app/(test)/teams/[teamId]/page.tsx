@@ -3,7 +3,7 @@ import { mockTeams } from "@/lib/mock-data/teams";
 import { getPlayersByTeamId } from "@/lib/data/players";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
 import PlayerSmallCard from "@/components/players/PlayerSmallCard";
-import SmallBlock from "@/components/SmallBlock";
+import SummaryBlock from "@/components/SummaryBlock";
 
 type TeamPageProps = {
 	params: Promise<{
@@ -28,8 +28,9 @@ export default async function TeamPage({ params }: TeamPageProps) {
 					<h1 className="text-2xl font-bold">{team.name}</h1>
 					<p className="text-muted-foreground">Menehune team</p>
 				</div>
-				<div>
-					<SmallBlock />
+				<div className="flex gap-2">
+					<SummaryBlock value={players.length} label="Player Count" />
+					<SummaryBlock value={fundraisers.length} label="Fundraiser Count" />
 				</div>
 			</div>
 			<div>
@@ -55,10 +56,9 @@ export default async function TeamPage({ params }: TeamPageProps) {
 						</div>
 					</div>
 				) : (
-					// fundraisers.map((player) => (
-					// 	<PlayerSmallCard key={player.id} player={player} />
-					// ))
-					<div>None</div>
+					fundraisers.map((player) => (
+						<PlayerSmallCard key={player.id} player={player} />
+					))
 				)}
 			</div>
 		</div>

@@ -3,6 +3,7 @@ import { mockTeams } from "@/lib/mock-data/teams";
 import { getPlayersByTeamId } from "@/lib/data/players";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
 import PlayerSmallCard from "@/components/players/PlayerSmallCard";
+import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
 import SummaryBlock from "@/components/SummaryBlock";
 
 type TeamPageProps = {
@@ -56,8 +57,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
 						</div>
 					</div>
 				) : (
-					fundraisers.map((player) => (
-						<PlayerSmallCard key={player.id} player={player} />
+					fundraisers.map((fundraiser) => (
+						<FundraiserSmallCard key={fundraiser.id} fundraiser={fundraiser} />
 					))
 				)}
 			</div>

@@ -7,10 +7,10 @@ type TestPageProps = {
 	}>;
 };
 
-export default async function TestPage({ params }: TestPageProps) {
-	const { testId } = await params;
+export default async function FundraiserPage({ params }: TestPageProps) {
+	const { fundraiserId } = await params;
 
-  const fundraiser = mockFundraisers.find((fundraiser) => fundraiser.id === testId)
+  const fundraiser = mockFundraisers.find((fundraiser) => fundraiser.id === fundraiserId)
 
   if (!fundraiser) {
     return <div>Fundraiser Not Found</div>
@@ -30,7 +30,7 @@ export default async function TestPage({ params }: TestPageProps) {
 					No seasons have been created yet.
 				</div>
 			</div>
-			<h1>Fundraiser: {testId}</h1>
+			<h1>Fundraiser: {fundraiserId}</h1>
 			<p>{fundraiser.name}</p>
 			<p>{fundraiser.description}</p>
 			<p>{fundraiser.notes}</p>

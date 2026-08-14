@@ -11,6 +11,13 @@ export default function AllTeamsPage() {
 		setTeams((currentTeams) => [...currentTeams, newTeam]);
 	}
 
+	function handleEditTeam(updatedTeam: Team) {
+		setTeams((currentTeams) =>
+			currentTeams.map((team) =>
+				team.id === updatedTeam.id ? updatedTeam : team,
+			),
+		);
+	}
 	return (
 		<div className="p-6">
 			<div className="mb-6 flex items-center justify-between">
@@ -19,7 +26,11 @@ export default function AllTeamsPage() {
 					<p className="text-muted-foreground">All Menehune teams</p>
 				</div>
 			</div>
-			<TeamGrid teams={teams} onAddTeam={handleAddTeam} />
+			<TeamGrid
+				teams={teams}
+				onAddTeam={handleAddTeam}
+				onEditTeam={handleEditTeam}
+			/>
 		</div>
 	);
 }

@@ -4,19 +4,22 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
 	Card,
-	CardDescription,
+	CardAction,
 	CardFooter,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import TeamActions from "@/components/teams/TeamActions";
 import Link from "next/link";
 
 import type { Team } from "@/types/team";
 type TeamCardProps = {
 	team: Team;
+	onEditTeam: (team: Team) => void;
+	// onDeleteTeam: (team: Team) => void;
 };
 
-export default function TeamCard({ team }: TeamCardProps) {
+export default function TeamCard({ team, onEditTeam }: TeamCardProps) {
 	return (
 		<Card className="flex h-[250px] w-full flex-col overflow-hidden pt-0">
 			<div className="relative aspect-video w-full">
@@ -32,6 +35,9 @@ export default function TeamCard({ team }: TeamCardProps) {
 			</div>
 
 			<CardHeader>
+				<CardAction>
+					<TeamActions team={team} onEditTeam={onEditTeam} />
+				</CardAction>
 				<Badge variant="secondary" className="bg-green-300">
 					{team.status}
 				</Badge>

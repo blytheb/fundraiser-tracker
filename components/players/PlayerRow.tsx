@@ -9,9 +9,14 @@ import PlayerActions from "@/components/players/PlayerActions";
 type PlayerRowProps = {
 	player: PlayerWithTeams;
 	onEditPlayer: (player: Player) => void;
+	onDeletePlayer: (player: Player) => void;
 };
 
-export default function PlayerRow({ player, onEditPlayer }: PlayerRowProps) {
+export default function PlayerRow({
+	player,
+	onEditPlayer,
+	onDeletePlayer,
+}: PlayerRowProps) {
 	return (
 		<TableRow>
 			<TableCell>{player.firstName}</TableCell>
@@ -26,7 +31,11 @@ export default function PlayerRow({ player, onEditPlayer }: PlayerRowProps) {
 				</div>
 			</TableCell> */}
 			<TableCell className="text-right">
-				<PlayerActions player={player} onEditPlayer={onEditPlayer} />
+				<PlayerActions
+					player={player}
+					onEditPlayer={onEditPlayer}
+					onDeletePlayer={onDeletePlayer}
+				/>
 			</TableCell>
 		</TableRow>
 	);

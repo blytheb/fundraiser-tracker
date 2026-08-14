@@ -14,20 +14,20 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import EditPlayerDialog from "@/components/forms/EditPlayerDialog";
-// import DeleteTeamDialog from "@/components/forms/DeleteTeamDialog";
+import DeletePlayerDialog from "@/components/forms/DeletePlayerDialog";
 
 import type { Player } from "@/types/player";
 
 type PlayerActionsProps = {
 	player: Player;
 	onEditPlayer: (player: PLayer) => void;
-	// onDeleteTeam: (playerId: string) => void;
+	onDeletePlayer: (playerId: string) => void;
 };
 
 export default function PlayerActions({
 	player,
 	onEditPlayer,
-	// onDeleteTeam,
+	onDeletePlayer,
 }: PlayerActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
@@ -46,7 +46,7 @@ export default function PlayerActions({
 							onClick={(e) => {
 								e.preventDefault();
 								console.log("Edit Clicked");
-								// setEditOpen(true);
+								setEditOpen(true);
 							}}>
 							Edit Team
 						</DropdownMenuItem>
@@ -54,27 +54,13 @@ export default function PlayerActions({
 							onClick={(e) => {
 								e.preventDefault();
 								console.log("delete clicked");
-								// setDeleteOpen(true);
+								setDeleteOpen(true);
 							}}
 							className="text-destructive">
 							Delete Team
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
-
-				{/* <EditTeamDialog
-				team={team}
-				open={editOpen}
-				onOpenChange={setEditOpen}
-				onEditTeam={onEditTeam}
-				/>
-
-				<DeleteTeamDialog
-					team={team}
-					open={deleteOpen}
-					onOpenChange={setDeleteOpen}
-					onDeleteTeam={onDeleteTeam}
-				/> */}
 			</div>
 
 			{/* Large Screen 3 action buttons */}
@@ -90,7 +76,7 @@ export default function PlayerActions({
 					<Pencil />
 				</Button>
 
-				<Button variant="ghost" size="icon">
+				<Button variant="ghost" size="icon" onClick={() => setDeleteOpen(true)}>
 					<Trash2 />
 				</Button>
 			</div>
@@ -102,12 +88,12 @@ export default function PlayerActions({
 				onEditPlayer={onEditPlayer}
 			/>
 
-			{/* <DeletePlayerDialog
-				team={team}
+			<DeletePlayerDialog
+				player={player}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
-				onDeleteTeam={onDeleteTeam}
-			/> */}
+				onDeletePlayer={onDeletePlayer}
+			/>
 		</>
 	);
 }

@@ -20,11 +20,11 @@ export default function AllPlayersPage() {
 		);
 	}
 
-	// function handleDeleteTeam(deleteTeam: Team) {
-	// 	setTeams((currentTeams) =>
-	// 		currentTeams.filter((team) => team.id !== deleteTeam.id),
-	// 	);
-	// }
+	function handleDeletePlayer(deletePlayer: Player) {
+		setPlayers((currentPlayers) =>
+			currentPlayers.filter((player) => player.id !== deletePlayer.id),
+		);
+	}
 	return (
 		<div className="p-6">
 			<div className="mb-6 flex items-center justify-between">
@@ -37,7 +37,7 @@ export default function AllPlayersPage() {
 			<PlayerTable
 				players={players}
 				onEditPlayer={handleEditPlayer}
-				// onDeleteTeam={handleDeleteTeam}
+				onDeletePlayer={handleDeletePlayer}
 			/>
 		</div>
 	);

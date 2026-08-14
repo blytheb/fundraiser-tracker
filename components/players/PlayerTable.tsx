@@ -13,11 +13,13 @@ import type { Player } from "@/types/Player";
 type PlayerTableProps = {
 	players: PlayersWithTeams[];
 	onEditPlayer: (player: Player) => void;
+	onDeletePlayer: (player: Player) => void;
 };
 
 export default function PlayerTable({
 	players,
 	onEditPlayer,
+	onDeletePlayer,
 }: PlayerTableProps) {
 	return (
 		<>
@@ -37,6 +39,7 @@ export default function PlayerTable({
 							key={player.id}
 							player={player}
 							onEditPlayer={onEditPlayer}
+							onDeletePlayer={onDeletePlayer}
 						/>
 					))}
 				</TableBody>

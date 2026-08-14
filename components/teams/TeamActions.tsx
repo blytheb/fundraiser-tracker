@@ -12,22 +12,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import EditTeamDialog from "@/components/forms/EditTeamDialog";
-// import DeleteTeamDialog from "@/components/forms/DeleteTeamDialog";
+import DeleteTeamDialog from "@/components/forms/DeleteTeamDialog";
 
 import type { Team } from "@/types/team";
 
 type TeamActionsProps = {
 	team: Team;
 	onEditTeam: (team: Team) => void;
-	// onDeleteTeam: (teamId: string) => void;
+	onDeleteTeam: (teamId: string) => void;
 };
 
 export default function TeamActions({
 	team,
 	onEditTeam,
-	// onDeleteTeam,
+	onDeleteTeam,
 }: TeamActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
+	const [deleteOpen, setDeleteOpen] = useState(false);
 
 	return (
 		<>
@@ -45,13 +46,15 @@ export default function TeamActions({
 						}}>
 						Edit Team
 					</DropdownMenuItem>
-					{/* <DeleteTeamDialog team={team} onDeleteTeam={onDeleteTeam}>
 					<DropdownMenuItem
-						onSelect={(event) => event.preventDefault()}
+						onClick={(e) => {
+							e.preventDefault();
+							console.log("delete clicked");
+							setDeleteOpen(true);
+						}}
 						className="text-destructive">
 						Delete Team
 					</DropdownMenuItem>
-				</DeleteTeamDialog> */}
 				</DropdownMenuContent>
 			</DropdownMenu>
 
@@ -60,6 +63,13 @@ export default function TeamActions({
 				open={editOpen}
 				onOpenChange={setEditOpen}
 				onEditTeam={onEditTeam}
+			/>
+
+			<DeleteTeamDialog
+				team={team}
+				open={deleteOpen}
+				onOpenChange={setDeleteOpen}
+				onDeleteTeam={onDeleteTeam}
 			/>
 		</>
 	);

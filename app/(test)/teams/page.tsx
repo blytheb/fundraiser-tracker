@@ -18,6 +18,12 @@ export default function AllTeamsPage() {
 			),
 		);
 	}
+
+	function handleDeleteTeam(deleteTeam: Team) {
+		setTeams((currentTeams) =>
+			currentTeams.filter((team) => team.id !== deleteTeam.id),
+		);
+	}
 	return (
 		<div className="p-6">
 			<div className="mb-6 flex items-center justify-between">
@@ -30,6 +36,7 @@ export default function AllTeamsPage() {
 				teams={teams}
 				onAddTeam={handleAddTeam}
 				onEditTeam={handleEditTeam}
+				onDeleteTeam={handleDeleteTeam}
 			/>
 		</div>
 	);

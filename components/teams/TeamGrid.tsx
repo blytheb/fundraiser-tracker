@@ -8,9 +8,15 @@ type TeamGridProps = {
 	teams: Team[];
 	onAddTeam: (team: Team) => void;
 	onEditTeam: (team: Team) => void;
+	onDeleteTeam: (team: Team) => void;
 };
 
-export function TeamGrid({ teams, onAddTeam, onEditTeam }: TeamGridProps) {
+export function TeamGrid({
+	teams,
+	onAddTeam,
+	onEditTeam,
+	onDeleteTeam,
+}: TeamGridProps) {
 	return (
 		<>
 			{teams.length === 0 ? (
@@ -22,7 +28,12 @@ export function TeamGrid({ teams, onAddTeam, onEditTeam }: TeamGridProps) {
 			) : (
 				<div className="grid grid-cols-1 gap-6 items-stretch sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 ">
 					{teams.map((team) => (
-						<TeamCard key={team.id} team={team} onEditTeam={onEditTeam} />
+						<TeamCard
+							key={team.id}
+							team={team}
+							onEditTeam={onEditTeam}
+							onDeleteTeam={onDeleteTeam}
+						/>
 					))}
 					<AddTeamDialog onAddTeam={onAddTeam} />
 				</div>

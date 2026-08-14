@@ -16,10 +16,14 @@ import type { Team } from "@/types/team";
 type TeamCardProps = {
 	team: Team;
 	onEditTeam: (team: Team) => void;
-	// onDeleteTeam: (team: Team) => void;
+	onDeleteTeam: (team: Team) => void;
 };
 
-export default function TeamCard({ team, onEditTeam }: TeamCardProps) {
+export default function TeamCard({
+	team,
+	onEditTeam,
+	onDeleteTeam,
+}: TeamCardProps) {
 	return (
 		<Card className="flex h-[250px] w-full flex-col overflow-hidden pt-0">
 			<div className="relative aspect-video w-full">
@@ -36,7 +40,11 @@ export default function TeamCard({ team, onEditTeam }: TeamCardProps) {
 
 			<CardHeader>
 				<CardAction>
-					<TeamActions team={team} onEditTeam={onEditTeam} />
+					<TeamActions
+						team={team}
+						onEditTeam={onEditTeam}
+						onDeleteTeam={onDeleteTeam}
+					/>
 				</CardAction>
 				<Badge variant="secondary" className="bg-green-300">
 					{team.status}

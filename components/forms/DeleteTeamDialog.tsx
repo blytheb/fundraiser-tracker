@@ -1,57 +1,53 @@
 "use client";
 
-import React from "react";
-import { CirclePlus } from "lucide-react";
+import { useState, useEffect } from "react";
+
 import {
 	Dialog,
+	DialogDescription,
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-type EditTeamDialogProps = {
+
+import type { Team } from "@/types/team";
+
+type DeleteTeamDialogProps = {
 	team: Team;
-	onEditTeam: (team: Team) => void;
-	children: React.ReactNode;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	onDeleteTeam: (team: Team) => void;
 };
 
-export default function EditTeamDialog({
+export default function DeleteTeamDialog({
 	team,
-	onEditTeam,
-	children,
-}: EditTeamDialogProps) {
-	const [open, setOpen] = useState(false);
-	const [name, setName] = useState("");
-
-	function handleEdit() {}
+	open,
+	onOpenChange,
+	onDeleteTeam,
+}: DeleteTeamDialogProps) {
+	function handleDelete() {
+		onDeleteTeam(team);
+		onOpenChange(false);
+	}
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger>{children}</DialogTrigger>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Edit this team</DialogTitle>
+					<DialogTitle>Delete {team.name}</DialogTitle>
 				</DialogHeader>
-				<div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="name">Team Name</Label>
-						<Input
-							id="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-						/>
-					</div>
-				</div>
+
+				<DialogDescription>
+					Are you sure you want to delete this team?
+				</DialogDescription>
+
 				<DialogFooter>
-					<Button type="button" onClick={handleEdit}>
-						Edit Team
-					</Button>
+					<Button onClick={handleDelete}>Yes, delete this team</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

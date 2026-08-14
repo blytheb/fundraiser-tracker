@@ -8,17 +8,17 @@ import { getAllPlayers, getPlayersWithTeams } from "@/lib/data/players";
 export default function AllPlayersPage() {
 	const [players, setPlayers] = useState(getPlayersWithTeams());
 
-	// function handleAddTeam(newTeam: Team) {
-	// 	setTeams((currentTeams) => [...currentTeams, newTeam]);
-	// }
+	function handleAddPlayer(newPlayer: Player) {
+		setPlayers((currentPlayers) => [...currentPlayers, newPlayer]);
+	}
 
-	// function handleEditTeam(updatedTeam: Team) {
-	// 	setTeams((currentTeams) =>
-	// 		currentTeams.map((team) =>
-	// 			team.id === updatedTeam.id ? updatedTeam : team,
-	// 		),
-	// 	);
-	// }
+	function handleEditPlayer(updatedPlayer: Player) {
+		setPlayers((currentPlayers) =>
+			currentPlayers.map((player) =>
+				player.id === updatedPlayer.id ? updatedPlayer : player,
+			),
+		);
+	}
 
 	// function handleDeleteTeam(deleteTeam: Team) {
 	// 	setTeams((currentTeams) =>
@@ -32,12 +32,11 @@ export default function AllPlayersPage() {
 					<h1 className="text-2xl font-bold">Teams</h1>
 					<p className="text-muted-foreground">All Menehune teams</p>
 				</div>
-				<AddPlayerDialog />
+				<AddPlayerDialog onAddPlayer={handleAddPlayer} />
 			</div>
 			<PlayerTable
 				players={players}
-				onAddTeam={handleAddTeam}
-				// onEditTeam={handleEditTeam}
+				onEditPlayer={handleEditPlayer}
 				// onDeleteTeam={handleDeleteTeam}
 			/>
 		</div>

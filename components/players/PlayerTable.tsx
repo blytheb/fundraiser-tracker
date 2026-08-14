@@ -12,10 +12,13 @@ import type { Player } from "@/types/Player";
 
 type PlayerTableProps = {
 	players: PlayersWithTeams[];
-	onAddPlayer: (player: Player) => void;
+	onEditPlayer: (player: Player) => void;
 };
 
-export default function PlayerTable({ players }: PlayerTableProps) {
+export default function PlayerTable({
+	players,
+	onEditPlayer,
+}: PlayerTableProps) {
 	return (
 		<>
 			<Table>
@@ -23,14 +26,18 @@ export default function PlayerTable({ players }: PlayerTableProps) {
 					<TableRow>
 						<TableHead>First Name</TableHead>
 						<TableHead>Last Name</TableHead>
-						<TableHead>Teams</TableHead>
+						{/* <TableHead>Teams</TableHead> */}
 						<TableHead className="text-right">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
 
 				<TableBody>
 					{players.map((player) => (
-						<PlayerRow key={player.id} player={player} />
+						<PlayerRow
+							key={player.id}
+							player={player}
+							onEditPlayer={onEditPlayer}
+						/>
 					))}
 				</TableBody>
 			</Table>

@@ -1,23 +1,22 @@
-import React from 'react';
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import {
-	TableCell,
-	TableRow,
-} from "@/components/ui/table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import Link from "next/link";
+import PlayerActions from "@/components/players/PlayerActions";
 
 type PlayerRowProps = {
 	player: PlayerWithTeams;
+	onEditPlayer: (player: Player) => void;
 };
 
-export default function PlayerRow({ player }: PlayerRowProps) {
+export default function PlayerRow({ player, onEditPlayer }: PlayerRowProps) {
 	return (
 		<TableRow>
 			<TableCell>{player.firstName}</TableCell>
 			<TableCell>{player.lastName}</TableCell>
-			<TableCell>
+			{/* <TableCell>
 				<div className="flex flew-wrap gap-1">
 					{player.teams.map((team) => (
 						<Badge key={team.id} variant="secondary">
@@ -25,23 +24,9 @@ export default function PlayerRow({ player }: PlayerRowProps) {
 						</Badge>
 					))}
 				</div>
-			</TableCell>
+			</TableCell> */}
 			<TableCell className="text-right">
-				<div className="flex justify-end gap-1">
-					<Button variant="ghost" size="icon">
-						<Link href={`/players/${player.id}`}>
-							<Eye />
-						</Link>
-					</Button>
-
-					<Button variant="ghost" size="icon">
-						<Pencil />
-					</Button>
-
-					<Button variant="ghost" size="icon">
-						<Trash2 />
-					</Button>
-				</div>
+				<PlayerActions player={player} onEditPlayer={onEditPlayer} />
 			</TableCell>
 		</TableRow>
 	);

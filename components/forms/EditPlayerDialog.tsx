@@ -14,34 +14,36 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-import type { Team } from "@/types/team";
+import type { Player } from "@/types/player";
 
-type EditTeamDialogProps = {
-	team: Team;
+type EditPlayerDialogProps = {
+	player: Player;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onEditTeam: (team: Team) => void;
+	onEditPlayer: (player: Player) => void;
 };
 
-export default function EditTeamDialog({
-	team,
+export default function EditPlayerDialog({
+	player,
 	open,
 	onOpenChange,
-	onEditTeam,
-}: EditTeamDialogProps) {
-	const [name, setName] = useState(team.name);
+	onEditPlayer,
+}: EditPlayerDialogProps) {
+	const [firstName, setFirstName] = useState(player.firstName);
+	const [lastName, setLastName] = useState(player.lastName);
 
 	// useEffect(() => {
 	// 	setName(team.name);
 	// }, [team]);
 
 	function handleEdit() {
-		const updatedTeam: Team = {
-			...team,
-			name,
+		const updatedPlayer: Player = {
+			...player,
+			firstName,
+			lastName,
 		};
 
-		onEditTeam(updatedTeam);
+		onEditPlayer(updatedPlayer);
 		onOpenChange(false);
 	}
 
@@ -49,17 +51,24 @@ export default function EditTeamDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Edit this team</DialogTitle>
+					<DialogTitle>Edit this Player</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-4 py-4">
 					<div className="space-y-2">
-						<Label htmlFor="name">Team Name</Label>
-
+						<Label htmlFor="firstName">Player First Name</Label>
 						<Input
-							id="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
+							id="firstName"
+							value={firstName}
+							onChange={(e) => setFirstName(e.target.value)}
+						/>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="lastName">Player Last Name</Label>
+						<Input
+							id="lastName"
+							value={lastName}
+							onChange={(e) => setLastName(e.target.value)}
 						/>
 					</div>
 				</div>

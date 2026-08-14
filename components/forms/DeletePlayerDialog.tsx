@@ -37,15 +37,17 @@ export default function DeletePlayerDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Delete {player.name}</DialogTitle>
+					<DialogTitle>
+						Delete {player.firstName} {player.lastName}
+					</DialogTitle>
 				</DialogHeader>
 
 				<DialogDescription>
-					Are you sure you want to delete this team?
+					Are you sure you want to delete this player?
 				</DialogDescription>
 
 				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, delete this team</Button>
+					<Button onClick={handleDelete}>Yes, delete this player</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

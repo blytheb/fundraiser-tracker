@@ -29,8 +29,8 @@ export default function AllPlayersPage() {
 		<div className="p-6">
 			<div className="mb-6 flex items-center justify-between">
 				<div>
-					<h1 className="text-2xl font-bold">Teams</h1>
-					<p className="text-muted-foreground">All Menehune teams</p>
+					<h1 className="text-2xl font-bold">Players</h1>
+					<p className="text-muted-foreground">All Menehune players</p>
 				</div>
 				<AddPlayerDialog onAddPlayer={handleAddPlayer} />
 			</div>

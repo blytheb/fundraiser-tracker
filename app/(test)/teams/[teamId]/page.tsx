@@ -1,12 +1,11 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { mockTeams } from "@/lib/mock-data/teams";
-import { getPlayersByTeamId } from "@/lib/data/players";
+import { getPlayersByTeamId, getAllPlayers } from "@/lib/data/players";
+import { getTeamById } from "@/lib/data/teams";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
-import EditTeamRosterDialog from "@/components/forms/EditTeamRosterDialog";
 import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
 import SummaryBlock from "@/components/SummaryBlock";
-import TeamRoster from "@/components/teams/TeamRoster";
+import RosterSection from "@/components/teams/rosters/RosterSection";
 
 type TeamPageProps = {
 	params: Promise<{
@@ -16,8 +15,9 @@ type TeamPageProps = {
 
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
-	const team = mockTeams.find((team) => team.id === teamId);
+	const team = getTeamById(teamId);
 	const players = getPlayersByTeamId(teamId);
+	const allPlayers = getAllPlayers();
 	const fundraisers = getFundraisersByTeamId(teamId);
 
 	if (!team) {
@@ -44,13 +44,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
 					<Badge variant="secondary">23054 Days away</Badge>
 				</div>
 			</div>
-			<div className="pt-6">
-				<div className="flex justify-between">
-					<h2>Roster</h2>
-					<EditTeamRosterDialog players={players} />
-				</div>
-				<TeamRoster players={players} />
-			</div>
+			<RosterSection players={players} allPlayers={allPlayers} />
 			<div className="pt-6">
 				<h2>Fundraisers</h2>
 				{fundraisers.length === 0 ? (

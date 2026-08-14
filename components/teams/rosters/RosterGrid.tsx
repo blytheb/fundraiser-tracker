@@ -1,12 +1,13 @@
-import React from "react";
+"use client";
+
 import PlayerSmallCard from "@/components/players/PlayerSmallCard";
 import type { Player } from "@/lib/types/player";
 
-type TeamRosterProps = {
+type RosterGridProps = {
 	players: Player[];
 };
 
-export default function TeamRoster({ players }: TeamRosterProps) {
+export default function RosterGrid({ players }: RosterGridProps) {
 	return players.length === 0 ? (
 		<div className="rounded-lg border">
 			<div className="p-6 text-center text-muted-foreground">

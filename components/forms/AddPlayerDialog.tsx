@@ -28,12 +28,13 @@ export default function AddPlayerDialog() {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger>
-				<Button>
-					<Plus />
-					Add Player
-				</Button>
-			</DialogTrigger>
+			<DialogTrigger
+				render={
+					<Button>
+						<Plus />
+						Add Player
+					</Button>
+				}></DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Create a New Player</DialogTitle>
@@ -58,7 +59,7 @@ export default function AddPlayerDialog() {
 				</div>
 				<DialogFooter>
 					<Button type="button" onClick={handleCreate}>
-						Create Fundraiser
+						Create Player
 					</Button>
 				</DialogFooter>
 			</DialogContent>

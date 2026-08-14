@@ -8,9 +8,11 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import PlayerRow from "@/components/players/PlayerRow";
+import type { Player } from "@/types/Player";
 
 type PlayerTableProps = {
 	players: PlayersWithTeams[];
+	onAddPlayer: (player: Player) => void;
 };
 
 export default function PlayerTable({ players }: PlayerTableProps) {

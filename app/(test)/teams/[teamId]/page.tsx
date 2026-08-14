@@ -15,9 +15,9 @@ type TeamPageProps = {
 
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
-	const team = getTeamById(teamId);
-	const players = getPlayersByTeamId(teamId);
-	const allPlayers = getAllPlayers();
+	const team = await getTeamById(teamId);
+	const players = await getPlayersByTeamId(teamId);
+	const allPlayers = await getAllPlayers();
 	const fundraisers = getFundraisersByTeamId(teamId);
 
 	if (!team) {

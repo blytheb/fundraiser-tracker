@@ -14,17 +14,25 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 		<TableRow>
 			<TableCell>{fundraiser.startDate.toLocaleDateString()}</TableCell>
 			<TableCell>
-				<Badge variant="secondary">{fundraiser.status}</Badge>
-			</TableCell>
-			<TableCell>
 				<Link
 					href={`/test/${fundraiser.id}`}
 					className="font-medium hover:underline">
 					{fundraiser.name}
 				</Link>
 			</TableCell>
-			<TableCell>All Teams</TableCell>
-			<TableCell>${fundraiser.amount}</TableCell>
+			<TableCell>
+				<div className="flex flew-wrap gap-1">
+					{fundraiser.teams.map((team) => (
+						<Badge key={team.id} variant="secondary">
+							{team.name}
+						</Badge>
+					))}
+				</div>
+			</TableCell>
+			<TableCell>$0.00</TableCell>
+			<TableCell>
+				<Badge variant="secondary">{fundraiser.status}</Badge>
+			</TableCell>
 			<TableCell>
 				<div className="flex justify-end gap-1">
 					<Button variant="ghost" size="icon">

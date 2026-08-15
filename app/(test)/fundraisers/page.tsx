@@ -1,12 +1,16 @@
 import React from "react";
-// import { PlayerList } from "@/components/players/PlayerList";
-import { FundraiserList } from "@/components/fundraisers/FundraiserList";
+import AllFundraisersLayout from "@/components/fundraisers/AllFundraisersLayout";
+import {
+	getAllFundraisers,
+	getFundraisersWithTeams,
+} from "@/lib/data/fundraisers";
 
-export default function AllFundraisersPage() {
+export default async function AllFundraisersPage() {
+	const fundraisers = await getFundraisersWithTeams();
+
 	return (
 		<div>
-			{/* <PlayerList /> */}
-			<FundraiserList />
+			<AllFundraisersLayout initialFundraisers={fundraisers} />
 		</div>
 	);
 }

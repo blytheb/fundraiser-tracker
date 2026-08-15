@@ -4,5 +4,5 @@ export type Fundraiser = {
 	description: string | null;
 	startDate: Date;
 	status: "In Progress" | "Completed";
-	created_at: Date;
+	// created_at: Date;
 };

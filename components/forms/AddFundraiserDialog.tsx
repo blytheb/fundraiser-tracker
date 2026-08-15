@@ -3,12 +3,10 @@
 import React from "react";
 
 import { getActiveTeams } from "@/lib/data/teams";
-// import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 
 import {
 	Dialog,
@@ -38,12 +36,13 @@ export default function AddFundraiserDialog() {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger>
-				<Button>
-					<Plus />
-					Add Fundraiser
-				</Button>
-			</DialogTrigger>
+			<DialogTrigger
+				render={
+					<Button>
+						<Plus />
+						Add Fundraiser
+					</Button>
+				}></DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Create a Fundraiser</DialogTitle>

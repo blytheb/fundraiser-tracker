@@ -20,10 +20,10 @@ export default function FundraiserTable({ fundraisers }: FundraiserTableProps) {
 				<TableHeader>
 					<TableRow>
 						<TableHead>Date</TableHead>
-						<TableHead>Status</TableHead>
 						<TableHead>Fundraiser Name</TableHead>
 						<TableHead>Teams</TableHead>
-						<TableHead>Amount</TableHead>
+						<TableHead>Collected</TableHead>
+						<TableHead>Status</TableHead>
 						<TableHead className="text-right">Actions</TableHead>
 					</TableRow>
 				</TableHeader>

@@ -1,13 +1,25 @@
-import React from "react";
+"use client";
 
+import { useState } from "react";
+import { FundraiserList } from "@/components/fundraisers/FundraiserList";
 import AddFundraiserDialog from "@/components/forms/AddFundraiserDialog";
 
 import FundraiserTable from "@/components/fundraisers/FundraiserTable";
 import { mockFundraisers } from "@/lib/mock-data/fundraisers";
 
-export function FundraiserList() {
+import type { Fundraiser } from "@/types/fundraisers";
+
+type LayoutProps = {
+	initialFundraisers: Fundraiser[];
+};
+
+export default function AllFundraisersLayout({
+	initialFundraisers,
+}: LayoutProps) {
+	const [fundraisers, setFundraisers] = useState(initialFundraisers);
+
 	return (
-		<>
+		<div>
 			<div className="p-6">
 				<div className="mb-6 flex items-center justify-between">
 					<div>
@@ -23,8 +35,8 @@ export function FundraiserList() {
 							No fundraisers have been created yet.
 						</div>
 					</div> */}
-				<FundraiserTable fundraisers={mockFundraisers} />
+				<FundraiserTable fundraisers={fundraisers} />
 			</div>
-		</>
+		</div>
 	);
 }

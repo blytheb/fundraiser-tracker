@@ -1,7 +1,5 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import FundraiserActions from "@/components/fundraisers/FundraiserActions";

@@ -1,13 +1,16 @@
-import { mockPlayers } from "@/lib/mock-data/players";
-import { mockTeams } from "@/lib/mock-data/teams";
-import { mockTeamPlayers } from "@/lib/mock-data/team-players";
-
-const useDatabase = process.env.USE_DATABASE === "true";
+import { prisma } from "@/lib/prisma";
 
 export function getAllPlayers() {
-	if (!useDatabase) {
-		return mockPlayers;
-	}
+	return prisma.player.findMany({
+		orderBy: [
+			{
+				lastName: "asc",
+			},
+			{
+				firstName: "asc",
+			},
+		],
+	});
 }
 
 //Give me every player along with the teams they belong to

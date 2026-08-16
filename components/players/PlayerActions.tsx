@@ -8,7 +8,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -20,15 +19,9 @@ import type { Player } from "@/types/player";
 
 type PlayerActionsProps = {
 	player: Player;
-	onEditPlayer: (player: PLayer) => void;
-	onDeletePlayer: (playerId: string) => void;
 };
 
-export default function PlayerActions({
-	player,
-	onEditPlayer,
-	onDeletePlayer,
-}: PlayerActionsProps) {
+export default function PlayerActions({ player }: PlayerActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -85,14 +78,12 @@ export default function PlayerActions({
 				player={player}
 				open={editOpen}
 				onOpenChange={setEditOpen}
-				onEditPlayer={onEditPlayer}
 			/>
 
 			<DeletePlayerDialog
 				player={player}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
-				onDeletePlayer={onDeletePlayer}
 			/>
 		</>
 	);

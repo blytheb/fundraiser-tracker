@@ -3,9 +3,9 @@
 import { prisma } from "@/lib/prisma";
 
 type TeamData = {
-	name: data.name;
-	status: data.status;
-	imageUrl?: data.imageUrl | null;
+	name: string;
+	status: string;
+	imageUrl?: string | null;
 };
 
 export async function createTeam(data: TeamData) {

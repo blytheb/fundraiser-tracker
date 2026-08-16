@@ -32,7 +32,7 @@ export default function TeamCard({ team }: TeamCardProps) {
 				/> */}
 				{team.imageUrl ? (
 					<Image
-						src={team.imageUrl}
+						src={team.imageUrl ?? "https://robohash.org/1?set=set2"}
 						alt={`${team.name} team`}
 						fill
 						className="object-cover"

@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "robohash.org",
 			},
+			{
+				protocol: "http",
+				hostname: "robohash.org",
+			},
 		],
 	},
 };

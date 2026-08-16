@@ -1,6 +1,9 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
+import { createTeam } from "@/lib/actions/teams";
+
 import { CirclePlus } from "lucide-react";
 import {
 	Dialog,
@@ -16,23 +19,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-type AddTeamDialogProps = {
-	onAddTeam: (team: Team) => void;
-};
-
-export default function AddTeamDialog({ onAddTeam }: AddTeamDialogProps) {
+export default function AddTeamDialog() {
+	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [name, setName] = useState("");
 
-	function handleCreate() {
-		const id = crypto.randomUUID();
-		const newTeam: Team = {
-			id,
+	async function handleCreate() {
+		await createTeam({
 			name,
 			status: "IN_SEASON",
-			imageUrl: `https://robohash.org/${id}`,
-		};
-		onAddTeam(newTeam);
+			imageUrl: "https://robohash.org/1",
+		});
+		router.refresh();
 		setOpen(false);
 		setName("");
 	}

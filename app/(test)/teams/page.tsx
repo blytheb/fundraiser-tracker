@@ -6,7 +6,7 @@ export default async function AllTeamsPage() {
 
 	return (
 		<>
-			<AllTeamsLayout initialTeams={teams} />
+			<AllTeamsLayout teams={teams} />
 		</>
 	);
 }

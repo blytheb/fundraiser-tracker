@@ -1,13 +1,6 @@
-import { mockTeams } from "@/lib/mock-data/teams";
 import { prisma } from "@/lib/prisma";
 
-const useDatabase = process.env.USE_DATABASE === "true";
-
 export async function getAllTeams() {
-	if (!useDatabase) {
-		return mockTeams;
-	}
-
 	return prisma.team.findMany({
 		orderBy: {
 			name: "asc",

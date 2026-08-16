@@ -15,36 +15,38 @@ import Link from "next/link";
 import type { Team } from "@/types/team";
 type TeamCardProps = {
 	team: Team;
-	onEditTeam: (team: Team) => void;
-	onDeleteTeam: (team: Team) => void;
 };
 
-export default function TeamCard({
-	team,
-	onEditTeam,
-	onDeleteTeam,
-}: TeamCardProps) {
+export default function TeamCard({ team }: TeamCardProps) {
 	return (
 		<Card className="flex h-[250px] w-full flex-col overflow-hidden pt-0">
 			<div className="relative aspect-video w-full">
 				<div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-				<Image
+				{/* <Image
 					src={team.imageUrl}
 					loading="eager"
 					alt={`${team.name} team`}
 					width={500}
 					height={300}
 					className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-				/>
+				/> */}
+				{team.imageUrl ? (
+					<Image
+						src={team.imageUrl}
+						alt={`${team.name} team`}
+						fill
+						className="object-cover"
+					/>
+				) : (
+					<div className="flex h-full items-center justify-center">
+						No team image
+					</div>
+				)}
 			</div>
 
 			<CardHeader>
 				<CardAction>
-					<TeamActions
-						team={team}
-						onEditTeam={onEditTeam}
-						onDeleteTeam={onDeleteTeam}
-					/>
+					<TeamActions team={team} />
 				</CardAction>
 				<Badge variant="secondary" className="bg-green-300">
 					{team.status}

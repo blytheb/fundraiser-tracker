@@ -16,15 +16,9 @@ import type { Team } from "@/types/team";
 
 type TeamActionsProps = {
 	team: Team;
-	onEditTeam: (team: Team) => void;
-	onDeleteTeam: (teamId: string) => void;
 };
 
-export default function TeamActions({
-	team,
-	onEditTeam,
-	onDeleteTeam,
-}: TeamActionsProps) {
+export default function TeamActions({ team }: TeamActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -56,18 +50,12 @@ export default function TeamActions({
 				</DropdownMenuContent>
 			</DropdownMenu>
 
-			<EditTeamDialog
-				team={team}
-				open={editOpen}
-				onOpenChange={setEditOpen}
-				onEditTeam={onEditTeam}
-			/>
+			<EditTeamDialog team={team} open={editOpen} onOpenChange={setEditOpen} />
 
 			<DeleteTeamDialog
 				team={team}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
-				onDeleteTeam={onDeleteTeam}
 			/>
 		</>
 	);

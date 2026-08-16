@@ -15,24 +15,32 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
+import { useRouter } from "next/navigation";
+import { deleteTeam } from "@/lib/actions/teams";
+
 import type { Team } from "@/types/team";
 
 type DeleteTeamDialogProps = {
 	team: Team;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onDeleteTeam: (team: Team) => void;
 };
 
 export default function DeleteTeamDialog({
 	team,
 	open,
 	onOpenChange,
-	onDeleteTeam,
 }: DeleteTeamDialogProps) {
-	function handleDelete() {
-		onDeleteTeam(team);
-		onOpenChange(false);
+	const router = useRouter();
+
+	async function handleDelete() {
+		try {
+			await deleteTeam(team.id);
+			router.refresh();
+			onOpenChange(false);
+		} catch (error) {
+			console.error("Failed to delete team:", error);
+		}
 	}
 
 	return (

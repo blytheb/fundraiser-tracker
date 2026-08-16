@@ -25,14 +25,18 @@ export default function AddTeamDialog() {
 	const [name, setName] = useState("");
 
 	async function handleCreate() {
-		await createTeam({
-			name,
-			status: "IN_SEASON",
-			imageUrl: "https://robohash.org/1",
-		});
-		router.refresh();
-		setOpen(false);
-		setName("");
+		try {
+			await createTeam({
+				name,
+				status: "IN_SEASON",
+				imageUrl: "https://robohash.org/1",
+			});
+			router.refresh();
+			setOpen(false);
+			setName("");
+		} catch (error) {
+			console.error("Failed to create team:", error);
+		}
 	}
 
 	return (

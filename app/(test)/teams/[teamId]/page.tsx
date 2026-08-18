@@ -2,7 +2,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { getAllPlayers } from "@/lib/data/players";
 import { getTeamById } from "@/lib/data/teams";
-import { getAllTeamPlayers } from "@/lib/data/teamPlayers";
+import { getTeamPlayers } from "@/lib/data/teamPlayers";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
 import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
 import SummaryBlock from "@/components/SummaryBlock";
@@ -17,7 +17,7 @@ type TeamPageProps = {
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
 	const team = await getTeamById(teamId);
-	const players = await getAllTeamPlayers();
+	const players = await getTeamPlayers(teamId);
 	const allPlayers = await getAllPlayers();
 	// const fundraisers = getFundraisersByTeamId(teamId);
 

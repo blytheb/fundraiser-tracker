@@ -9,9 +9,6 @@ export async function getAllTeams() {
 }
 
 export async function getActiveTeams() {
-	if (!useDatabase) {
-		return mockTeams.filter((team) => team.status === "IN_SEASON");
-	}
 	return prisma.team.findMany({
 		where: {
 			status: "IN_SEASON",

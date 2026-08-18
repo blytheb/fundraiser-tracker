@@ -14,3 +14,13 @@
 // 		)
 // 		.filter(Boolean);
 // }
+
+import { prisma } from "@/lib/prisma";
+
+export function getAllFundraisers() {
+	return prisma.fundraiser.findMany({
+		orderBy: {
+			name: "asc",
+		},
+	});
+}

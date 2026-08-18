@@ -39,7 +39,6 @@ export default function AddFundraiserDialog() {
 				description,
 				startDate: new Date(startDate),
 				status: "ACTIVE",
-				imageUrl: "https://placehold.co/600x400",
 			});
 			router.refresh();
 			setOpen(false);

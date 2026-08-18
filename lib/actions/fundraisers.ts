@@ -13,19 +13,20 @@ export async function createFundraiser(data: FundraiserData) {
 	return prisma.fundraiser.create({ data });
 }
 
-// export async function updatePlayer(id: string, data: PlaterData) {
-// 	return prisma.player.update({
-// 		where: {
-// 			id,
-// 		},
-// 		data: {
-// 			firstName: data.firstName,
-// 			lastName: data.lastName,
-// 			status: data.status,
-// 			imageUrl: data.imageUrl ?? null,
-// 		},
-// 	});
-// }
+export async function updateFundraiser(id: string, data: PlaterData) {
+	return prisma.fundraiser.update({
+		where: {
+			id,
+		},
+		data: {
+			name: data.name,
+			description: data.description,
+			startDate: data.startDate,
+			status: data.status ?? "ACTIVE",
+			imageUrl: data.imageUrl ?? null,
+		},
+	});
+}
 
 // export async function deletePlayer(id: string) {
 // 	return prisma.player.delete({

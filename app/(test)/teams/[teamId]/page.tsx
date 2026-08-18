@@ -1,7 +1,8 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { getPlayersByTeamId, getAllPlayers } from "@/lib/data/players";
+import { getAllPlayers } from "@/lib/data/players";
 import { getTeamById } from "@/lib/data/teams";
+import { getAllTeamPlayers } from "@/lib/data/teamPlayers";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
 import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
 import SummaryBlock from "@/components/SummaryBlock";
@@ -16,9 +17,9 @@ type TeamPageProps = {
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
 	const team = await getTeamById(teamId);
-	const players = await getPlayersByTeamId(teamId);
+	const players = await getAllTeamPlayers();
 	const allPlayers = await getAllPlayers();
-	const fundraisers = getFundraisersByTeamId(teamId);
+	// const fundraisers = getFundraisersByTeamId(teamId);
 
 	if (!team) {
 		return <div>Team Not Found</div>;
@@ -33,7 +34,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
 				</div>
 				<div className="flex gap-2">
 					<SummaryBlock value={players.length} label="Players" />
-					<SummaryBlock value={fundraisers.length} label="Fundraisers" />
+					{/* <SummaryBlock value={fundraisers.length} label="Fundraisers" /> */}
 				</div>
 			</div>
 			<div>
@@ -45,7 +46,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
 				</div>
 			</div>
 			<RosterSection players={players} allPlayers={allPlayers} />
-			<div className="pt-6">
+			{/* <div className="pt-6">
 				<h2>Fundraisers</h2>
 				{fundraisers.length === 0 ? (
 					<div className="rounded-lg border">
@@ -58,7 +59,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
 						<FundraiserSmallCard key={fundraiser.id} fundraiser={fundraiser} />
 					))
 				)}
-			</div>
+			</div> */}
 		</div>
 	);
 }

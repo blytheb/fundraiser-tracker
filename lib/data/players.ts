@@ -35,17 +35,15 @@ export function getPlayersWithTeams() {
 	}
 }
 
-//Give me every player that belongs to a certain team
-export function getPlayersByTeamId(teamId: string) {
-	if (!useDatabase) {
-		const teamMemberships = mockTeamPlayers.filter(
-			(teamPlayer) => teamPlayer.teamId === teamId,
-		);
+// //Give me every player that belongs to a certain team
+// export function getPlayersByTeamId(teamId: string) {
+// 	const teamMemberships = mockTeamPlayers.filter(
+// 		(teamPlayer) => teamPlayer.teamId === teamId,
+// 	);
 
-		return teamMemberships
-			.map((membership) =>
-				mockPlayers.find((player) => player.id === membership.playerId),
-			)
-			.filter(Boolean);
-	}
-}
+// 	return teamMemberships
+// 		.map((membership) =>
+// 			mockPlayers.find((player) => player.id === membership.playerId),
+// 		)
+// 		.filter(Boolean);
+// }

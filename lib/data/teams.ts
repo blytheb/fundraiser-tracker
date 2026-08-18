@@ -20,10 +20,6 @@ export async function getActiveTeams() {
 }
 
 export async function getTeamById(teamId: string) {
-	if (!useDatabase) {
-		return mockTeams.find((team) => team.id === teamId);
-	}
-
 	return prisma.team.findUnique({
 		where: {
 			id: teamId,

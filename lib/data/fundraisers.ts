@@ -1,16 +1,16 @@
-import { mockFundraisers } from "@/lib/mock-data/fundraisers";
-import { mockTeamFundraisers } from "@/lib/mock-data/team-fundraisers";
+// import { mockFundraisers } from "@/lib/mock-data/fundraisers";
+// import { mockTeamFundraisers } from "@/lib/mock-data/team-fundraisers";
 
-export function getFundraisersByTeamId(teamId: string) {
-	const fundraiserMemberships = mockTeamFundraisers.filter(
-		(teamFundraiser) => teamFundraiser.teamId === teamId,
-	);
+// export function getFundraisersByTeamId(teamId: string) {
+// 	const fundraiserMemberships = mockTeamFundraisers.filter(
+// 		(teamFundraiser) => teamFundraiser.teamId === teamId,
+// 	);
 
-	return fundraiserMemberships
-		.map((membership) =>
-			mockFundraisers.find(
-				(fundraiser) => fundraiser.id === membership.fundraiserId,
-			),
-		)
-		.filter(Boolean);
-}
+// 	return fundraiserMemberships
+// 		.map((membership) =>
+// 			mockFundraisers.find(
+// 				(fundraiser) => fundraiser.id === membership.fundraiserId,
+// 			),
+// 		)
+// 		.filter(Boolean);
+// }

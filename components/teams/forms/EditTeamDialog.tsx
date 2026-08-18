@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { updateTeam } from "@/lib/actions/teams";
 
 import {
 	Dialog,
@@ -20,29 +22,29 @@ type EditTeamDialogProps = {
 	team: Team;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onEditTeam: (team: Team) => void;
 };
 
 export default function EditTeamDialog({
 	team,
 	open,
 	onOpenChange,
-	onEditTeam,
 }: EditTeamDialogProps) {
+	const router = useRouter();
 	const [name, setName] = useState(team.name);
 
-	// useEffect(() => {
-	// 	setName(team.name);
-	// }, [team]);
-
-	function handleEdit() {
-		const updatedTeam: Team = {
-			...team,
-			name,
-		};
-
-		onEditTeam(updatedTeam);
-		onOpenChange(false);
+	async function handleEdit() {
+		try {
+			await updateTeam(team.id, {
+				name,
+				status: team.status,
+				imageUrl: team.imageUrl,
+			});
+			router.refresh();
+			onOpenChange(false);
+			setName("");
+		} catch (error) {
+			console.error("Failed to edit team:", error);
+		}
 	}
 
 	return (

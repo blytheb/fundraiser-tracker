@@ -1,6 +1,10 @@
 "use client";
 
 import React from "react";
+
+import { useRouter } from "next/navigation";
+import { createPlayer } from "@/lib/actions/players";
+
 import { Plus } from "lucide-react";
 import {
 	Dialog,
@@ -15,28 +19,27 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-type AddPlayerDialogProps = {
-	onAddPlayer: (player: Player) => void;
-};
-
-export default function AddPlayerDialog({ onAddPlayer }: AddPlayerDialogProps) {
+export default function AddPlayerDialog() {
+	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
 
-	function handleCreate() {
-		const id = crypto.randomUUID();
-		const newPlayer: Player = {
-			id,
-			firstName,
-			lastName,
-			status: true,
-			imageUrl: `https://robohash.org/${id}?set=set2`,
-		};
-		onAddPlayer(newPlayer);
-		setOpen(false);
-		setFirstName("");
-		setLastName("");
+	async function handleCreate() {
+		try {
+			await createPlayer({
+				firstName,
+				lastName,
+				status: true,
+				imageUrl: "https://robohash.org/1?set=set2",
+			});
+			router.refresh();
+			setOpen(false);
+			setFirstName("");
+			setLastName("");
+		} catch (error) {
+			console.error("Failed to create player:", error);
+		}
 	}
 
 	return (

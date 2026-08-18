@@ -1,22 +1,12 @@
 import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
-import Link from "next/link";
 import PlayerActions from "@/components/players/PlayerActions";
 
 type PlayerRowProps = {
 	player: PlayerWithTeams;
-	onEditPlayer: (player: Player) => void;
-	onDeletePlayer: (player: Player) => void;
 };
 
-export default function PlayerRow({
-	player,
-	onEditPlayer,
-	onDeletePlayer,
-}: PlayerRowProps) {
+export default function PlayerRow({ player }: PlayerRowProps) {
 	return (
 		<TableRow>
 			<TableCell>{player.firstName}</TableCell>
@@ -31,11 +21,7 @@ export default function PlayerRow({
 				</div>
 			</TableCell> */}
 			<TableCell className="text-right">
-				<PlayerActions
-					player={player}
-					onEditPlayer={onEditPlayer}
-					onDeletePlayer={onDeletePlayer}
-				/>
+				<PlayerActions player={player} />
 			</TableCell>
 		</TableRow>
 	);

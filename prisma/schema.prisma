@@ -20,9 +20,6 @@ model User {
   sessions  Session[]
   accounts  Account[]
 
-  memberships         OrganizationMember[]
-  walletTransactionis WalletTransaction[]
-
   @@map("user")
 }
 
@@ -77,192 +74,97 @@ model Verification {
   @@map("verification")
 }
 
-//declares an organization
-model Organization {
-  id String @id @default(cuid())
+model Team {
+  id       String     @id @default(cuid())
+  name     String
+  status   TeamStatus
+  imageUrl String?
 
-  name  String
-  sport String?
+  players TeamPlayer[]
+  fundraiserTeams FundraiserTeam[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  members OrganizationMember[]
-
-  seasons Season[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
-//connects user to organization (can belong to multiple clubs)
-model OrganizationMember {
-  id String @id @default(cuid())
-
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  role OrganizationRole
-
-  createdAt DateTime @default(now())
-
-  @@unique([organizationId, userId])
+enum TeamStatus {
+  IN_SEASON
+  SEASON_ENDED
 }
 
-enum OrganizationRole {
-  ADMIN
-  COACH
-  PARENT
-  ATHLETE
-}
-
-//season within an organization
-model Season {
-  id String @id @default(cuid())
-
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-
-  name String
-
-  startDate DateTime?
-  endDate   DateTime?
-
-  status SeasonStatus
-
-  players     SeasonPlayer[]
-  fundraisers Fundraiser[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum SeasonStatus {
-  ACTIVE
-  ARCHIVED
-}
-
-//players exist forever (not recreated every season)
 model Player {
-  id String @id @default(cuid())
-
+  id        String  @id @default(cuid())
   firstName String
   lastName  String
+  status    Boolean
+  imageUrl  String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  teams TeamPlayer[]
+  fundraiserParticipants FundraiserParticipant[]
 
-  seasons SeasonPlayer[]
+
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
 }
 
-//player account for specific season
-model SeasonPlayer {
+model TeamPlayer {
   id String @id @default(cuid())
 
-  seasonId String
-  season   Season @relation(fields: [seasonId], references: [id])
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   playerId String
-  player   Player @relation(fields: [playerId], references: [id])
-
-  division String?
-
-  fundraiserTransactions FundraiserTransaction[]
-  walletTransactions     WalletTransaction[]
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@unique([seasonId, playerId])
+  @@unique([teamId, playerId])
 }
 
-//declares a fundraiser
 model Fundraiser {
-  id String @id @default(cuid())
-
-  seasonId String
-  season   Season @relation(fields: [seasonId], references: [id])
-
+  id          String           @id @default(cuid())
   name        String
+  description String
+  startDate   DateTime
   status      FundraiserStatus
-  description String?
-  notes       String?
 
-  fundraiserDate DateTime?
-
-  distributionMethod FundraiserDistribution
-  transactions       FundraiserTransaction[]
+  teams        FundraiserTeam[]
+  participants FundraiserParticipant[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-enum FundraiserDistribution {
-  EQUAL
-  CUSTOM
 }
 
 enum FundraiserStatus {
-  DRAFT
   ACTIVE
   COMPLETED
 }
 
-//tracks fundraiser money
-model FundraiserTransaction {
+model FundraiserParticipant {
   id String @id @default(cuid())
 
-  seasonPlayerId String
-  seasonPlayer   SeasonPlayer @relation(fields: [seasonPlayerId], references: [id])
+  fundraiserId String
+  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+
+  playerId String
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([fundraiserId, playerId])
+}
+
+model FundraiserTeam {
+  id String @id @default(cuid())
 
   fundraiserId String
-  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id])
+  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
 
-  type   FundraiserTransactionType
-  amount Decimal                   @db.Decimal(10, 2)
-
-  walletTransactions WalletTransaction[]
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
-}
 
-enum FundraiserTransactionType {
-  EARNED
-  TRANSFER_TO_WALLET
-  ADJUSTMENT
-}
-
-model WalletTransaction {
-  id     String                @id @default(cuid())
-  type   WalletTransactionType
-  amount Decimal               @db.Decimal(10, 2)
-
-  description   String?
-  paymentMethod PaymentMethod?
-
-  seasonPlayerId String
-  seasonPlayer   SeasonPlayer @relation(fields: [seasonPlayerId], references: [id])
-
-  fundraiserTransactionId String?                @unique
-  fundraiserTransaction   FundraiserTransaction? @relation(fields: [fundraiserTransactionId], references: [id])
-
-  createdById String
-  createdBy   User   @relation(fields: [createdById], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-enum WalletTransactionType {
-  FUNDRAISER_TRANSFER
-  DEPOSIT
-  PAYMENT
-  REFUND
-  ADJUSTMENT
-}
-
-enum PaymentMethod {
-  CASH
-  CHECK
-  VENMO
-  CREDIT_CARD
+  @@unique([fundraiserId, teamId])
 }

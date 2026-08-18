@@ -1,13 +1,11 @@
-import { mockTeams } from "@/lib/mock-data/teams";
-
-const useDatabase = process.env.USE_DATABASE === "true";
+import { prisma } from "@/lib/prisma";
 
 export async function getAllTeams() {
-	if (!useDatabase) {
-		return mockTeams;
-	}
-
-	return prisma.team.findMany();
+	return prisma.team.findMany({
+		orderBy: {
+			name: "asc",
+		},
+	});
 }
 
 export async function getActiveTeams() {
@@ -22,10 +20,6 @@ export async function getActiveTeams() {
 }
 
 export async function getTeamById(teamId: string) {
-	if (!useDatabase) {
-		return mockTeams.find((team) => team.id === teamId);
-	}
-
 	return prisma.team.findUnique({
 		where: {
 			id: teamId,

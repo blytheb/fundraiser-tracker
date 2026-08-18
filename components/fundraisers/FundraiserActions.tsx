@@ -14,16 +14,18 @@ import { MoreVertical } from "lucide-react";
 
 import Link from "next/link";
 
-import EditPlayerDialog from "@/components/players/forms/EditPlayerDialog";
-import DeletePlayerDialog from "@/components/players/forms/DeletePlayerDialog";
+import EditFundraiserDialog from "@/components/fundraisers/forms/EditFundraiserDialog";
+import DeleteFundraiserDialog from "@/components/fundraisers/forms/DeleteFundraiserDialog";
 
-import type { Player } from "@/types/player";
+import type { Fundraiser } from "@/types/fundraiser";
 
-type PlayerActionsProps = {
-	player: Player;
+type FundraiserActionsProps = {
+	fundraiser: Fundraiser;
 };
 
-export default function PlayerActions({ player }: PlayerActionsProps) {
+export default function FundraiserActions({
+	fundraiser,
+}: FundraiserActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -62,7 +64,7 @@ export default function PlayerActions({ player }: PlayerActionsProps) {
 			{/* <div className="hidden lg:flex items-center gap-1"> */}
 			<div className="flex items-center gap-1">
 				<Button variant="ghost" size="icon">
-					<Link href={`/players/${player.id}`}>
+					<Link href={`/fundraisers/${fundraiser.id}`}>
 						<Eye />
 					</Link>
 				</Button>
@@ -76,14 +78,14 @@ export default function PlayerActions({ player }: PlayerActionsProps) {
 				</Button>
 			</div>
 
-			<EditPlayerDialog
-				player={player}
+			<EditFundraiserDialog
+				fundraiser={fundraiser}
 				open={editOpen}
 				onOpenChange={setEditOpen}
 			/>
 
-			<DeletePlayerDialog
-				player={player}
+			<DeleteFundraiserDialog
+				fundraiser={fundraiser}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
 			/>

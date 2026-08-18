@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 
+import { useRouter } from "next/navigation";
+import { deletePlayer } from "@/lib/actions/players";
+
 import {
 	Dialog,
 	DialogDescription,
@@ -19,18 +22,23 @@ type DeletePlayerDialogProps = {
 	player: Player;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onDeletePlayer: (player: Player) => void;
 };
 
 export default function DeletePlayerDialog({
 	player,
 	open,
 	onOpenChange,
-	onDeletePlayer,
 }: DeletePlayerDialogProps) {
-	function handleDelete() {
-		onDeletePlayer(player);
-		onOpenChange(false);
+	const router = useRouter();
+
+	async function handleDelete() {
+		try {
+			await deletePlayer(player.id);
+			router.refresh();
+			onOpenChange(false);
+		} catch (error) {
+			console.error("Failed to delete player:", error);
+		}
 	}
 
 	return (

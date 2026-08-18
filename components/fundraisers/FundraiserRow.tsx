@@ -1,9 +1,8 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import Link from "next/link";
+import FundraiserActions from "@/components/fundraisers/FundraiserActions";
 
 type FundraiserRowProps = {
 	fundraiser: Fundrlaiser;
@@ -18,7 +17,7 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 			</TableCell>
 			<TableCell>
 				<Link
-					href={`/test/${fundraiser.id}`}
+					href={`/fundraisers/${fundraiser.id}`}
 					className="font-medium hover:underline">
 					{fundraiser.name}
 				</Link>
@@ -26,21 +25,7 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 			<TableCell>All Teams</TableCell>
 			<TableCell>${fundraiser.amount}</TableCell>
 			<TableCell>
-				<div className="flex justify-end gap-1">
-					<Button variant="ghost" size="icon">
-						<Link href={`/fundraisers/${fundraiser.id}`}>
-							<Eye />
-						</Link>
-					</Button>
-
-					<Button variant="ghost" size="icon">
-						<Pencil />
-					</Button>
-
-					<Button variant="ghost" size="icon">
-						<Trash2 />
-					</Button>
-				</div>
+				<FundraiserActions fundraiser={fundraiser} />
 			</TableCell>
 		</TableRow>
 	);

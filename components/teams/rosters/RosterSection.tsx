@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import RosterGrid from "@/components/teams/rosters/RosterGrid";
-import TeamRosterDialog from "@/components/forms/TeamRosterDialog";
+import TeamRosterDialog from "@/components/teams/rosters/TeamRosterDialog";
 
 import type { Player } from "@/lib/types/player";
 
@@ -17,24 +16,17 @@ export default function RosterSection({
 	players,
 	allPlayers,
 }: RosterSectionProps) {
-	const [roster, setRoster] = useState(players);
-
-	function handleUpdateRoster(updatedRoster: Player[]) {
-		setRoster(updatedRoster);
-	}
-
 	return (
 		<div className="pt-6">
 			<div className="flex justify-between">
 				<h2>Roster</h2>
 				<TeamRosterDialog
 					teamId={teamId}
-					players={roster}
+					players={players}
 					allPlayers={allPlayers}
-					onUpdateRoster={handleUpdateRoster}
 				/>
 			</div>
-			<RosterGrid players={roster} />
+			<RosterGrid players={players} />
 		</div>
 	);
 }

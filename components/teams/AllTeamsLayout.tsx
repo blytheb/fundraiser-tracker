@@ -1,34 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { TeamGrid } from "@/components/teams/TeamGrid";
-
 import type { Team } from "@/types/team";
 
 type LayoutProps = {
-	initialTeams: Team[];
+	teams: Team[];
 };
 
-export default function AllTeamsLayout({ initialTeams }: LayoutProps) {
-	const [teams, setTeams] = useState(initialTeams);
-
-	function handleAddTeam(newTeam: Team) {
-		setTeams((currentTeams) => [...currentTeams, newTeam]);
-	}
-
-	function handleEditTeam(updatedTeam: Team) {
-		setTeams((currentTeams) =>
-			currentTeams.map((team) =>
-				team.id === updatedTeam.id ? updatedTeam : team,
-			),
-		);
-	}
-
-	function handleDeleteTeam(deleteTeam: Team) {
-		setTeams((currentTeams) =>
-			currentTeams.filter((team) => team.id !== deleteTeam.id),
-		);
-	}
+export default function AllTeamsLayout({ teams }: LayoutProps) {
 	return (
 		<div className="p-6">
 			<div className="mb-6 flex items-center justify-between">
@@ -37,12 +16,7 @@ export default function AllTeamsLayout({ initialTeams }: LayoutProps) {
 					<p className="text-muted-foreground">All Menehune teams</p>
 				</div>
 			</div>
-			<TeamGrid
-				teams={teams}
-				onAddTeam={handleAddTeam}
-				onEditTeam={handleEditTeam}
-				onDeleteTeam={handleDeleteTeam}
-			/>
+			<TeamGrid teams={teams} />
 		</div>
 	);
 }

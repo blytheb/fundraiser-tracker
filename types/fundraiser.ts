@@ -9,3 +9,9 @@ export type Fundraiser = {
 	distributionMethod: "Custom" | "Equal";
 	collectionType: "Cash" | "Check" | "Venmo" | "Other";
 };
+
+// id          String           @id @default(cuid())
+// name        String
+// description String
+// startDate   DateTime
+// status      FundraiserStatus

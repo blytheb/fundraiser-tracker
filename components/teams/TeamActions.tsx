@@ -1,6 +1,5 @@
 "use client";
 
-import { MoreVertical } from "lucide-react";
 import { useState } from "react";
 import {
 	DropdownMenu,
@@ -9,22 +8,18 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import EditTeamDialog from "@/components/forms/EditTeamDialog";
-import DeleteTeamDialog from "@/components/forms/DeleteTeamDialog";
+import { MoreVertical } from "lucide-react";
+
+import EditTeamDialog from "@/components/teams/forms/EditTeamDialog";
+import DeleteTeamDialog from "@/components/teams/forms/DeleteTeamDialog";
 
 import type { Team } from "@/types/team";
 
 type TeamActionsProps = {
 	team: Team;
-	onEditTeam: (team: Team) => void;
-	onDeleteTeam: (teamId: string) => void;
 };
 
-export default function TeamActions({
-	team,
-	onEditTeam,
-	onDeleteTeam,
-}: TeamActionsProps) {
+export default function TeamActions({ team }: TeamActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -56,18 +51,12 @@ export default function TeamActions({
 				</DropdownMenuContent>
 			</DropdownMenu>
 
-			<EditTeamDialog
-				team={team}
-				open={editOpen}
-				onOpenChange={setEditOpen}
-				onEditTeam={onEditTeam}
-			/>
+			<EditTeamDialog team={team} open={editOpen} onOpenChange={setEditOpen} />
 
 			<DeleteTeamDialog
 				team={team}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
-				onDeleteTeam={onDeleteTeam}
 			/>
 		</>
 	);

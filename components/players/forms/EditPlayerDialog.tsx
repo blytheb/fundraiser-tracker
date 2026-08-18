@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 
+import { useRouter } from "next/navigation";
+import { updatePlayer } from "@/lib/actions/players";
+
 import {
 	Dialog,
 	DialogContent,
@@ -20,15 +23,14 @@ type EditPlayerDialogProps = {
 	player: Player;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onEditPlayer: (player: Player) => void;
 };
 
 export default function EditPlayerDialog({
 	player,
 	open,
 	onOpenChange,
-	onEditPlayer,
 }: EditPlayerDialogProps) {
+	const router = useRouter();
 	const [firstName, setFirstName] = useState(player.firstName);
 	const [lastName, setLastName] = useState(player.lastName);
 
@@ -36,15 +38,21 @@ export default function EditPlayerDialog({
 	// 	setName(team.name);
 	// }, [team]);
 
-	function handleEdit() {
-		const updatedPlayer: Player = {
-			...player,
-			firstName,
-			lastName,
-		};
-
-		onEditPlayer(updatedPlayer);
-		onOpenChange(false);
+	async function handleEdit() {
+		try {
+			await updatePlayer(player.id, {
+				firstName,
+				lastName,
+				status: player.status,
+				imageUrl: player.imageUrl,
+			});
+			router.refresh();
+			onOpenChange(false);
+			setFirstName("");
+			setLastName("");
+		} catch (error) {
+			console.error("Failed to edit player:", error);
+		}
 	}
 
 	return (

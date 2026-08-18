@@ -2,7 +2,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import Link from "next/link";
-import FundraiserActions from "@/components/fundraiser/FundraiserActions";
+import FundraiserActions from "@/components/fundraisers/FundraiserActions";
 
 type FundraiserRowProps = {
 	fundraiser: Fundrlaiser;
@@ -17,7 +17,7 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 			</TableCell>
 			<TableCell>
 				<Link
-					href={`/test/${fundraiser.id}`}
+					href={`/fundraisers/${fundraiser.id}`}
 					className="font-medium hover:underline">
 					{fundraiser.name}
 				</Link>

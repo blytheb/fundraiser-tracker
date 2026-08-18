@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
-import EditPlayerDialog from "@/components/forms/EditPlayerDialog";
+import EditFundraiserDialog from "@/components/forms/EditFundraiserDialog";
 import DeletePlayerDialog from "@/components/forms/DeletePlayerDialog";
 
 import type { Fundraiser } from "@/types/fundraiser";
@@ -62,7 +62,7 @@ export default function FundraiserActions({
 			{/* <div className="hidden lg:flex items-center gap-1"> */}
 			<div className="flex items-center gap-1">
 				<Button variant="ghost" size="icon">
-					<Link href={`/players/${player.id}`}>
+					<Link href={`/fundraisers/${fundraiser.id}`}>
 						<Eye />
 					</Link>
 				</Button>
@@ -76,17 +76,17 @@ export default function FundraiserActions({
 				</Button>
 			</div>
 
-			<EditPlayerDialog
-				player={player}
+			<EditFundraiserDialog
+				fundraiser={fundraiser}
 				open={editOpen}
 				onOpenChange={setEditOpen}
 			/>
-
+			{/* 
 			<DeletePlayerDialog
 				player={player}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
-			/>
+			/> */}
 		</>
 	);
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
-import { updatePlayer } from "@/lib/actions/players";
+import { updateFundraiser } from "@/lib/actions/fundraisers";
 
 import {
 	Dialog,
@@ -26,10 +26,10 @@ type EditFundraiserDialogProps = {
 };
 
 export default function EditFundraiserDialog({
-	player,
+	fundraiser,
 	open,
 	onOpenChange,
-}: EditPlayerDialogProps) {
+}: EditFundraiserDialogProps) {
 	const router = useRouter();
 	const [name, setName] = useState(fundraiser.name);
 	const [description, setDescription] = useState(fundraiser.description);
@@ -41,7 +41,7 @@ export default function EditFundraiserDialog({
 
 	async function handleEdit() {
 		try {
-			await updateFundraiser(player.id, {
+			await updateFundraiser(fundraiser.id, {
 				name,
 				description,
 				startDate,

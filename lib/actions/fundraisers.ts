@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 type FundraiserData = {
 	name: string;
 	description: string;
+	startDate: DateTime;
 	status: "ACTIVE" | "COMPLETED";
-	imageUrl?: string | null;
 };
 
 export async function createFundraiser(data: FundraiserData) {
@@ -23,7 +23,6 @@ export async function updateFundraiser(id: string, data: PlaterData) {
 			description: data.description,
 			startDate: data.startDate,
 			status: data.status ?? "ACTIVE",
-			imageUrl: data.imageUrl ?? null,
 		},
 	});
 }

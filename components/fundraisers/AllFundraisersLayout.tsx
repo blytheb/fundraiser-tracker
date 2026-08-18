@@ -1,15 +1,15 @@
 "use client";
 
 import AddFundraiserDialog from "@/components/forms/AddFundraiserDialog";
-// import PlayerTable from "@/components/players/PlayerTable";
+import FundraiserTable from "@/components/fundraisers/FundraiserTable";
 
 import type { Fundraiser } from "@/types/fundraisers";
 
 type LayoutProps = {
-	fundraiser: Fundraiser[];
+	fundraisers: Fundraiser[];
 };
 
-export default function AllFundraisersLayout({ fundraiser }: LayoutProps) {
+export default function AllFundraisersLayout({ fundraisers }: LayoutProps) {
 	return (
 		<div className="p-6">
 			<div className="mb-6 flex items-center justify-between">
@@ -19,7 +19,7 @@ export default function AllFundraisersLayout({ fundraiser }: LayoutProps) {
 				</div>
 				<AddFundraiserDialog />
 			</div>
-			{/* <PlayerTable players={players} /> */}
+			<FundraiserTable fundraisers={fundraisers} />
 		</div>
 	);
 }

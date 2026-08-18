@@ -1,6 +1,5 @@
 "use client";
 
-import { MoreVertical } from "lucide-react";
 import { useState } from "react";
 import {
 	DropdownMenu,
@@ -9,11 +8,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+
 import { Eye, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical } from "lucide-react";
+
 import Link from "next/link";
 
-import EditPlayerDialog from "@/components/forms/EditPlayerDialog";
-import DeletePlayerDialog from "@/components/forms/DeletePlayerDialog";
+import EditPlayerDialog from "@/components/players/forms/EditPlayerDialog";
+import DeletePlayerDialog from "@/components/players/forms/DeletePlayerDialog";
 
 import type { Player } from "@/types/player";
 

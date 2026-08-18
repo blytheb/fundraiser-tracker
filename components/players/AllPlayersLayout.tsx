@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AddPlayerDialog from "@/components/forms/AddPlayerDialog";
+import AddPlayerDialog from "@/components/players/forms/AddPlayerDialog";
 import PlayerTable from "@/components/players/PlayerTable";
 
 import type { Player } from "@/types/players";

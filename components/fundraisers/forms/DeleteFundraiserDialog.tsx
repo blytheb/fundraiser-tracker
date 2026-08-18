@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
 import { useRouter } from "next/navigation";
 import { deleteFundraiser } from "@/lib/actions/fundraiser";
 

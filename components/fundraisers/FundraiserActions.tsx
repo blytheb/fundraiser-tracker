@@ -1,6 +1,5 @@
 "use client";
 
-import { MoreVertical } from "lucide-react";
 import { useState } from "react";
 import {
 	DropdownMenu,
@@ -9,11 +8,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+
 import { Eye, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical } from "lucide-react";
+
 import Link from "next/link";
 
-import EditFundraiserDialog from "@/components/forms/EditFundraiserDialog";
-import DeleteFundraiserDialog from "@/components/forms/DeleteFundraiserDialog";
+import EditFundraiserDialog from "@/components/fundraisers/forms/EditFundraiserDialog";
+import DeleteFundraiserDialog from "@/components/fundraisers/forms/DeleteFundraiserDialog";
 
 import type { Fundraiser } from "@/types/fundraiser";
 

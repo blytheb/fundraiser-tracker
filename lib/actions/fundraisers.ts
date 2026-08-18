@@ -27,10 +27,10 @@ export async function updateFundraiser(id: string, data: PlaterData) {
 	});
 }
 
-// export async function deletePlayer(id: string) {
-// 	return prisma.player.delete({
-// 		where: {
-// 			id,
-// 		},
-// 	});
-// }
+export async function deleteFundraiser(id: string) {
+	return prisma.fundraiser.delete({
+		where: {
+			id,
+		},
+	});
+}

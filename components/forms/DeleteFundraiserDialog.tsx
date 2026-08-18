@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
-import { deletePlayer } from "@/lib/actions/players";
+import { deleteFundraiser } from "@/lib/actions/fundraiser";
 
 import {
 	Dialog,
@@ -16,28 +16,28 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import type { Player } from "@/types/player";
+import type { Fundraiser } from "@/types/fundraiser";
 
-type DeletePlayerDialogProps = {
-	player: Player;
+type DeleteFundraiserDialogProps = {
+	fundraiser: Fundraiser;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 };
 
-export default function DeletePlayerDialog({
-	player,
+export default function DeleteFundraiserDialog({
+	fundraiser,
 	open,
 	onOpenChange,
-}: DeletePlayerDialogProps) {
+}: DeleteFundraiserDialogProps) {
 	const router = useRouter();
 
 	async function handleDelete() {
 		try {
-			await deletePlayer(player.id);
+			await deleteFundraiser(fundraiser.id);
 			router.refresh();
 			onOpenChange(false);
 		} catch (error) {
-			console.error("Failed to delete player:", error);
+			console.error("Failed to delete fundraiser:", error);
 		}
 	}
 
@@ -45,17 +45,15 @@ export default function DeletePlayerDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>
-						Delete {player.firstName} {player.lastName}
-					</DialogTitle>
+					<DialogTitle>Delete {fundraiser.name}</DialogTitle>
 				</DialogHeader>
 
 				<DialogDescription>
-					Are you sure you want to delete this player?
+					Are you sure you want to delete this fundraiser?
 				</DialogDescription>
 
 				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, delete this player</Button>
+					<Button onClick={handleDelete}>Yes, delete this fundraiser</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

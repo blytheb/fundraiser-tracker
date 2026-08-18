@@ -13,7 +13,7 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import EditFundraiserDialog from "@/components/forms/EditFundraiserDialog";
-import DeletePlayerDialog from "@/components/forms/DeletePlayerDialog";
+import DeleteFundraiserDialog from "@/components/forms/DeleteFundraiserDialog";
 
 import type { Fundraiser } from "@/types/fundraiser";
 
@@ -81,12 +81,12 @@ export default function FundraiserActions({
 				open={editOpen}
 				onOpenChange={setEditOpen}
 			/>
-			{/* 
-			<DeletePlayerDialog
-				player={player}
+
+			<DeleteFundraiserDialog
+				fundraiser={fundraiser}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
-			/> */}
+			/>
 		</>
 	);
 }

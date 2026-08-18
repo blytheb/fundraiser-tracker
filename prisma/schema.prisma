@@ -75,15 +75,17 @@ model Verification {
 }
 
 model Team {
-  id        String     @id @default(cuid())
-  name      String
-  status    TeamStatus
-  imageUrl  String?
+  id       String     @id @default(cuid())
+  name     String
+  status   TeamStatus
+  imageUrl String?
 
-  players   TeamPlayer[]
+  players TeamPlayer[]
+  fundraiserTeams FundraiserTeam[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 enum TeamStatus {
@@ -92,23 +94,25 @@ enum TeamStatus {
 }
 
 model Player {
-  id        String     @id @default(cuid())
+  id        String  @id @default(cuid())
   firstName String
   lastName  String
   status    Boolean
   imageUrl  String?
 
-  teams     TeamPlayer[]
+  teams TeamPlayer[]
+  fundraiserParticipants FundraiserParticipant[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
 }
 
 model TeamPlayer {
-  id       String @id @default(cuid())
+  id String @id @default(cuid())
 
-  teamId   String
-  team     Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   playerId String
   player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
@@ -116,4 +120,51 @@ model TeamPlayer {
   createdAt DateTime @default(now())
 
   @@unique([teamId, playerId])
+}
+
+model Fundraiser {
+  id          String           @id @default(cuid())
+  name        String
+  description String
+  status      FundraiserStatus
+  imageUrl    String?
+
+  teams        FundraiserTeam[]
+  participants FundraiserParticipant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum FundraiserStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model FundraiserParticipant {
+  id String @id @default(cuid())
+
+  fundraiserId String
+  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+
+  playerId String
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([fundraiserId, playerId])
+}
+
+model FundraiserTeam {
+  id String @id @default(cuid())
+
+  fundraiserId String
+  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([fundraiserId, teamId])
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { MoreVertical } from "lucide-react";
 import { useState } from "react";
 import {
 	DropdownMenu,
@@ -9,8 +8,10 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import EditTeamDialog from "@/components/forms/EditTeamDialog";
-import DeleteTeamDialog from "@/components/forms/DeleteTeamDialog";
+import { MoreVertical } from "lucide-react";
+
+import EditTeamDialog from "@/components/teams/forms/EditTeamDialog";
+import DeleteTeamDialog from "@/components/teams/forms/DeleteTeamDialog";
 
 import type { Team } from "@/types/team";
 

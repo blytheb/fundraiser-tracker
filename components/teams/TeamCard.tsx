@@ -1,7 +1,6 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import {
 	Card,
 	CardAction,
@@ -9,8 +8,10 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import TeamActions from "@/components/teams/TeamActions";
 import Link from "next/link";
+import Image from "next/image";
+
+import TeamActions from "@/components/teams/TeamActions";
 
 import type { Team } from "@/types/team";
 type TeamCardProps = {

@@ -1,7 +1,7 @@
 "use client";
 
 import RosterGrid from "@/components/teams/rosters/RosterGrid";
-import TeamRosterDialog from "@/components/forms/TeamRosterDialog";
+import TeamRosterDialog from "@/components/teams/rosters/TeamRosterDialog";
 
 import type { Player } from "@/lib/types/player";
 

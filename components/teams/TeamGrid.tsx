@@ -1,6 +1,6 @@
 import React from "react";
 import TeamCard from "@/components/teams/TeamCard";
-import AddTeamDialog from "@/components/forms/AddTeamDialog";
+import AddTeamDialog from "@/components/teams/forms/AddTeamDialog";
 
 import type { Team } from "@/types/Team";
 

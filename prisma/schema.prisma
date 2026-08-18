@@ -128,7 +128,6 @@ model Fundraiser {
   description String
   startDate   DateTime
   status      FundraiserStatus
-  imageUrl    String?
 
   teams        FundraiserTeam[]
   participants FundraiserParticipant[]

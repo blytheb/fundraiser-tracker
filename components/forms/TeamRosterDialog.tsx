@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
 	Dialog,
 	DialogContent,
@@ -11,20 +12,20 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { saveTeamRoster } from "@/lib/actions/teamPlayer";
 
 type TeamRosterProps = {
 	teamId: string;
 	players: Player[];
 	allPlayers: Player[];
-	onUpdateRoster: (players: Player[]) => void;
 };
 
 export default function TeamRosterDialog({
 	teamId,
 	players,
 	allPlayers,
-	onUpdateRoster,
 }: TeamRosterProps) {
+	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
 
@@ -59,9 +60,17 @@ export default function TeamRosterDialog({
 		);
 	}
 
-	function handleSave() {
-		onUpdateRoster(roster);
-		setOpen(false);
+	async function handleSave() {
+		try {
+			const playerIds = roster.map((player) => player.id);
+
+			await saveTeamRoster(teamId, playerIds);
+
+			router.refresh();
+			setOpen(false);
+		} catch (error) {
+			console.error("Failed to save roster:", error);
+		}
 	}
 
 	function handleCancel() {

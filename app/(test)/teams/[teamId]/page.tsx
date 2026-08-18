@@ -45,7 +45,11 @@ export default async function TeamPage({ params }: TeamPageProps) {
 					<Badge variant="secondary">23054 Days away</Badge>
 				</div>
 			</div>
-			<RosterSection players={players} allPlayers={allPlayers} />
+			<RosterSection
+				teamId={teamId}
+				players={players}
+				allPlayers={allPlayers}
+			/>
 			{/* <div className="pt-6">
 				<h2>Fundraisers</h2>
 				{fundraisers.length === 0 ? (

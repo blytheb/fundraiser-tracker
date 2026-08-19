@@ -27,7 +27,7 @@ type DialogProps = {
 	activeTeams: Team[];
 };
 
-export default function EditFundraiserTeamsDialog({
+export default function ManageFundraiserTeamsDialog({
 	fundraiserId,
 	selectedTeams,
 	activeTeams,
@@ -79,24 +79,7 @@ export default function EditFundraiserTeamsDialog({
 						{team.name}
 					</div>
 				))}
-				{/* <div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="firstName">Player First Name</Label>
-						<Input
-							id="firstName"
-							value={firstName}
-							onChange={(e) => setFirstName(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="lastName">Player Last Name</Label>
-						<Input
-							id="lastName"
-							value={lastName}
-							onChange={(e) => setLastName(e.target.value)}
-						/>
-					</div>
-				</div> */}
+
 				<DialogFooter>
 					<Button type="button" onClick={handleSave}>
 						Save Team Selection

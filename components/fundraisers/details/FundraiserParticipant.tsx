@@ -3,33 +3,35 @@ import React from "react";
 import ManageFundraiserTeamsDialog from "@/components/fundraisers/forms/ManageFundraiserTeamsDialog";
 
 import type { Fundraiser } from "@/types/fundraisers";
-import type { Team } from "@/types/teams";
+import type { Players } from "@/types/players";
 
 type CardProps = {
 	fundraiserId: string;
-	selectedTeams: Team[];
-	activeTeams: Team[];
+	selectedPlayers: Players[];
+	eligiblePlayers: Players[];
 };
 
-export default function FundraiserTeamsCard({
+export default function FundraiserParticipantCard({
 	fundraiserId,
-	selectedTeams,
-	activeTeams,
+	selectedPlayers,
+	eligiblePlayers,
 }: CardProps) {
 	return (
 		<div>
-			<p>Active Teams</p>
-			{selectedTeams.length === 0 ? (
+			<p>Selected Players</p>
+			{selectedPlayers.length === 0 ? (
 				<div className="rounded-lg border">
 					<div className="p-6 text-center text-muted-foreground">
-						No teams have been added.
+						No players have been added.
 					</div>
 				</div>
 			) : (
 				<div className="grid grid-cols-1 itesm-stretch sm:grid-cols-3 gap-3">
-					{selectedTeams.map((team) => (
-						<div key={team.id}>
-							<p className="text-smtext-muted-foreground">{team.name}</p>
+					{selectedPlayers.map((player) => (
+						<div key={player.id}>
+							<p className="text-smtext-muted-foreground">
+								{player.firstName} {player.lastName}
+							</p>
 						</div>
 					))}
 				</div>
@@ -37,8 +39,8 @@ export default function FundraiserTeamsCard({
 
 			<ManageFundraiserTeamsDialog
 				fundraiserId={fundraiserId}
-				selectedTeams={selectedTeams}
-				activeTeams={activeTeams}
+				selectedPlayers={selectedPlayers}
+				eligiblePlayers={eligiblePlayers}
 			/>
 		</div>
 	);

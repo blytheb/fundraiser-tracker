@@ -13,5 +13,18 @@ export async function getFundraiserById(id: string) {
 		where: {
 			id,
 		},
+
+		include: {
+			teams: {
+				include: {
+					team: true,
+				},
+			},
+			participants: {
+				include: {
+					player: true,
+				},
+			},
+		},
 	});
 }

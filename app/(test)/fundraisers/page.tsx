@@ -11,12 +11,3 @@ export default async function AllFundraisersPage() {
 		</>
 	);
 }
-
-// export default function AllFundraisersPage() {
-// 	const fundraisers = mockFundraisers;
-// 	return (
-// 		<>
-// 			<AllFundraisersLayout fundraisers={fundraisers} />
-// 		</>
-// 	);
-// }

@@ -21,10 +21,7 @@ export default function PlayerSmallCard({ player }: PlayerSmallCardProps) {
 			</div>
 
 			<div className="flex flex-col gap-0.5">
-				<div>
-					<p className="text-smtext-muted-foreground">{player.firstName}</p>
-					<p className="text-2xl font-bold">{player.lastName}</p>
-				</div>
+				<div></div>
 				<Badge variant="secondary">{player.status}</Badge>
 			</div>
 		</div>

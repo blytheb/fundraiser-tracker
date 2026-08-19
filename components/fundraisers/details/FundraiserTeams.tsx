@@ -7,33 +7,37 @@ import type { Team } from "@/types/teams";
 
 type CardProps = {
 	fundraiserId: string;
-	teams: Team[];
+	selectedTeams: Team[];
 	activeTeams: Team[];
 };
 
 export default function FundraiserTeamsCard({
 	fundraiserId,
-	teams,
+	selectedTeams,
 	activeTeams,
 }: CardProps) {
 	return (
 		<div>
 			<p>Active Teams</p>
-			{activeTeams.length === 0 ? (
-				<div> No teams</div>
+			{selectedTeams.length === 0 ? (
+				<div className="rounded-lg border">
+					<div className="p-6 text-center text-muted-foreground">
+						No teams have been added.
+					</div>
+				</div>
 			) : (
-				activeTeams.map((team) => <h1 key={team.id}>{team.name}</h1>)
+				<div className="grid grid-cols-1 itesm-stretch sm:grid-cols-3 gap-3">
+					{selectedTeams.map((team) => (
+						<div key={team.id}>
+							<p className="text-smtext-muted-foreground">{team.name}</p>
+						</div>
+					))}
+				</div>
 			)}
 
-			<p>Participating Teams</p>
-			{teams.length === 0 ? (
-				<div> No teams</div>
-			) : (
-				teams.map((team) => <h1 key={team.id}>{team.name}</h1>)
-			)}
 			<EditFundraiserTeamsDialog
 				fundraiserId={fundraiserId}
-				teams={teams}
+				selectedTeams={selectedTeams}
 				activeTeams={activeTeams}
 			/>
 		</div>

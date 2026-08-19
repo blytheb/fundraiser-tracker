@@ -15,26 +15,27 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+
+import { saveFundraiserTeams } from "@/lib/actions/fundraiserTeams";
 
 import type { Team } from "@/types/team";
 
 type DialogProps = {
 	fundraiserId: string;
-	teams: Team[];
+	selectedTeams: Team[];
 	activeTeams: Team[];
 };
 
 export default function EditFundraiserTeamsDialog({
 	fundraiserId,
-	teams,
+	selectedTeams,
 	activeTeams,
 }: DialogProps) {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>(
-		activeTeams.map((team) => team.id),
+		selectedTeams.map((team) => team.id),
 	);
 	async function handleSave() {
 		try {
@@ -46,7 +47,7 @@ export default function EditFundraiserTeamsDialog({
 		}
 	}
 
-	function toggleTeam(teamId: string) {
+	function handleToggle(teamId: string) {
 		setSelectedTeamIds((current) =>
 			current.includes(teamId)
 				? current.filter((id) => id !== teamId)
@@ -67,11 +68,17 @@ export default function EditFundraiserTeamsDialog({
 				<DialogHeader>
 					<DialogTitle>Team Selection</DialogTitle>
 				</DialogHeader>
-				<div>
-					{activeTeams.map((activeTeam) => (
-						<p key={activeTeam.id}>{activeTeam.name}</p>
-					))}
-				</div>
+				{activeTeams.map((team) => (
+					<div key={team.id}>
+						<Input
+							type="checkbox"
+							checked={selectedTeamIds.includes(team.id)}
+							onChange={() => handleToggle(team.id)}
+						/>
+
+						{team.name}
+					</div>
+				))}
 				{/* <div className="space-y-4 py-4">
 					<div className="space-y-2">
 						<Label htmlFor="firstName">Player First Name</Label>

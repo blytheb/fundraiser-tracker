@@ -29,7 +29,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 			<FundraiserDetail fundraiser={fundraiser} />
 			<FundraiserTeams
 				fundraiserId={fundraiserId}
-				teams={fundraiserTeams}
+				selectedTeams={fundraiserTeams}
 				activeTeams={activeTeams}
 			/>
 		</div>

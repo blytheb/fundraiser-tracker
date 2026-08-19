@@ -32,14 +32,14 @@ export async function saveFundraiserParticipants(
 	fundraiserId: string,
 	playerIds: string[],
 ) {
-	await prisma.fundraiserTeam.deleteMany({
+	await prisma.fundraiserParticipant.deleteMany({
 		where: {
 			fundraiserId,
 		},
 	});
 
 	if (playerIds.length > 0) {
-		await prisma.fundraiserTeam.createMany({
+		await prisma.fundraiserParticipant.createMany({
 			data: playerIds.map((playerId) => ({
 				fundraiserId,
 				playerId,

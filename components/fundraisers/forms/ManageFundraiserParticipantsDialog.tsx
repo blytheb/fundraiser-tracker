@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { saveFundraiserParticipants } from "@/lib/actions/fundraiserParticipants";
 
@@ -24,7 +25,7 @@ import type { Player } from "@/types/player";
 type DialogProps = {
 	fundraiserId: string;
 	selectedPlayers: Player[];
-	eligiblePlayers: PLayer[];
+	eligiblePlayers: Player[];
 };
 
 export default function ManageFundraiserParticipantsDialog({
@@ -39,7 +40,7 @@ export default function ManageFundraiserParticipantsDialog({
 	);
 	async function handleSave() {
 		try {
-			await saveFundraiserParticipants(fundraiserId, selectedTeamIds);
+			await saveFundraiserParticipants(fundraiserId, selectedPlayerIds);
 			router.refresh();
 			setOpen(false);
 		} catch (error) {
@@ -47,11 +48,9 @@ export default function ManageFundraiserParticipantsDialog({
 		}
 	}
 
-	function handleToggle(playerId: string) {
-		setSelectedPlayerIds((current) =>
-			current.includes(playerId)
-				? current.filter((id) => id !== playerId)
-				: [...current, playerId],
+	function handleToggle(playerId: string, checked: boolean) {
+		setSelectedPlayerIds((prev) =>
+			checked ? [...prev, playerId] : prev.filter((id) => id !== playerId),
 		);
 	}
 
@@ -66,16 +65,20 @@ export default function ManageFundraiserParticipantsDialog({
 				}></DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Team Selection</DialogTitle>
+					<DialogTitle>Manage Participants</DialogTitle>
 				</DialogHeader>
 				{eligiblePlayers.map((player) => (
-					<div key={player.id}>
-						<Input
-							type="checkbox"
+					<div key={player.id} className="flex items-center gap-3">
+						<Checkbox
+							id={player.id}
 							checked={selectedPlayerIds.includes(player.id)}
-							onChange={() => handleToggle(player.id)}
+							onCheckedChange={(checked) =>
+								handleToggle(player.id, checked === true)
+							}
 						/>
-						{player.firstName} {player.lastName}
+						<Label htmlFor={player.id}>
+							{player.firstName} {player.lastName}
+						</Label>
 					</div>
 				))}
 

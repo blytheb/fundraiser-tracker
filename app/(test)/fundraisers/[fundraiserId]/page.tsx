@@ -11,7 +11,7 @@ import { getFundraiserTeams } from "@/lib/data/fundraiserTeams";
 import {
 	getEligibleFundraiserPlayers,
 	getFundraiserParticipants,
-} from "@/lib/fundraiserParticipants";
+} from "@/lib/data/fundraiserParticipants";
 
 type PageProps = {
 	params: Promise<{

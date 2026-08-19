@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getFundraiserParticipants(fundraiserId: string) {
-	const fundraiserParticipants = await prisma.fundraiserParticipants.findMany({
+	const fundraiserParticipants = await prisma.fundraiserParticipant.findMany({
 		where: {
 			fundraiserId,
 		},
@@ -14,8 +14,6 @@ export async function getFundraiserParticipants(fundraiserId: string) {
 		(fundraiserParticipant) => fundraiserParticipant.player,
 	);
 }
-
-import { prisma } from "@/lib/prisma";
 
 export async function getEligibleFundraiserPlayers(fundraiserId: string) {
 	return prisma.player.findMany({

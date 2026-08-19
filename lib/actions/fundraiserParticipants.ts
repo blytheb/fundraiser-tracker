@@ -28,7 +28,7 @@ export async function removePlayerFromFundraiser(
 	});
 }
 
-export async function saveFundraiserParticipant(
+export async function saveFundraiserParticipants(
 	fundraiserId: string,
 	playerIds: string[],
 ) {

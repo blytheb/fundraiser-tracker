@@ -1,17 +1,17 @@
 import React from "react";
 
-import ManageFundraiserTeamsDialog from "@/components/fundraisers/forms/ManageFundraiserTeamsDialog";
+import ManageFundraiserParticipantsDialog from "@/components/fundraisers/forms/ManageFundraiserParticipantsDialog";
 
 import type { Fundraiser } from "@/types/fundraisers";
-import type { Players } from "@/types/players";
+import type { Player } from "@/types/players";
 
 type CardProps = {
 	fundraiserId: string;
-	selectedPlayers: Players[];
-	eligiblePlayers: Players[];
+	selectedPlayers: Player[];
+	eligiblePlayers: Player[];
 };
 
-export default function FundraiserParticipantCard({
+export default function FundraiserParticipants({
 	fundraiserId,
 	selectedPlayers,
 	eligiblePlayers,
@@ -37,7 +37,7 @@ export default function FundraiserParticipantCard({
 				</div>
 			)}
 
-			<ManageFundraiserTeamsDialog
+			<ManageFundraiserParticipantsDialog
 				fundraiserId={fundraiserId}
 				selectedPlayers={selectedPlayers}
 				eligiblePlayers={eligiblePlayers}

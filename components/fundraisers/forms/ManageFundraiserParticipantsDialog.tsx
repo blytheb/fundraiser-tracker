@@ -68,8 +68,8 @@ export default function ManageFundraiserParticipantsDialog({
 				<DialogHeader>
 					<DialogTitle>Team Selection</DialogTitle>
 				</DialogHeader>
-				{eligiblePlayers.map((team) => (
-					<div key={team.id}>
+				{eligiblePlayers.map((player) => (
+					<div key={player.id}>
 						<Input
 							type="checkbox"
 							checked={selectedPlayerIds.includes(player.id)}

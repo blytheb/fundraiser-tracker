@@ -1,39 +1,37 @@
 import React from "react";
-import {
-	mockFundraisers,
-	mockTestFundraiser,
-	mockTestActiveTeams,
-} from "@/lib/mock-data/fundraisers";
 
-import FundraiserDetailLayout from "@/components/fundraisers/details/FundraiserDetailLayout";
+import PageHeader from "@/components/PageHeader";
+import FundraiserDetail from "@/components/fundraisers/details/FundraiserDetail";
+import FundraiserTeams from "@/components/fundraisers/details/FundraiserTeams";
+
 import { getFundraiserById } from "@/lib/data/fundraisers";
 import { getActiveTeams } from "@/lib/data/teams";
+import { getFundraiserTeams } from "@/lib/data/fundraiserTeams";
 
-type TestPageProps = {
+type PageProps = {
 	params: Promise<{
 		fundraiserId: string;
 	}>;
 };
 
-export default async function FundraiserPage({ params }: TestPageProps) {
+export default async function FundraiserPage({ params }: PageProps) {
 	const { fundraiserId } = await params;
-	// const fundraiser = await getFundraiserById(fundraiserId);
-	// const fundraiserTeams = getFundraiserTeams(fundraiserId)
-	// const activeTeams = await getActiveTeams();
-
-	const fundraiser = mockTestFundraiser;
-	const fundraiserTeams = 
-	const activeTeams = mockTestActiveTeams;
+	const fundraiser = await getFundraiserById(fundraiserId);
+	const fundraiserTeams = await getFundraiserTeams(fundraiserId);
+	const activeTeams = await getActiveTeams();
 
 	return (
 		<div className="p-6">
-			<FundraiserDetailLayout
-				fundraiser={fundraiser}
+			<PageHeader
+				heading={fundraiser.name}
+				subheading={fundraiser.description}
+			/>
+			<FundraiserDetail fundraiser={fundraiser} />
+			<FundraiserTeams
+				fundraiserId={fundraiserId}
+				teams={fundraiserTeams}
 				activeTeams={activeTeams}
 			/>
-
-			<p>{fundraiser.startDate.toLocaleDateString()}</p>
-			<p>{fundraiser.status}</p>
 		</div>
 	);
 }

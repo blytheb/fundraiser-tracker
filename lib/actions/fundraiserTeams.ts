@@ -27,3 +27,23 @@ export async function removeTeamFromFundraiser(
 		},
 	});
 }
+
+export async function saveFundraiserTeams(
+	fundraiserId: string,
+	teamIds: string[],
+) {
+	await prisma.fundraiserTeam.deleteMany({
+		where: {
+			fundraiserId,
+		},
+	});
+
+	if (teamIds.length > 0) {
+		await prisma.fundraiserTeam.createMany({
+			data: teamIds.map((teamId) => ({
+				fundraiserId,
+				teamId,
+			})),
+		});
+	}
+}

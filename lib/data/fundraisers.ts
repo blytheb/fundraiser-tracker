@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-export function getAllFundraisers() {
+export async function getAllFundraisers() {
 	return prisma.fundraiser.findMany({
 		orderBy: {
 			name: "asc",
@@ -8,7 +8,7 @@ export function getAllFundraisers() {
 	});
 }
 
-export function getFundraiserById(id: string) {
+export async function getFundraiserById(id: string) {
 	return prisma.fundraiser.findUnique({
 		where: {
 			id,

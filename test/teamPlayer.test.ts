@@ -6,7 +6,7 @@ import {
 	saveTeamRoster,
 } from "@/lib/actions/teamPlayer";
 
-describe("Player Actions", () => {
+describe("TeamPlayer Actions", () => {
 	beforeEach(async () => {
 		await prisma.teamPlayer.deleteMany();
 		await prisma.Team.deleteMany();

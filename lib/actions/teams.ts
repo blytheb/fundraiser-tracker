@@ -1,10 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { TeamStatus } from "@prisma/client";
 
 type TeamData = {
 	name: string;
-	status: string;
+	status: TeamStatus;
 	imageUrl?: string | null;
 };
 

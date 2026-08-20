@@ -12,12 +12,12 @@ export default async function AllTeamsPage() {
 			<PageHeader heading="Teams" subheading="All Menehune Teams" />
 			{teams.length === 0 ? (
 				<div>
+					<AddTeamDialog />
 					<div className="rounded-lg border">
 						<div className="p-6 text-center text-muted-foreground">
 							No seasons have been created yet.
 						</div>
 					</div>
-					<AddTeamDialog />
 				</div>
 			) : (
 				<div className="grid grid-cols-1 gap-4 items-stretch sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 ">

@@ -1,4 +1,6 @@
 import React from "react";
+import TeamHeader from "@/components/teams/TeamHeader";
+
 import { Badge } from "@/components/ui/badge";
 import { getAllPlayers } from "@/lib/data/players";
 import { getTeamById } from "@/lib/data/teams";
@@ -26,7 +28,13 @@ export default async function TeamPage({ params }: TeamPageProps) {
 	}
 
 	return (
-		<div className="p-6">
+		<div className="mx-auto w-full max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+			<TeamHeader team={team} />
+			{/* Summary */}
+			{/* Upcoming Trip */}
+			{/* Roster */}
+			{/* Fundraising */}
+
 			<div className="mb-6 flex items-center justify-between">
 				<div>
 					<h1 className="text-2xl font-bold">{team.name}</h1>

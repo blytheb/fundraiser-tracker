@@ -1,17 +1,31 @@
 import React from "react";
 
-type HeaderProps = {
+type PageHeaderProps = {
 	heading: string;
-	subheading: string;
+	subheading?: string;
+	action?: React.ReactNode;
 };
 
-export default function PageHeader({ heading, subheading }: HeaderProps) {
+export default function PageHeader({
+	heading,
+	subheading,
+	action,
+}: PageHeaderProps) {
 	return (
-		<div className="mb-6 flex items-center justify-between">
-			<div>
-				<h1 className="text-2xl font-bold">{heading}</h1>
-				<p className="text-muted-foreground">{subheading}</p>
+		<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			<div className="min-w-0">
+				<h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+					{heading}
+				</h1>
+
+				{subheading && (
+					<p className="mt-1 text-sm text-muted-foreground sm:text-base">
+						{subheading}
+					</p>
+				)}
 			</div>
+
+			{action && <div className="shrink-0">{action}</div>}
 		</div>
 	);
 }

@@ -1,15 +1,20 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getAllFundraisers() {
-	return prisma.fundraiser.findMany({
+	const fundraisers = await prisma.fundraiser.findMany({
 		orderBy: {
 			name: "asc",
 		},
 	});
+
+	return fundraisers.map((fundraiser) => ({
+		...fundraiser,
+		totalAmount: fundraiser.totalAmount.toNumber(),
+	}));
 }
 
 export async function getFundraiserById(id: string) {
-	return prisma.fundraiser.findUnique({
+	const fundraiser = await prisma.fundraiser.findUnique({
 		where: {
 			id,
 		},
@@ -27,4 +32,13 @@ export async function getFundraiserById(id: string) {
 			},
 		},
 	});
+
+	if (!fundraiser) {
+		return null;
+	}
+
+	return {
+		...fundraiser,
+		totalAmount: fundraiser.totalAmount.toNumber(),
+	};
 }

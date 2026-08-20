@@ -20,40 +20,40 @@ type TeamCardProps = {
 
 export default function TeamCard({ team }: TeamCardProps) {
 	return (
-		<Card className="flex h-[250px] w-full flex-col overflow-hidden pt-0">
-			<div className="relative aspect-video w-full">
-				<div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-				{/* <Image
-					src={team.imageUrl}
-					loading="eager"
-					alt={`${team.name} team`}
-					width={500}
-					height={300}
-					className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-				/> */}
+		<Card className="w-full overflow-hidden pt-0">
+			{/* image */}
+			<div className="relative aspect-video w-full overflow-hidden">
 				{team.imageUrl ? (
-					<Image
-						src={team.imageUrl ?? "https://robohash.org/1?set=set2"}
-						alt={`${team.name} team`}
-						fill
-						className="object-cover"
-					/>
+					<>
+						<Image
+							src={team.imageUrl ?? "https://robohash.org/1?set=set2"}
+							alt={`${team.name} team`}
+							fill
+							sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw"
+							className="object-cover"
+						/>
+						<div className="absolute inset-0 bg-black/20" />
+					</>
 				) : (
-					<div className="flex h-full items-center justify-center">
+					<div className="flex h-full items-center justify-center bg-muted text-sm text-muted-foreground">
 						No team image
 					</div>
 				)}
 			</div>
-
-			<CardHeader>
+			{/* Team Information */}
+			<CardHeader className="relative">
 				<CardAction>
 					<TeamActions team={team} />
 				</CardAction>
 				<Badge variant="secondary" className="bg-green-300">
 					{team.status}
 				</Badge>
-				<CardTitle>{team.name}</CardTitle>
+				<CardTitle className="truncate text-lg sm:text-xl">
+					{team.name}
+				</CardTitle>
 			</CardHeader>
+
+			{/* Action */}
 			<CardFooter>
 				<Button className="w-full">
 					<Link href={`/teams/${team.id}`}>View Team</Link>

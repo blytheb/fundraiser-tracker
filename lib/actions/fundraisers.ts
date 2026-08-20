@@ -57,19 +57,25 @@ export async function distributeFunds(fundraiserId: string) {
 		throw new Error("Fundraiser has no money to distribute");
 	}
 
-	const amountPerPlayer =
-		Number(fundraiser.totalAmount) / fundraiser.participants.length;
+	const totalCents = fundraiser.totalAmount.mul(100).toNumber();
+	const participantCount = fundraiser.participants.length;
+	const centsPerPlayer = Math.floor(totalCents / participantCount);
+	const remainder = totalCents % participantCount;
 
 	await prisma.$transaction(
-		fundraiser.participants.map((participant) =>
-			prisma.fundraiserParticipant.update({
+		fundraiser.participants.map((participant, index) => {
+			const distributionCents = centsPerPlayer + (index < remainder ? 1 : 0);
+
+			const distributionAmount = distributionCents / 100;
+
+			return prisma.fundraiserParticipant.update({
 				where: {
 					id: participant.id,
 				},
 				data: {
-					distributionAmount: amountPerPlayer,
+					distributionAmount,
 				},
-			}),
-		),
+			});
+		}),
 	);
 }

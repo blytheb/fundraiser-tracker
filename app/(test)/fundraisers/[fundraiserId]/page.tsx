@@ -12,7 +12,7 @@ import {
 	getEligibleFundraiserPlayers,
 	getFundraiserParticipants,
 } from "@/lib/data/fundraiserParticipants";
-
+import DistributeFundsDialog from "@/components/fundraisers/forms/DistributeFundsDialog";
 type PageProps = {
 	params: Promise<{
 		fundraiserId: string;
@@ -42,7 +42,11 @@ export default async function FundraiserPage({ params }: PageProps) {
 				heading={fundraiser.name}
 				subheading={fundraiser.description}
 			/>
-
+			<DistributeFundsDialog
+				fundraiserId={fundraiser.id}
+				totalAmount={Number(fundraiser.totalAmount)}
+				participants={fundraiserParticipants}
+			/>
 			<FundraiserDetail fundraiser={fundraiser} />
 
 			<div className="grid gap-6 lg:grid-cols-2">

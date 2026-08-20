@@ -34,3 +34,42 @@ export async function deleteFundraiser(id: string) {
 		},
 	});
 }
+
+export async function distributeFunds(fundraiserId: string) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: {
+			id: fundraiserId,
+		},
+		include: {
+			participants: true,
+		},
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.participants.length === 0) {
+		throw new Error("No participants found");
+	}
+
+	if (fundraiser.totalAmount <= 0) {
+		throw new Error("Fundraiser has no money to distribute");
+	}
+
+	const amountPerPlayer =
+		Number(fundraiser.totalAmount) / fundraiser.participants.length;
+
+	await prisma.$transaction(
+		fundraiser.participants.map((participant) =>
+			prisma.fundraiserParticipant.update({
+				where: {
+					id: participant.id,
+				},
+				data: {
+					distributionAmount: amountPerPlayer,
+				},
+			}),
+		),
+	);
+}

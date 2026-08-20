@@ -55,6 +55,7 @@ describe("Fundraiser actions", () => {
 			status: "ACTIVE",
 		});
 
+		console.log("created fundraiser:", fundraiser);
 		await deleteFundraiser(fundraiser.id);
 
 		const deletedFundraiser = await prisma.fundraiser.findUnique({

@@ -13,7 +13,7 @@ export async function createPlayer(data: PlayerData) {
 	return prisma.player.create({ data });
 }
 
-export async function updatePlayer(id: string, data: PlaterData) {
+export async function updatePlayer(id: string, data: PlayerData) {
 	return prisma.player.update({
 		where: {
 			id,

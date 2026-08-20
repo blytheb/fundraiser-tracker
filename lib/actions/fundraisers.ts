@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 type FundraiserData = {
 	name: string;
 	description: string;
-	startDate: DateTime;
+	startDate: Date;
 	status: "ACTIVE" | "COMPLETED";
 };
 
@@ -13,7 +13,7 @@ export async function createFundraiser(data: FundraiserData) {
 	return prisma.fundraiser.create({ data });
 }
 
-export async function updateFundraiser(id: string, data: PlaterData) {
+export async function updateFundraiser(id: string, data: FundraiserData) {
 	return prisma.fundraiser.update({
 		where: {
 			id,

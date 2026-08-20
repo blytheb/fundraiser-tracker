@@ -21,29 +21,43 @@ type PageProps = {
 
 export default async function FundraiserPage({ params }: PageProps) {
 	const { fundraiserId } = await params;
-	const fundraiser = await getFundraiserById(fundraiserId);
-	const fundraiserTeams = await getFundraiserTeams(fundraiserId);
-	const activeTeams = await getActiveTeams();
-	const fundraiserParticipants = await getFundraiserParticipants(fundraiserId);
-	const eligiblePlayers = await getEligibleFundraiserPlayers(fundraiserId);
+
+	const [
+		fundraiser,
+		fundraiserTeams,
+		activeTeams,
+		fundraiserParticipants,
+		eligiblePlayers,
+	] = await Promise.all([
+		getFundraiserById(fundraiserId),
+		getFundraiserTeams(fundraiserId),
+		getActiveTeams(),
+		getFundraiserParticipants(fundraiserId),
+		getEligibleFundraiserPlayers(fundraiserId),
+	]);
 
 	return (
-		<div className="p-6">
+		<div className="space-y-6 p-6">
 			<PageHeader
 				heading={fundraiser.name}
 				subheading={fundraiser.description}
 			/>
+
 			<FundraiserDetail fundraiser={fundraiser} />
-			<FundraiserTeams
-				fundraiserId={fundraiserId}
-				selectedTeams={fundraiserTeams}
-				activeTeams={activeTeams}
-			/>
-			<FundraiserParticipants
-				fundraiserId={fundraiserId}
-				selectedPlayers={fundraiserParticipants}
-				eligiblePlayers={eligiblePlayers}
-			/>
+
+			<div className="grid gap-6 lg:grid-cols-2">
+				<FundraiserTeams
+					fundraiserId={fundraiserId}
+					selectedTeams={fundraiserTeams}
+					activeTeams={activeTeams}
+				/>
+
+				<FundraiserParticipants
+					fundraiserId={fundraiserId}
+					selectedPlayers={fundraiserParticipants}
+					eligiblePlayers={eligiblePlayers}
+				/>
+			</div>
 		</div>
 	);
 }

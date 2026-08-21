@@ -11,6 +11,13 @@ import {
 	getFundraiserParticipants,
 	getEligibleFundraiserPlayers,
 } from "@/lib/data/fundraiserParticipants";
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarGroup,
+	AvatarGroupCount,
+	AvatarImage,
+} from "@/components/ui/avatar";
 // const fundraiser = {
 // 	name: "Fall Tournament Fundraiser",
 // 	status: "Completed",
@@ -58,7 +65,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 px-4 py-4 sm:px-6">
 			{/* Summary Card */}
-			<Card className="overflow-hidden">
+			<Card className="overflow-hidden bg-gray-200">
 				<CardContent className="p-5">
 					<div className="flex items-start justify-between gap-4">
 						<div>
@@ -76,6 +83,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 						<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
 							Total Raised
 						</p>
+						<p>$ --- </p>
 
 						{/* <p className="mt-1 text-4xl font-bold tracking-tight">
 							$
@@ -86,19 +94,39 @@ export default async function FundraiserPage({ params }: PageProps) {
 						</p> */}
 					</div>
 
-					<div className="mt-5 flex gap-6 text-sm">
-						<div>
-							<p className="font-semibold">{participants.length}</p>
-							<p className="text-muted-foreground">Participants</p>
-						</div>
+					<div className="mt-5 flex gap-6 text-sm items-center">
+						<AvatarGroup className="grayscale">
+							{participants.map((participant) => (
+								<Avatar key={participant.id}>
+									<AvatarImage
+										src={participant.imageUrl}
+										alt={participant.firstName}
+									/>
+									<AvatarFallback>AA</AvatarFallback>
+								</Avatar>
+							))}
 
-						<div>
-							<p className="font-semibold">
-								{fundraiser.teams
-									.map((fundraiserTeam) => fundraiserTeam.team.name)
-									.join(", ")}
-							</p>{" "}
-							<p className="text-muted-foreground">Team</p>
+							<Avatar>
+								<AvatarImage
+									src="https://github.com/maxleiter.png"
+									alt="@maxleiter"
+								/>
+								<AvatarFallback>LR</AvatarFallback>
+							</Avatar>
+							<Avatar>
+								<AvatarImage
+									src="https://github.com/evilrabbit.png"
+									alt="@evilrabbit"
+								/>
+								<AvatarFallback>ER</AvatarFallback>
+							</Avatar>
+							<AvatarGroupCount>+3</AvatarGroupCount>
+						</AvatarGroup>
+
+						<div className="space-x-2">
+							{fundraiserTeams.map((team) => (
+								<Badge key={team.id}>{team.name}</Badge>
+							))}
 						</div>
 					</div>
 				</CardContent>
@@ -109,7 +137,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
 					<CardTitle className="text-base">Money Breakdown</CardTitle>
 
-					<Button size="sm" variant="outline">
+					<Button size="sm">
 						<Plus className="mr-1.5 h-4 w-4" />
 						Add Funds
 					</Button>
@@ -172,7 +200,9 @@ export default async function FundraiserPage({ params }: PageProps) {
 							key={participant.id}
 							className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50">
 							<div>
-								<p className="text-sm font-medium">{participant.name}</p>
+								<p className="text-sm font-medium">
+									{participant.firstName} {participant.lastName}
+								</p>
 
 								<p className="text-xs text-muted-foreground">
 									{fundraiser.teams[0]?.team.name}
@@ -201,7 +231,9 @@ export default async function FundraiserPage({ params }: PageProps) {
 					<div className="flex justify-between gap-4 text-sm">
 						<span className="text-muted-foreground">Date</span>
 
-						<span className="font-medium">{fundraiser.date}</span>
+						<span className="font-medium">
+							{fundraiser.startDate.toLocaleDateString()}
+						</span>
 					</div>
 
 					<div className="flex justify-between gap-4 text-sm">

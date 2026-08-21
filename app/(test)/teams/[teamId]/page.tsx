@@ -2,6 +2,8 @@ import React from "react";
 import TeamHeader from "@/components/teams/TeamHeader";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Link } from "next/link";
 import { getAllPlayers } from "@/lib/data/players";
 import { getTeamById } from "@/lib/data/teams";
 import { getTeamPlayers } from "@/lib/data/teamPlayers";
@@ -19,59 +21,81 @@ type TeamPageProps = {
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
 	const team = await getTeamById(teamId);
-	const players = await getTeamPlayers(teamId);
-	const allPlayers = await getAllPlayers();
-	// const fundraisers = getFundraisersByTeamId(teamId);
 
 	if (!team) {
 		return <div>Team Not Found</div>;
 	}
+	const players = await getTeamPlayers(teamId);
+	const allPlayers = await getAllPlayers();
+	// const fundraisers = getFundraisersByTeamId(teamId);
 
 	return (
 		<div className="mx-auto w-full max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+			{/* <Button variant="ghost" size="sm">
+				<Link href="/teams"> Back to All Teams</Link>
+			</Button> */}
 			<TeamHeader team={team} />
 			{/* Summary */}
-			{/* Upcoming Trip */}
-			{/* Roster */}
-			{/* Fundraising */}
+			<section>
+				<h2 className="mb-3 text-lg font-semibold">Summary</h2>
 
-			<div className="mb-6 flex items-center justify-between">
-				<div>
-					<h1 className="text-2xl font-bold">{team.name}</h1>
-					<p className="text-muted-foreground">Menehune team</p>
-				</div>
-				<div className="flex gap-2">
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
 					<SummaryBlock value={players.length} label="Players" />
-					{/* <SummaryBlock value={fundraisers.length} label="Fundraisers" /> */}
+
+					<SummaryBlock value="3" label="Upcoming Events" />
+
+					<SummaryBlock value="$2,450" label="Fundraised" />
 				</div>
-			</div>
-			<div>
-				<div className="p-6 text-muted-foreground border">
-					<h1>Trip to Japan</h1>
-					<p>June 1, 2027 - June 9,2027</p>
-					<p>Goal: $1,500 per player</p>
-					<Badge variant="secondary">23054 Days away</Badge>
+			</section>
+			{/* Upcoming Trip */}
+			<section>
+				<div className="mb-3 flex items-center justify-between">
+					<h2 className="text-lg font-semibold">Upcoming Trip</h2>
 				</div>
-			</div>
-			<RosterSection
-				teamId={teamId}
-				players={players}
-				allPlayers={allPlayers}
-			/>
-			{/* <div className="pt-6">
-				<h2>Fundraisers</h2>
-				{fundraisers.length === 0 ? (
-					<div className="rounded-lg border">
-						<div className="p-6 text-center text-muted-foreground">
-							No fundraisers
+
+				<div className="rounded-lg border p-4 sm:p-6">
+					<div className="space-y-2">
+						<div className="flex items-start justify-between gap-4">
+							<div>
+								<h3 className="font-semibold">Trip to Japan</h3>
+
+								<p className="text-sm text-muted-foreground">June 1–9, 2027</p>
+							</div>
+
+							<Badge variant="secondary">Upcoming</Badge>
 						</div>
+
+						<p className="text-sm text-muted-foreground">
+							Goal: $1,500 per player
+						</p>
 					</div>
-				) : (
-					fundraisers.map((fundraiser) => (
-						<FundraiserSmallCard key={fundraiser.id} fundraiser={fundraiser} />
-					))
-				)}
-			</div> */}
+				</div>
+			</section>
+
+			{/* Roster */}
+			<section>
+				<div className="mb-3">
+					<h2 className="text-lg font-semibold">Roster</h2>
+				</div>
+
+				<RosterSection
+					teamId={teamId}
+					players={players}
+					allPlayers={allPlayers}
+				/>
+			</section>
+			{/* Fundraising */}
+			<section>
+				<div className="mb-3 flex items-center justify-between">
+					<h2 className="text-lg font-semibold">Fundraising</h2>
+				</div>
+
+				<div className="rounded-lg border p-4 sm:p-6">
+					<p className="text-sm text-muted-foreground">
+						No fundraising information yet.
+					</p>
+				</div>
+			</section>
 		</div>
 	);
 }

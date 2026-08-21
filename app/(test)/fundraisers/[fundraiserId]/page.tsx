@@ -1,100 +1,43 @@
-// import React from "react";
-
-// import PageHeader from "@/components/PageHeader";
-// import FundraiserDetail from "@/components/fundraisers/details/FundraiserDetail";
-// import FundraiserTeams from "@/components/fundraisers/details/FundraiserTeams";
-// import FundraiserParticipants from "@/components/fundraisers/details/FundraiserParticipants";
-
-// import { getFundraiserById } from "@/lib/data/fundraisers";
-// import { getActiveTeams } from "@/lib/data/teams";
-// import { getFundraiserTeams } from "@/lib/data/fundraiserTeams";
-// import {
-// 	getEligibleFundraiserPlayers,
-// 	getFundraiserParticipants,
-// } from "@/lib/data/fundraiserParticipants";
-// import DistributeFundsDialog from "@/components/fundraisers/forms/DistributeFundsDialog";
-// import { Badge } from "@/components/ui/badge";
-
-// type PageProps = {
-// 	params: Promise<{
-// 		fundraiserId: string;
-// 	}>;
-// };
-
-// export default async function FundraiserPage({ params }: PageProps) {
-// 	const { fundraiserId } = await params;
-
-// 	const [
-// 		fundraiser,
-// 		fundraiserTeams,
-// 		activeTeams,
-// 		fundraiserParticipants,
-// 		eligiblePlayers,
-// 	] = await Promise.all([
-// 		getFundraiserById(fundraiserId),
-// 		getFundraiserTeams(fundraiserId),
-// 		getActiveTeams(),
-// 		getFundraiserParticipants(fundraiserId),
-// 		getEligibleFundraiserPlayers(fundraiserId),
-// 	]);
-
-// 	return (
-// 		<div className="space-y-6 p-6">
-// 			<div className="flex flex-col border text-center items-center justify-center">
-// 				<h1>{fundraiser.name}</h1>
-// 				<p>$0.00</p>
-// 				<p>{fundraiser.description}</p>
-// 				<div className="space-x-2 py-2">
-// 					{fundraiserTeams.length === 0 ? (
-// 						<Badge>NoTeams</Badge>
-// 					) : (
-// 						fundraiserTeams.map((team) => (
-// 							<Badge variant="outline" key={team.id}>
-// 								{team.name}
-// 							</Badge>
-// 						))
-// 					)}
-// 				</div>
-// 			</div>
-// 			<DistributeFundsDialog
-// 				fundraiserId={fundraiser.id}
-// 				totalAmount={Number(fundraiser.totalAmount)}
-// 				participants={fundraiserParticipants}
-// 			/>
-// 			{/* <FundraiserDetail fundraiser={fundraiser} /> */}
-
-// 			<div className="grid gap-6 lg:grid-cols-2">
-// 				<FundraiserParticipants
-// 					fundraiserId={fundraiserId}
-// 					selectedPlayers={fundraiserParticipants}
-// 					eligiblePlayers={eligiblePlayers}
-// 				/>
-// 			</div>
-// 		</div>
-// 	);
-// }
-
-import PageHeader from "@/components/PageHeader";
-import FundraiserParticipants from "@/components/fundraisers/details/FundraiserParticipants";
-import DistributeFundsDialog from "@/components/fundraisers/forms/DistributeFundsDialog";
+import { Plus, ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 import { getFundraiserById } from "@/lib/data/fundraisers";
-import { getActiveTeams } from "@/lib/data/teams";
 import { getFundraiserTeams } from "@/lib/data/fundraiserTeams";
+import { getActiveTeams } from "@/lib/data/teams";
 import {
-	getEligibleFundraiserPlayers,
 	getFundraiserParticipants,
+	getEligibleFundraiserPlayers,
 } from "@/lib/data/fundraiserParticipants";
+// const fundraiser = {
+// 	name: "Fall Tournament Fundraiser",
+// 	status: "Completed",
+// 	date: "August 15, 2026",
+// 	teams: ["18U"],
+// };
 
-import { Badge } from "@/components/ui/badge";
-import { Users, Wallet, UsersRound } from "lucide-react";
+const funds = [
+	{
+		id: 1,
+		description: "Event Profit",
+		amount: 2000,
+	},
+	{
+		id: 2,
+		description: "Tips",
+		amount: 350,
+	},
+];
+
+const totalRaised = funds.reduce((total, fund) => total + fund.amount, 0);
 
 type PageProps = {
 	params: Promise<{
-		fundraiserId: string;
+		teamId: string;
 	}>;
 };
-
 export default async function FundraiserPage({ params }: PageProps) {
 	const { fundraiserId } = await params;
 
@@ -102,7 +45,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 		fundraiser,
 		fundraiserTeams,
 		activeTeams,
-		fundraiserParticipants,
+		participants,
 		eligiblePlayers,
 	] = await Promise.all([
 		getFundraiserById(fundraiserId),
@@ -112,112 +55,178 @@ export default async function FundraiserPage({ params }: PageProps) {
 		getEligibleFundraiserPlayers(fundraiserId),
 	]);
 
-	if (!fundraiser) {
-		return <div>Fundraiser not found</div>;
-	}
-
-	const totalAmount = Number(fundraiser.totalAmount);
-
 	return (
-		<div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-			{/* Fundraiser overview */}
-			<section className="rounded-xl border bg-card p-5">
-				<div className="space-y-4">
-					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-						<div className="space-y-1">
-							<p className="text-sm text-muted-foreground">Fundraiser</p>
+		<main className="mx-auto w-full max-w-2xl space-y-4 px-4 py-4 sm:px-6">
+			{/* Summary Card */}
+			<Card className="overflow-hidden">
+				<CardContent className="p-5">
+					<div className="flex items-start justify-between gap-4">
+						<div>
+							<p className="text-lg font-semibold">{fundraiser.name}</p>
 
-							<h1 className="text-2xl font-semibold tracking-tight">
-								{fundraiser.name}
-							</h1>
-
-							<p className="text-sm text-muted-foreground">
-								{fundraiser.description}
+							<p className="mt-1 text-sm text-muted-foreground">
+								{fundraiser.startDate.toLocaleDateString()}
 							</p>
 						</div>
 
-						<Badge>{fundraiser.status}</Badge>
+						<Badge variant="secondary">{fundraiser.status}</Badge>
 					</div>
 
-					{/* Teams */}
-					<div className="space-y-2">
-						<p className="text-sm font-medium">Teams</p>
-
-						{fundraiserTeams.length === 0 ? (
-							<Badge variant="outline">No teams</Badge>
-						) : (
-							<div className="flex flex-wrap gap-2">
-								{fundraiserTeams.map((team) => (
-									<Badge variant="outline" key={team.id}>
-										{team.name}
-									</Badge>
-								))}
-							</div>
-						)}
-					</div>
-				</div>
-			</section>
-
-			{/* Summary */}
-			<section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-				<div className="rounded-xl border p-4">
-					<div className="flex items-center gap-2 text-muted-foreground">
-						<Wallet className="size-4" />
-						<span className="text-sm">Total Raised</span>
-					</div>
-
-					<p className="mt-2 text-2xl font-semibold">
-						${totalAmount.toFixed(2)}
-					</p>
-				</div>
-
-				<div className="rounded-xl border p-4">
-					<div className="flex items-center gap-2 text-muted-foreground">
-						<Users className="size-4" />
-						<span className="text-sm">Participants</span>
-					</div>
-
-					<p className="mt-2 text-2xl font-semibold">
-						{fundraiserParticipants.length}
-					</p>
-				</div>
-
-				<div className="rounded-xl border p-4">
-					<div className="flex items-center gap-2 text-muted-foreground">
-						<UsersRound className="size-4" />
-						<span className="text-sm">Teams</span>
-					</div>
-
-					<p className="mt-2 text-2xl font-semibold">
-						{fundraiserTeams.length}
-					</p>
-				</div>
-			</section>
-
-			{/* Main content */}
-			<section className="space-y-4">
-				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-					<div>
-						<h2 className="text-lg font-semibold">Participants</h2>
-
-						<p className="text-sm text-muted-foreground">
-							Manage the players participating in this fundraiser.
+					<div className="mt-6">
+						<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+							Total Raised
 						</p>
+
+						{/* <p className="mt-1 text-4xl font-bold tracking-tight">
+							$
+							{totalRaised.toLocaleString("en-US", {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2,
+							})}
+						</p> */}
 					</div>
 
-					<DistributeFundsDialog
-						fundraiserId={fundraiser.id}
-						totalAmount={totalAmount}
-						participants={fundraiserParticipants}
-					/>
-				</div>
+					<div className="mt-5 flex gap-6 text-sm">
+						<div>
+							<p className="font-semibold">{participants.length}</p>
+							<p className="text-muted-foreground">Participants</p>
+						</div>
 
-				<FundraiserParticipants
-					fundraiserId={fundraiserId}
-					selectedPlayers={fundraiserParticipants}
-					eligiblePlayers={eligiblePlayers}
-				/>
-			</section>
-		</div>
+						<div>
+							<p className="font-semibold">
+								{fundraiser.teams
+									.map((fundraiserTeam) => fundraiserTeam.team.name)
+									.join(", ")}
+							</p>{" "}
+							<p className="text-muted-foreground">Team</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Money Breakdown */}
+			<Card>
+				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+					<CardTitle className="text-base">Money Breakdown</CardTitle>
+
+					<Button size="sm" variant="outline">
+						<Plus className="mr-1.5 h-4 w-4" />
+						Add Funds
+					</Button>
+				</CardHeader>
+
+				<CardContent className="space-y-3">
+					{funds.map((fund) => (
+						<div
+							key={fund.id}
+							className="flex items-center justify-between text-sm">
+							<span className="text-muted-foreground">{fund.description}</span>
+
+							{/* <span className="font-medium">
+								$
+								{fund.amount.toLocaleString("en-US", {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2,
+								})}
+							</span> */}
+						</div>
+					))}
+
+					<Separator />
+
+					<div className="flex items-center justify-between">
+						<span className="font-medium">Total Raised</span>
+
+						{/* <span className="text-lg font-bold">
+							$
+							{totalRaised.toLocaleString("en-US", {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2,
+							})}
+						</span> */}
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Participant Distribution */}
+			<Card>
+				<CardHeader>
+					<div className="flex items-center justify-between">
+						<div>
+							<CardTitle className="text-base">
+								Participant Distribution
+							</CardTitle>
+
+							<p className="mt-1 text-sm text-muted-foreground">
+								{participants.length} participants
+							</p>
+						</div>
+
+						<p className="text-sm font-medium">Equal</p>
+					</div>
+				</CardHeader>
+
+				<CardContent className="space-y-1">
+					{participants.map((participant) => (
+						<div
+							key={participant.id}
+							className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50">
+							<div>
+								<p className="text-sm font-medium">{participant.name}</p>
+
+								<p className="text-xs text-muted-foreground">
+									{fundraiser.teams[0]?.team.name}
+								</p>
+							</div>
+							{/* 
+							<p className="font-semibold">
+								$
+								{participant.amount.toLocaleString("en-US", {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2,
+								})}
+							</p> */}
+						</div>
+					))}
+				</CardContent>
+			</Card>
+
+			{/* Details */}
+			<Card>
+				<CardHeader>
+					<CardTitle className="text-base">Fundraiser Details</CardTitle>
+				</CardHeader>
+
+				<CardContent className="space-y-4">
+					<div className="flex justify-between gap-4 text-sm">
+						<span className="text-muted-foreground">Date</span>
+
+						<span className="font-medium">{fundraiser.date}</span>
+					</div>
+
+					<div className="flex justify-between gap-4 text-sm">
+						<span className="text-muted-foreground">Teams</span>
+
+						<span className="font-medium">
+							{fundraiser.teams
+								.map((fundraiserTeam) => fundraiserTeam.team.name)
+								.join(", ")}
+						</span>
+					</div>
+
+					<div className="flex justify-between gap-4 text-sm">
+						<span className="text-muted-foreground">Participants</span>
+
+						<span className="font-medium">{participants.length}</span>
+					</div>
+
+					<div className="flex justify-between gap-4 text-sm">
+						<span className="text-muted-foreground">Distribution</span>
+
+						<span className="font-medium">Equal</span>
+					</div>
+				</CardContent>
+			</Card>
+		</main>
 	);
 }

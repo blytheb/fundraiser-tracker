@@ -1,5 +1,4 @@
 import React from "react";
-import { mockPlayers } from "@/lib/mock-data/players";
 
 type PlayerPageProps = {
 	params: Promise<{
@@ -10,9 +9,7 @@ type PlayerPageProps = {
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
 
-	const player = mockPlayers.find(
-		(player) => player.id === playerId,
-	);
+	const player = mockPlayers.find((player) => player.id === playerId);
 
 	if (!player) {
 		return <div>Player Not Found</div>;

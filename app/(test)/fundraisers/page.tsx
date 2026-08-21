@@ -29,6 +29,7 @@ export default async function AllFundraisersPage() {
 								heading={fundraiser.name}
 								subheading={fundraiser.startDate.toLocaleDateString()}
 								actions={<FundraiserActions fundraiser={fundraiser} />}
+								href={`/fundraisers/${fundraiser.id}`}
 							/>
 						))}
 					</div>

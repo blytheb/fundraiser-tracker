@@ -31,6 +31,7 @@ export default async function AllPlayersPage() {
 								heading={`${player.firstName} ${player.lastName}`}
 								subheading={player.status === true ? "ACTIVE" : "INACTIVE"}
 								actions={<PlayerActions player={player} />}
+								href={`/players/${player.id}`}
 							/>
 						))}
 					</div>

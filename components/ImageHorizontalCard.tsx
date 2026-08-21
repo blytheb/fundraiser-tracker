@@ -12,7 +12,7 @@ export default function InfoCard({
 	actions,
 }: InfoCardProps) {
 	return (
-		<div className="flex w-full items-center gap-3 rounded-lg border p-3">
+		<div className="flex w-full items-center gap-3 rounded-lg border p-3 lg:flex-col">
 			{/* Image */}
 			<div className="shrink-0">
 				{image ? (

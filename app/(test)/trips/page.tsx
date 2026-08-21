@@ -1,4 +1,5 @@
 import React from "react";
+import InfoCard from "@/components/InfoCard";
 import ImageHorizontalCard from "@/components/ImageHorizontalCard";
 import IconHorizontalCard from "@/components/IconHorizontalCard";
 import TeamActions from "@/components/teams/TeamActions";
@@ -19,7 +20,7 @@ export default function page() {
 		imageUrl: "https://robohash.org/2?set=set2",
 	};
 	return (
-		<div className="space-y-2 px-2">
+		<div className="space-y-2 px-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 md:gap-3">
 			<ImageHorizontalCard
 				image={varsteam.imageUrl}
 				heading={varsteam.name}
@@ -42,6 +43,13 @@ export default function page() {
 				icon={"https://robohash.org/1"}
 				name="McDoanlds Fundraiser"
 				description="January 12, 2025"
+			/>
+
+			<InfoCard
+				image={varsteam.imageUrl}
+				heading={varsteam.name}
+				subheading={varsteam.status}
+				actions={<TeamActions team={varsteam} />}
 			/>
 		</div>
 	);

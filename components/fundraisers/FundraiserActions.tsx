@@ -45,7 +45,7 @@ export default function FundraiserActions({
 								console.log("Edit Clicked");
 								setEditOpen(true);
 							}}>
-							Edit Team
+							Edit Fundraiser
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={(e) => {
@@ -54,15 +54,15 @@ export default function FundraiserActions({
 								setDeleteOpen(true);
 							}}
 							className="text-destructive">
-							Delete Team
+							Delete Fundraiser
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
 
 			{/* Large Screen 3 action buttons */}
-			{/* <div className="hidden lg:flex items-center gap-1"> */}
-			<div className="flex items-center gap-1">
+			<div className="hidden lg:flex items-center gap-1">
+				{/* <div className="flex items-center gap-1"> */}
 				<Button variant="ghost" size="icon">
 					<Link href={`/fundraisers/${fundraiser.id}`}>
 						<Eye />

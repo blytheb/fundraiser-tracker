@@ -6,6 +6,18 @@ import SearchBar from "@/components/SearchBar";
 import FundraiserActions from "@/components/fundraisers/FundraiserActions";
 import ImageHorizontalCard from "@/components/ImageHorizontalCard";
 import AddFundraiserDialog from "@/components/fundraisers/forms/AddFundraiserDialog";
+import {
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemDescription,
+	ItemMedia,
+	ItemTitle,
+	ItemGroup,
+} from "@/components/ui/item";
+import { Button } from "@/components/ui/button";
+import { BadgeCheckIcon, CalendarClock } from "lucide-react";
+import Link from "next/link";
 
 export default async function AllFundraisersPage() {
 	const fundraisers = await getAllFundraisers();
@@ -23,15 +35,32 @@ export default async function AllFundraisersPage() {
 					</div>
 				) : (
 					<div className="space-y-4">
-						{fundraisers.map((fundraiser) => (
-							<ImageHorizontalCard
-								key={fundraiser.id}
-								heading={fundraiser.name}
-								subheading={fundraiser.startDate.toLocaleDateString()}
-								actions={<FundraiserActions fundraiser={fundraiser} />}
-								href={`/fundraisers/${fundraiser.id}`}
-							/>
-						))}
+						<ItemGroup>
+							{fundraisers.map((fundraiser) => (
+								<Item
+									className="flex w-full items-center justify-center gap-6 py-2"
+									key={fundraiser.id}
+									variant="outline"
+									size="sm">
+									<ItemMedia>
+										{fundraiser.status === "ACTIVE" ? (
+											<CalendarClock className="size-6" />
+										) : (
+											<BadgeCheckIcon className="size-6" />
+										)}
+									</ItemMedia>
+									<ItemContent>
+										<Link href={`/fundraisers/${fundraiser.id}`}>
+											<ItemTitle>{fundraiser.name}</ItemTitle>
+											<ItemDescription> 8/19/2026 </ItemDescription>
+										</Link>
+									</ItemContent>
+									<ItemActions>
+										<FundraiserActions fundraiser={fundraiser} />
+									</ItemActions>
+								</Item>
+							))}
+						</ItemGroup>
 					</div>
 				)}
 			</div>

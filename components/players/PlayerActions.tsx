@@ -43,7 +43,7 @@ export default function PlayerActions({ player }: PlayerActionsProps) {
 								console.log("Edit Clicked");
 								setEditOpen(true);
 							}}>
-							Edit Team
+							Edit Player
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={(e) => {
@@ -52,15 +52,15 @@ export default function PlayerActions({ player }: PlayerActionsProps) {
 								setDeleteOpen(true);
 							}}
 							className="text-destructive">
-							Delete Team
+							Delete Player
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
 
 			{/* Large Screen 3 action buttons */}
-			{/* <div className="hidden lg:flex items-center gap-1"> */}
-			<div className="flex items-center gap-1">
+			<div className="hidden lg:flex items-center gap-1">
+				{/* <div className="flex items-center gap-1"> */}
 				<Button variant="ghost" size="icon">
 					<Link href={`/players/${player.id}`}>
 						<Eye />

@@ -1,3 +1,6 @@
+import react from "React";
+import Image from "next/image";
+
 type InfoCardProps = {
 	image?: string;
 	heading: string;
@@ -5,7 +8,7 @@ type InfoCardProps = {
 	actions?: React.ReactNode;
 };
 
-export default function InfoCard({
+export default function ImageHorizontalCrad({
 	image,
 	heading,
 	subheading,
@@ -16,9 +19,11 @@ export default function InfoCard({
 			{/* Image */}
 			<div className="shrink-0">
 				{image ? (
-					<img
+					<Image
 						src={image}
 						alt=""
+						width={12}
+						height={12}
 						className="h-12 w-12 rounded-md object-cover"
 					/>
 				) : (

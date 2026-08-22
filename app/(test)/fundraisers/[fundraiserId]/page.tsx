@@ -1,4 +1,4 @@
-import { Plus, ChevronLeft } from "lucide-react";
+import { PlusIcon, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +64,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 	]);
 
 	return (
-		<main className="mx-auto w-full max-w-2xl space-y-4 px-4 py-4 sm:px-6">
+		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
 			{/* Summary Card */}
 			<Card className="overflow-hidden bg-gray-200">
 				<CardContent className="p-5">
@@ -95,7 +95,12 @@ export default async function FundraiserPage({ params }: PageProps) {
 						</p> */}
 					</div>
 
-					<div className="mt-5 flex gap-6 text-sm items-center">
+					<div className="space-x-2 m-4">
+						{fundraiserTeams.map((team) => (
+							<Badge key={team.id}>{team.name}</Badge>
+						))}
+					</div>
+					<div className="my-4 flex gap-6 text-sm items-center">
 						<AvatarGroup className="grayscale">
 							{participants.map((participant) => (
 								<Avatar key={participant.id}>
@@ -121,15 +126,12 @@ export default async function FundraiserPage({ params }: PageProps) {
 								/>
 								<AvatarFallback>ER</AvatarFallback>
 							</Avatar>
-							<AvatarGroupCount>+3</AvatarGroupCount>
+							<AvatarGroupCount>
+								<PlusIcon />
+							</AvatarGroupCount>
 						</AvatarGroup>
-
-						<div className="space-x-2">
-							{fundraiserTeams.map((team) => (
-								<Badge key={team.id}>{team.name}</Badge>
-							))}
-						</div>
 					</div>
+					<Badge variant="secondary">Manage Participants</Badge>
 				</CardContent>
 			</Card>
 
@@ -219,13 +221,13 @@ export default async function FundraiserPage({ params }: PageProps) {
 								</p>
 							</div>
 
-							{/* <p className="font-semibold">
-								$
-								{participant.amount.toLocaleString("en-US", {
+							<p className="font-semibold">
+								$ -
+								{/* {participant.amount.toLocaleString("en-US", {
 									minimumFractionDigits: 2,
 									maximumFractionDigits: 2,
-								})}
-							</p> */}
+								})} */}
+							</p>
 						</div>
 					))}
 				</CardContent>

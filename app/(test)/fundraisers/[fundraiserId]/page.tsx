@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ChevronsUpDown } from "lucide-react";
 
 import { getFundraiserById } from "@/lib/data/fundraisers";
 import { getFundraiserTeams } from "@/lib/data/fundraiserTeams";
@@ -18,12 +19,11 @@ import {
 	AvatarGroupCount,
 	AvatarImage,
 } from "@/components/ui/avatar";
-// const fundraiser = {
-// 	name: "Fall Tournament Fundraiser",
-// 	status: "Completed",
-// 	date: "August 15, 2026",
-// 	teams: ["18U"],
-// };
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const funds = [
 	{
@@ -134,16 +134,36 @@ export default async function FundraiserPage({ params }: PageProps) {
 
 			{/* Money Breakdown */}
 			<Card>
-				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-					<CardTitle className="text-base">Money Breakdown</CardTitle>
-
-					<Button size="sm">
-						<Plus className="mr-1.5 h-4 w-4" />
-						Add Funds
-					</Button>
-				</CardHeader>
-
 				<CardContent className="space-y-3">
+					<Collapsible className="flex w-[350px] flex-col gap-2">
+						<div className="flex items-center justify-between gap-4">
+							<h4 className="text-sm font-semibold">Money Breakdown</h4>
+							<CollapsibleTrigger
+								render={
+									<Button variant="ghost" size="icon" className="size-8">
+										<ChevronsUpDown />
+										<span className="sr-only">Toggle details</span>
+									</Button>
+								}
+							/>
+						</div>
+						<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
+							<span className="text-muted-foreground">Status</span>
+							<span className="font-medium">Shipped</span>
+						</div>
+						<CollapsibleContent className="flex flex-col gap-2">
+							<div className="rounded-md border px-4 py-2 text-sm">
+								<p className="font-medium">Shipping address</p>
+								<p className="text-muted-foreground">
+									100 Market St, San Francisco
+								</p>
+							</div>
+							<div className="rounded-md border px-4 py-2 text-sm">
+								<p className="font-medium">Items</p>
+								<p className="text-muted-foreground">2x Studio Headphones</p>
+							</div>
+						</CollapsibleContent>
+					</Collapsible>
 					{funds.map((fund) => (
 						<div
 							key={fund.id}

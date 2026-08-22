@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ChevronsUpDown } from "lucide-react";
-
+import { ButtonGroup } from "@/components/ui/button-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { getFundraiserById } from "@/lib/data/fundraisers";
 import { getFundraiserTeams } from "@/lib/data/fundraiserTeams";
 import { getActiveTeams } from "@/lib/data/teams";
@@ -135,9 +136,9 @@ export default async function FundraiserPage({ params }: PageProps) {
 			{/* Money Breakdown */}
 			<Card>
 				<CardContent className="space-y-3">
-					<Collapsible className="flex w-[350px] flex-col gap-2">
+					<Collapsible className="flex flex-col gap-2">
 						<div className="flex items-center justify-between gap-4">
-							<h4 className="text-sm font-semibold">Money Breakdown</h4>
+							<CardTitle className="text-base">MoneyBreakdown</CardTitle>
 							<CollapsibleTrigger
 								render={
 									<Button variant="ghost" size="icon" className="size-8">
@@ -148,51 +149,26 @@ export default async function FundraiserPage({ params }: PageProps) {
 							/>
 						</div>
 						<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
-							<span className="text-muted-foreground">Status</span>
-							<span className="font-medium">Shipped</span>
+							<span className="font-medium">Total Raised</span>
+							<span className="font-medium">$ 100 </span>
 						</div>
+
 						<CollapsibleContent className="flex flex-col gap-2">
-							<div className="rounded-md border px-4 py-2 text-sm">
-								<p className="font-medium">Shipping address</p>
-								<p className="text-muted-foreground">
-									100 Market St, San Francisco
-								</p>
+							<Separator />
+
+							<div className="rounded-md border px-4 py-2 text-sm flex justify-between">
+								<p className="text-muted-foreground">Event Profit</p>
+								<p className="text-muted-foreground">$2,000</p>
 							</div>
-							<div className="rounded-md border px-4 py-2 text-sm">
-								<p className="font-medium">Items</p>
-								<p className="text-muted-foreground">2x Studio Headphones</p>
+							<div className="rounded-md border px-4 py-2 text-sm flex justify-between">
+								<p className="text-muted-foreground">Tips</p>
+								<p className="text-muted-foreground">$350</p>
+							</div>
+							<div className="rounded-md border px-4 py-2 text-sm flex justify-between">
+								<p className="font-medium"> + Add Funds </p>
 							</div>
 						</CollapsibleContent>
 					</Collapsible>
-					{funds.map((fund) => (
-						<div
-							key={fund.id}
-							className="flex items-center justify-between text-sm">
-							<span className="text-muted-foreground">{fund.description}</span>
-
-							{/* <span className="font-medium">
-								$
-								{fund.amount.toLocaleString("en-US", {
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2,
-								})}
-							</span> */}
-						</div>
-					))}
-
-					<Separator />
-
-					<div className="flex items-center justify-between">
-						<span className="font-medium">Total Raised</span>
-
-						{/* <span className="text-lg font-bold">
-							$
-							{totalRaised.toLocaleString("en-US", {
-								minimumFractionDigits: 2,
-								maximumFractionDigits: 2,
-							})}
-						</span> */}
-					</div>
 				</CardContent>
 			</Card>
 
@@ -210,7 +186,21 @@ export default async function FundraiserPage({ params }: PageProps) {
 							</p>
 						</div>
 
-						<p className="text-sm font-medium">Equal</p>
+						<ToggleGroup
+							type="single"
+							className="h-8 overflow-hidden rounded-md border gap-0">
+							<ToggleGroupItem
+								value="equal"
+								className="h-8 rounded-none border-0 px-3 bg-amber-200">
+								Equal
+							</ToggleGroupItem>
+
+							<ToggleGroupItem
+								value="custom"
+								className=" h-8 rounded-none border-0 px-3 bg-green-500">
+								Custom
+							</ToggleGroupItem>
+						</ToggleGroup>
 					</div>
 				</CardHeader>
 
@@ -228,8 +218,8 @@ export default async function FundraiserPage({ params }: PageProps) {
 									{fundraiser.teams[0]?.team.name}
 								</p>
 							</div>
-							{/* 
-							<p className="font-semibold">
+
+							{/* <p className="font-semibold">
 								$
 								{participant.amount.toLocaleString("en-US", {
 									minimumFractionDigits: 2,

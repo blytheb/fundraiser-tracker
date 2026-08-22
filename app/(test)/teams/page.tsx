@@ -1,7 +1,9 @@
 import PageHeader from "@/components/PageHeader";
 import TeamCard from "@/components/teams/TeamCard";
 import AddTeamDialog from "@/components/teams/forms/AddTeamDialog";
-
+import { ItemGroup } from "@/components/ui/item";
+import ListItemWithImage from "@/components/ListItemWithImage";
+import Image from "next/image";
 import { getAllTeams } from "@/lib/data/teams";
 
 export default async function AllTeamsPage() {
@@ -21,9 +23,12 @@ export default async function AllTeamsPage() {
 				</div>
 			) : (
 				<div className="grid grid-cols-1 gap-4 items-stretch sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 ">
-					{teams.map((team) => (
-						<TeamCard key={team.id} team={team} />
-					))}
+					<ItemGroup>
+						{teams.map((team) => (
+							// <TeamCard key={team.id} team={team} />
+							<ListItemWithImage key={team.id} team={team} />
+						))}
+					</ItemGroup>
 					<AddTeamDialog />
 				</div>
 			)}

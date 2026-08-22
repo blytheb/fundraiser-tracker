@@ -3,9 +3,9 @@ import { getAllPlayers, getPlayersWithTeams } from "@/lib/data/players";
 
 import PageHeader from "@/components/PageHeader";
 import SearchBar from "@/components/SearchBar";
-import PlayerActions from "@/components/players/PlayerActions";
-import ImageHorizontalCard from "@/components/ImageHorizontalCard";
+import ListItemWithAvatar from "@/components/ListItemWithAvatar";
 import AddPlayerDialog from "@/components/players/forms/AddPlayerDialog";
+import { ItemGroup } from "@/components/ui/item";
 
 export default async function AllPlayersPage() {
 	const players = await getAllPlayers();
@@ -24,16 +24,11 @@ export default async function AllPlayersPage() {
 					</div>
 				) : (
 					<div className="space-y-4">
-						{players.map((player) => (
-							<ImageHorizontalCard
-								key={player.id}
-								image={player.imageUrl}
-								heading={`${player.firstName} ${player.lastName}`}
-								subheading={player.status === true ? "ACTIVE" : "INACTIVE"}
-								actions={<PlayerActions player={player} />}
-								href={`/players/${player.id}`}
-							/>
-						))}
+						<ItemGroup>
+							{players.map((player) => (
+								<ListItemWithAvatar key={player.id} player={player} />
+							))}
+						</ItemGroup>
 					</div>
 				)}
 			</div>

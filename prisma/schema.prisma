@@ -80,12 +80,11 @@ model Team {
   status   TeamStatus
   imageUrl String?
 
-  players TeamPlayer[]
+  players         TeamPlayer[]
   fundraiserTeams FundraiserTeam[]
 
-
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum TeamStatus {
@@ -100,12 +99,11 @@ model Player {
   status    Boolean
   imageUrl  String?
 
-  teams TeamPlayer[]
+  teams                  TeamPlayer[]
   fundraiserParticipants FundraiserParticipant[]
 
-
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model TeamPlayer {
@@ -129,11 +127,11 @@ model Fundraiser {
   startDate   DateTime
   status      FundraiserStatus
 
-  totalAmount     Decimal   @default(0) @db.Decimal(10,2)
-  distributionMethod    FundraiserDistribution @default(EQUAL)
+  distributionMethod FundraiserDistribution @default(EQUAL)
 
   teams        FundraiserTeam[]
   participants FundraiserParticipant[]
+  funds        FundraiserFund[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -149,6 +147,25 @@ enum FundraiserDistribution {
   CUSTOM
 }
 
+model FundraiserFund {
+  id          String   @id @default(cuid())
+  type        FundType
+  amount      Decimal
+  description String?
+
+  fundraiserId String
+  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+enum FundType {
+  SALES
+  EVENT_PROFIT
+  TIPS
+  OTHER
+}
+
 model FundraiserParticipant {
   id String @id @default(cuid())
 
@@ -158,7 +175,7 @@ model FundraiserParticipant {
   playerId String
   player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
-  distributionAmount Decimal? @db.Decimal(10,2)
+  amount    Decimal  @default(0)
   createdAt DateTime @default(now())
 
   @@unique([fundraiserId, playerId])

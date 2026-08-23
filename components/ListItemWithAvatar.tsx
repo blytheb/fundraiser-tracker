@@ -20,25 +20,28 @@ type ItemProps = {
 export default function ListItemWithAvatar({ player }: ItemProps) {
 	return (
 		<Item
-			className="flex w-full items-center justify-center gap-6 py-2"
+			// className="flex w-full items-center justify-center gap-6 py-2"
 			variant="outline"
 			size="sm">
-			<ItemMedia>
-				<Avatar className="size-10">
-					<AvatarImage src={player.imageUrl} />
-					<AvatarFallback>AA</AvatarFallback>
-				</Avatar>
-			</ItemMedia>
-			<ItemContent>
-				<Link href={`/players/${player.id}`}>
-					<ItemTitle>
-						{player.firstName} {player.lastName}
-					</ItemTitle>
-				</Link>
-			</ItemContent>
-			<ItemActions>
-				<PlayerActions player={player} />
-			</ItemActions>
+			<Link href={`/players/${player.id}`}>
+				<div className="flex w-full items-center gap-6 py-2">
+					<ItemMedia>
+						<Avatar className="size-10">
+							<AvatarImage src={player.imageUrl} />
+							<AvatarFallback>AA</AvatarFallback>
+						</Avatar>
+					</ItemMedia>
+					<ItemContent>
+						{" "}
+						<ItemTitle>
+							{player.firstName} {player.lastName}
+						</ItemTitle>
+					</ItemContent>
+					{/* <ItemActions>
+					<PlayerActions player={player} />
+				</ItemActions> */}
+				</div>
+			</Link>
 		</Item>
 	);
 }

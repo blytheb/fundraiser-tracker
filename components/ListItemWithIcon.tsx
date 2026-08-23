@@ -25,26 +25,25 @@ export default function ListItemWithIcon({
 	inactiveIcon: InactiveIcon,
 }: ItemProps) {
 	return (
-		<Item
-			className="flex w-full items-center justify-center gap-6 py-2"
-			variant="outline"
-			size="sm">
-			<ItemMedia>
-				{fundraiser.status === "ACTIVE" ? (
-					<ActiveIcon className="size-8" />
-				) : (
-					<InactiveIcon className="size-8" />
-				)}
-			</ItemMedia>
-			<ItemContent>
-				<Link href={`/fundraisers/${fundraiser.id}`}>
-					<ItemTitle>{fundraiser.name}</ItemTitle>
-					<ItemDescription> 8/19/2026 </ItemDescription>
-				</Link>
-			</ItemContent>
-			<ItemActions>
-				<FundraiserActions fundraiser={fundraiser} />
-			</ItemActions>
+		<Item variant="outline" size="sm">
+			<Link href={`/fundraisers/${fundraiser.id}`}>
+				<div className="flex w-full items-center justify-center gap-6 py-2">
+					<ItemMedia>
+						{fundraiser.status === "ACTIVE" ? (
+							<ActiveIcon className="size-8" />
+						) : (
+							<InactiveIcon className="size-8" />
+						)}
+					</ItemMedia>
+					<ItemContent>
+						<ItemTitle>{fundraiser.name}</ItemTitle>
+						<ItemDescription> 8/19/2026 </ItemDescription>
+					</ItemContent>
+					{/* <ItemActions>
+					<FundraiserActions fundraiser={fundraiser} />
+				</ItemActions> */}
+				</div>
+			</Link>
 		</Item>
 	);
 }

@@ -95,7 +95,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 						</p> */}
 					</div>
 
-					<div className="space-x-2 m-4">
+					<div className="space-x-2 my-4 ">
 						{fundraiserTeams.map((team) => (
 							<Badge key={team.id}>{team.name}</Badge>
 						))}
@@ -126,9 +126,9 @@ export default async function FundraiserPage({ params }: PageProps) {
 								/>
 								<AvatarFallback>ER</AvatarFallback>
 							</Avatar>
-							<AvatarGroupCount>
+							{/* <AvatarGroupCount>
 								<PlusIcon />
-							</AvatarGroupCount>
+							</AvatarGroupCount> */}
 						</AvatarGroup>
 					</div>
 					<Badge variant="secondary">Manage Participants</Badge>
@@ -140,7 +140,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 				<CardContent className="space-y-3">
 					<Collapsible className="flex flex-col gap-2">
 						<div className="flex items-center justify-between gap-4">
-							<CardTitle className="text-base">MoneyBreakdown</CardTitle>
+							<CardTitle className="text-base">Money Breakdown</CardTitle>
 							<CollapsibleTrigger
 								render={
 									<Button variant="ghost" size="icon" className="size-8">

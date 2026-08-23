@@ -1,15 +1,10 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getAllFundraisers() {
-	const fundraisers = await prisma.fundraiser.findMany({
+	return (fundraisers = await prisma.fundraiser.findMany({
 		orderBy: {
 			name: "asc",
 		},
-	});
-
-	return fundraisers.map((fundraiser) => ({
-		...fundraiser,
-		totalAmount: fundraiser.totalAmount.toNumber(),
 	}));
 }
 
@@ -20,6 +15,7 @@ export async function getFundraiserById(id: string) {
 		},
 
 		include: {
+			funds: true,
 			teams: {
 				include: {
 					team: true,
@@ -37,8 +33,5 @@ export async function getFundraiserById(id: string) {
 		return null;
 	}
 
-	return {
-		...fundraiser,
-		totalAmount: fundraiser.totalAmount.toNumber(),
-	};
+	return fundraiser;
 }

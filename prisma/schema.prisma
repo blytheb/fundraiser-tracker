@@ -150,7 +150,7 @@ enum FundraiserDistribution {
 model FundraiserFund {
   id          String   @id @default(cuid())
   type        FundType
-  amount      Decimal
+  amount      Decimal  @db.Decimal(10, 2)
   description String?
 
   fundraiserId String
@@ -175,7 +175,7 @@ model FundraiserParticipant {
   playerId String
   player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
-  amount    Decimal  @default(0)
+  amount    Decimal  @default(0) @db.Decimal(10, 2)
   createdAt DateTime @default(now())
 
   @@unique([fundraiserId, playerId])

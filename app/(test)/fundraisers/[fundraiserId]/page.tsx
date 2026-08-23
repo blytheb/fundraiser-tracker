@@ -13,6 +13,7 @@ import {
 	getFundraiserParticipants,
 	getEligibleFundraiserPlayers,
 } from "@/lib/data/fundraiserParticipants";
+import AddFundraiserFund from "@/components/fundraisers/forms/AddFundraiserFund";
 import {
 	Avatar,
 	AvatarFallback,
@@ -26,24 +27,9 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-const funds = [
-	{
-		id: 1,
-		description: "Event Profit",
-		amount: 2000,
-	},
-	{
-		id: 2,
-		description: "Tips",
-		amount: 350,
-	},
-];
-
-const totalRaised = funds.reduce((total, fund) => total + fund.amount, 0);
-
 type PageProps = {
 	params: Promise<{
-		teamId: string;
+		fundraiserId: string;
 	}>;
 };
 export default async function FundraiserPage({ params }: PageProps) {
@@ -62,6 +48,13 @@ export default async function FundraiserPage({ params }: PageProps) {
 		getFundraiserParticipants(fundraiserId),
 		getEligibleFundraiserPlayers(fundraiserId),
 	]);
+
+	const funds = fundraiser.funds.map((fund) => ({
+		...fund,
+		amount: Number(fund.amount),
+	}));
+	const totalRaised =
+		funds.reduce((total, fund) => total + Number(fund.amount), 0) ?? 0;
 
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
@@ -86,13 +79,13 @@ export default async function FundraiserPage({ params }: PageProps) {
 						</p>
 						<p>$ --- </p>
 
-						{/* <p className="mt-1 text-4xl font-bold tracking-tight">
+						<p className="mt-1 text-4xl font-bold tracking-tight">
 							$
 							{totalRaised.toLocaleString("en-US", {
 								minimumFractionDigits: 2,
 								maximumFractionDigits: 2,
 							})}
-						</p> */}
+						</p>
 					</div>
 
 					<div className="space-x-2 my-4 ">
@@ -153,6 +146,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 						<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
 							<span className="font-medium">Total Raised</span>
 							<span className="font-medium">$ 100 </span>
+							<AddFundraiserFund fundraiserId={fundraiser.id} />
 						</div>
 
 						<CollapsibleContent className="flex flex-col gap-2">

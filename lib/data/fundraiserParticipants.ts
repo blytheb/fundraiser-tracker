@@ -10,9 +10,10 @@ export async function getFundraiserParticipants(fundraiserId: string) {
 		},
 	});
 
-	return fundraiserParticipants.map(
-		(fundraiserParticipant) => fundraiserParticipant.player,
-	);
+	return fundraiserParticipants.map((fundraiserParticipant) => ({
+		...fundraiserParticipant.player,
+		amount: Number(fundraiserParticipant.amount),
+	}));
 }
 
 export async function getEligibleFundraiserPlayers(fundraiserId: string) {

@@ -77,7 +77,6 @@ export default async function FundraiserPage({ params }: PageProps) {
 						<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
 							Total Raised
 						</p>
-						<p>$ --- </p>
 
 						<p className="mt-1 text-4xl font-bold tracking-tight">
 							$
@@ -134,35 +133,41 @@ export default async function FundraiserPage({ params }: PageProps) {
 					<Collapsible className="flex flex-col gap-2">
 						<div className="flex items-center justify-between gap-4">
 							<CardTitle className="text-base">Money Breakdown</CardTitle>
-							<CollapsibleTrigger
-								render={
-									<Button variant="ghost" size="icon" className="size-8">
-										<ChevronsUpDown />
-										<span className="sr-only">Toggle details</span>
-									</Button>
-								}
-							/>
+							<CollapsibleTrigger className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted">
+								<ChevronsUpDown />
+								<span className="sr-only">Toggle details</span>
+							</CollapsibleTrigger>
 						</div>
 						<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
 							<span className="font-medium">Total Raised</span>
-							<span className="font-medium">$ 100 </span>
-							<AddFundraiserFund fundraiserId={fundraiser.id} />
+							<span className="font-medium">
+								$
+								{totalRaised.toLocaleString("en-US", {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2,
+								})}{" "}
+							</span>
 						</div>
 
 						<CollapsibleContent className="flex flex-col gap-2">
 							<Separator />
-
-							<div className="rounded-md border px-4 py-2 text-sm flex justify-between">
-								<p className="text-muted-foreground">Event Profit</p>
-								<p className="text-muted-foreground">$2,000</p>
-							</div>
-							<div className="rounded-md border px-4 py-2 text-sm flex justify-between">
-								<p className="text-muted-foreground">Tips</p>
-								<p className="text-muted-foreground">$350</p>
-							</div>
-							<div className="rounded-md border px-4 py-2 text-sm flex justify-between">
-								<p className="font-medium"> + Add Funds </p>
-							</div>
+							{funds.map((fund) => {
+								return (
+									<div
+										key={fund.id}
+										className="rounded-md border px-4 py-2 text-sm flex justify-between">
+										<p className="text-muted-foreground">{fund.type}</p>
+										<p className="text-muted-foreground">
+											$
+											{fund.amount.toLocaleString("en-US", {
+												minimumFractionDigits: 2,
+												maximumFractionDigits: 2,
+											})}
+										</p>
+									</div>
+								);
+							})}
+							<AddFundraiserFund fundraiserId={fundraiser.id} />
 						</CollapsibleContent>
 					</Collapsible>
 				</CardContent>
@@ -201,29 +206,32 @@ export default async function FundraiserPage({ params }: PageProps) {
 				</CardHeader>
 
 				<CardContent className="space-y-1">
-					{participants.map((participant) => (
-						<div
-							key={participant.id}
-							className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50">
-							<div>
-								<p className="text-sm font-medium">
-									{participant.firstName} {participant.lastName}
-								</p>
+					{participants.map((participant) => {
+						console.log("participant", participant);
+						return (
+							<div
+								key={participant.id}
+								className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50">
+								<div>
+									<p className="text-sm font-medium">
+										{participant.firstName} {participant.lastName}
+									</p>
 
-								<p className="text-xs text-muted-foreground">
-									{fundraiser.teams[0]?.team.name}
+									<p className="text-xs text-muted-foreground">
+										{fundraiser.teams[0]?.team.name}
+									</p>
+								</div>
+
+								<p className="font-semibold">
+									$
+									{participant.amount.toLocaleString("en-US", {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 2,
+									})}
 								</p>
 							</div>
-
-							<p className="font-semibold">
-								$ -
-								{/* {participant.amount.toLocaleString("en-US", {
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2,
-								})} */}
-							</p>
-						</div>
-					))}
+						);
+					})}
 				</CardContent>
 			</Card>
 

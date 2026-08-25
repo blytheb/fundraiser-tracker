@@ -40,3 +40,9 @@ export type TeamWithPlayersAndFundraisers = Prisma.TeamGetPayload<{
 		};
 	};
 }>;
+
+export type TeamPlayerWithPlayer = Prisma.TeamPlayerGetPayload<{
+	include: {
+		player: true;
+	};
+}>;

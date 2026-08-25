@@ -2,8 +2,6 @@ import React from "react";
 import TeamHeader from "@/components/teams/TeamHeader";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Link } from "next/link";
 import { getAllPlayers } from "@/lib/data/players";
 import { getTeamById } from "@/lib/data/teams";
 import { getTeamPlayers } from "@/lib/data/teamPlayers";

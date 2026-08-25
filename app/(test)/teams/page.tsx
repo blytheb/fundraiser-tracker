@@ -1,9 +1,9 @@
 import PageHeader from "@/components/PageHeader";
-import TeamCard from "@/components/teams/TeamCard";
-import AddTeamDialog from "@/components/teams/forms/AddTeamDialog";
-import { ItemGroup } from "@/components/ui/item";
 import ListItemWithImage from "@/components/ListItemWithImage";
-import Image from "next/image";
+import AddTeamDialog from "@/components/teams/forms/AddTeamDialog";
+
+import { ItemGroup } from "@/components/ui/item";
+
 import { getAllTeams } from "@/lib/data/teams";
 
 export default async function AllTeamsPage() {

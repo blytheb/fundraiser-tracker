@@ -1,4 +1,4 @@
-import Sidebar from "@/components/sidebar";
+import Navbar from "@/components/Navbar";
 
 export default async function TestLayout({
 	children,
@@ -7,7 +7,7 @@ export default async function TestLayout({
 }) {
 	return (
 		<div className="flex flex-col min-h-screen">
-			<Sidebar />
+			<Navbar />
 			<main>{children}</main>
 		</div>
 	);

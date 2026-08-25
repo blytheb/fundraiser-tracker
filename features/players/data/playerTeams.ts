@@ -1,13 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import type { Team } from "@prisma/client";
 
-export async function getPlayerTeams(id: string): Promise<Team[]> {
+export async function getPlayerTeams(playerId: string): Promise<Team[]> {
 	const playerTeams = await prisma.teamPlayer.findMany({
 		where: {
-			id,
+			playerId,
 		},
 		include: {
-			teams: true,
+			team: true,
 		},
 	});
 

@@ -1,6 +1,9 @@
 import React from "react";
 import PlayerHeader from "@/features/players/PlayerHeader";
 
+import { getPlayerById } from "@/features/players/data/players";
+import { getPlayerTeams } from "@/features/players/data/playerTeams";
+
 type PlayerPageProps = {
 	params: Promise<{
 		playerId: string;

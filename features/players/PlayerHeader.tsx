@@ -1,4 +1,4 @@
-import type { Player } from "@prisma/client";
+import type { Player, Team } from "@prisma/client";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,8 @@ type HeaderProps = {
 	teams: Team[];
 };
 
-export default function PlayerHeader({ player }: HeaderProps) {
+export default function PlayerHeader({ player, teams }: HeaderProps) {
+	// console.log(teams);
 	return (
 		<Card className="mb-4">
 			<CardContent className="p-5">
@@ -24,10 +25,12 @@ export default function PlayerHeader({ player }: HeaderProps) {
 							<span>•</span>
 
 							<span>Varsity</span>
-							<span>•</span>
-							{teams.map((team) => {
-								<span>{team.name}</span>;
-							})}
+							{teams.length > 0 && (
+								<>
+									<span>•</span>
+									<span>{teams.map((team) => team.name).join(" • ")}</span>
+								</>
+							)}
 						</div>
 					</div>
 

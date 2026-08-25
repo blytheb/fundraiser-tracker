@@ -15,7 +15,7 @@ export function getPlayers(): Promise<Player[]> {
 }
 
 export async function getActivePlayers(): Promise<Player[]> {
-	return prisma.team.findMany({
+	return prisma.player.findMany({
 		where: {
 			status: true,
 		},
@@ -31,7 +31,7 @@ export async function getActivePlayers(): Promise<Player[]> {
 }
 
 export async function getPlayerById(id: string): Promise<Player | null> {
-	return prisma.team.findUnique({
+	return prisma.player.findUnique({
 		where: {
 			id,
 		},
@@ -41,7 +41,7 @@ export async function getPlayerById(id: string): Promise<Player | null> {
 export async function getPlayerWithTeams(
 	id: string,
 ): Promise<PlayerWithTeams | null> {
-	return prisma.team.findUnique({
+	return prisma.player.findUnique({
 		where: {
 			id,
 		},
@@ -58,7 +58,7 @@ export async function getPlayerWithTeams(
 export async function getPlayerWithFundraisers(
 	id: string,
 ): Promise<PlayerWithFundraisers | null> {
-	return prisma.team.findUnique({
+	return prisma.player.findUnique({
 		where: {
 			id,
 		},

@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { getFundraiserById } from "@/lib/data/fundraisers";
 import { getFundraiserTeams } from "@/lib/data/fundraiserTeams";
-import { getActiveTeams } from "@/lib/data/teams";
+// import { getActiveTeams } from "@/lib/data/teams";
 import {
 	getFundraiserParticipants,
 	getEligibleFundraiserPlayers,

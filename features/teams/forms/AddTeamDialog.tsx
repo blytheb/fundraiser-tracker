@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { createTeam } from "@/lib/actions/teams";
+import { createTeam } from "@/features/teams/actions/teams";
 
 import { CirclePlus } from "lucide-react";
 import {

@@ -1,8 +1,8 @@
 import React from "react";
 
-import TeamHeader from "@/components/teams/TeamHeader";
-import SummarySection from "@/components/teams/SummarySection";
-import TabSection from "@/components/teams/TabSection";
+import TeamHeader from "@/features/teams/TeamHeader";
+import SummarySection from "@/features/teams/SummarySection";
+import TabSection from "@/features/teams/TabSection";
 
 import { getTeamById } from "@/features/teams/data/teams";
 import { getTeamPlayers } from "@/features/teams/data/teamPlayers";

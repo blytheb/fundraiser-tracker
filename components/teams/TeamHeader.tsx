@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import TeamActions from "@/components/teams/TeamActions";
 import type { Team } from "@/types/team";
+import { Card, CardContent } from "@/components/ui/card";
 
 type TeamHeaderProps = {
 	team: Team;
@@ -8,30 +9,27 @@ type TeamHeaderProps = {
 
 export default function TeamHeader({ team }: TeamHeaderProps) {
 	return (
-		<header className="space-y-4">
-			{/* Top row */}
-			<div className="flex items-start justify-between gap-4">
-				<div className="min-w-0">
-					<p className="text-sm text-muted-foreground">Team</p>
+		<Card className="mb-4">
+			<CardContent className="p-5">
+				<div className="flex items-start justify-between gap-4">
+					<div className="min-w-0">
+						<p className="text-2xl font-bold tracking-tight">{team.name}</p>
 
-					<h1 className="truncate text-2xl font-bold tracking-tight sm:text-3xl">
-						{team.name}
-					</h1>
+						<div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+							<span>2026 Season</span>
 
-					<p className="mt-1 text-sm text-muted-foreground sm:text-base">
-						Menehune Volleyball
-					</p>
+							<span>•</span>
+
+							<span>Varsity</span>
+							<span>•</span>
+
+							<span>Active</span>
+						</div>
+					</div>
+
+					<Badge variant="secondary">14 Players</Badge>
 				</div>
-
-				<div className="shrink-0">
-					<TeamActions team={team} />
-				</div>
-			</div>
-
-			{/* Status */}
-			<Badge variant="secondary" className="w-fit">
-				{team.status}
-			</Badge>
-		</header>
+			</CardContent>
+		</Card>
 	);
 }

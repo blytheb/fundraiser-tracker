@@ -7,7 +7,7 @@ import { getTeamById } from "@/lib/data/teams";
 import { getTeamPlayers } from "@/lib/data/teamPlayers";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
 import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
-import RosterSection from "@/components/teams/rosters/RosterSection";
+import TabSection from "@/components/teams/TabSection";
 
 import SummarySection from "@/components/teams/SummarySection";
 
@@ -24,12 +24,12 @@ export default async function TeamPage({ params }: TeamPageProps) {
 	if (!team) {
 		return <div>Team Not Found</div>;
 	}
-	const players = await getTeamPlayers(teamId);
-	const allPlayers = await getAllPlayers();
+	// const players = await getTeamPlayers(teamId);
+	// const allPlayers = await getAllPlayers();
 	// const fundraisers = getFundraisersByTeamId(teamId);
 
 	return (
-		<div className="mx-auto w-full max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
 			{/* <Button variant="ghost" size="sm">
 				<Link href="/teams"> Back to All Teams</Link>
 			</Button> */}
@@ -37,55 +37,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
 			{/* Summary */}
 			<SummarySection />
 
-			{/* Upcoming Trip */}
-			<section>
-				<div className="mb-3 flex items-center justify-between">
-					<h2 className="text-lg font-semibold">Upcoming Trip</h2>
-				</div>
-
-				<div className="rounded-lg border p-4 sm:p-6">
-					<div className="space-y-2">
-						<div className="flex items-start justify-between gap-4">
-							<div>
-								<h3 className="font-semibold">Trip to Japan</h3>
-
-								<p className="text-sm text-muted-foreground">June 1–9, 2027</p>
-							</div>
-
-							<Badge variant="secondary">Upcoming</Badge>
-						</div>
-
-						<p className="text-sm text-muted-foreground">
-							Goal: $1,500 per player
-						</p>
-					</div>
-				</div>
-			</section>
-
-			{/* Roster */}
-			<section>
-				<div className="mb-3">
-					<h2 className="text-lg font-semibold">Roster</h2>
-				</div>
-
-				<RosterSection
-					teamId={teamId}
-					players={players}
-					allPlayers={allPlayers}
-				/>
-			</section>
-			{/* Fundraising */}
-			<section>
-				<div className="mb-3 flex items-center justify-between">
-					<h2 className="text-lg font-semibold">Fundraising</h2>
-				</div>
-
-				<div className="rounded-lg border p-4 sm:p-6">
-					<p className="text-sm text-muted-foreground">
-						No fundraising information yet.
-					</p>
-				</div>
-			</section>
-		</div>
+			{/* Tabs */}
+			<TabSection team={team} />
+		</main>
 	);
 }

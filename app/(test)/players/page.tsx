@@ -1,14 +1,12 @@
-import AllPlayersLayout from "@/components/players/AllPlayersLayout";
-import { getAllPlayers, getPlayersWithTeams } from "@/lib/data/players";
-
 import PageHeader from "@/components/PageHeader";
 import SearchBar from "@/components/SearchBar";
-import ListItemWithAvatar from "@/components/ListItemWithAvatar";
-import AddPlayerDialog from "@/components/players/forms/AddPlayerDialog";
-import { ItemGroup } from "@/components/ui/item";
+import AddPlayerDialog from "@/features/players/forms/AddPlayerDialog";
+import PlayerList from "@/features/players/PlayerList";
+
+import { getPlayers } from "@/features/players/data/players";
 
 export default async function AllPlayersPage() {
-	const players = await getAllPlayers();
+	const players = await getPlayers();
 
 	return (
 		<div className="space-y-4 px-4">
@@ -17,21 +15,7 @@ export default async function AllPlayersPage() {
 				<SearchBar />
 				<AddPlayerDialog />
 			</div>
-			<div className="space-y-2">
-				{players.length === 0 ? (
-					<div className="flex flex-col w-full items-center gap-3 rounded-lg border p-3">
-						No Players Found
-					</div>
-				) : (
-					<div className="space-y-4">
-						<ItemGroup>
-							{players.map((player) => (
-								<ListItemWithAvatar key={player.id} player={player} />
-							))}
-						</ItemGroup>
-					</div>
-				)}
-			</div>
+			<PlayerList players={players} />
 		</div>
 	);
 }

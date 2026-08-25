@@ -1,19 +1,17 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type { Player } from "@/prisma/client";
+import type { PlayerFormData } from ".../types";
 
-type PlayerData = {
-	firstName: string;
-	lastName: string;
-	status: boolean;
-	imageUrl?: string | null;
-};
-
-export async function createPlayer(data: PlayerData) {
+export async function createPlayer(data: PlayerFormData): Promise<Player> {
 	return prisma.player.create({ data });
 }
 
-export async function updatePlayer(id: string, data: PlayerData) {
+export async function updatePlayer(
+	id: string,
+	data: PlayerData,
+): Promise<Player> {
 	return prisma.player.update({
 		where: {
 			id,
@@ -27,7 +25,7 @@ export async function updatePlayer(id: string, data: PlayerData) {
 	});
 }
 
-export async function deletePlayer(id: string) {
+export async function deletePlayer(id: string): Promise<Player> {
 	return prisma.player.delete({
 		where: {
 			id,

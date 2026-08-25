@@ -1,11 +1,10 @@
 "use client";
 
-import React from "react";
-
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createPlayer } from "@/lib/actions/players";
 
-import { Plus } from "lucide-react";
+import { createPlayer } from "@/features/players/actions/players";
+
 import {
 	Dialog,
 	DialogContent,
@@ -14,10 +13,10 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 
 export default function AddPlayerDialog() {
 	const router = useRouter();

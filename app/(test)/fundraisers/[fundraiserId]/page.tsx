@@ -44,10 +44,15 @@ export default async function FundraiserPage({ params }: PageProps) {
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
 			{/* Summary Card */}
-			<SummarySection fundraiser={fundraiser} />
+			<SummarySection
+				fundraiser={fundraiser}
+				totalRaised={totalRaised}
+				fundraiserTeams={fundraiserTeams}
+				participants={participants}
+			/>
 			{/* Money Breakdown */}
 			<MoneyBreakdownSection
-				fundraiser={fundraiser}
+				fundraiserId={fundraiser.id}
 				total={totalRaised}
 				funds={funds}
 			/>

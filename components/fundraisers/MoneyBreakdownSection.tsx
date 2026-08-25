@@ -8,9 +8,19 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import type { Fund } from "types/fund";
 
-export default function MoneyBreakdownSection() {
+type SectionProps = {
+	fundraiserId: string;
+	total: number;
+	funds: Fund & { amount: number };
+};
+export default function MoneyBreakdownSection({
+	fundraiserId,
+	total,
+	funds,
+}: SectionProps) {
 	return (
 		<Card>
 			<CardContent className="space-y-3">
@@ -26,7 +36,7 @@ export default function MoneyBreakdownSection() {
 						<span className="font-medium">Total Raised</span>
 						<span className="font-medium">
 							$
-							{totalRaised.toLocaleString("en-US", {
+							{total.toLocaleString("en-US", {
 								minimumFractionDigits: 2,
 								maximumFractionDigits: 2,
 							})}{" "}
@@ -51,7 +61,7 @@ export default function MoneyBreakdownSection() {
 								</div>
 							);
 						})}
-						<AddFundraiserFund fundraiserId={fundraiser.id} />
+						<AddFundraiserFund fundraiserId={fundraiserId} />
 					</CollapsibleContent>
 				</Collapsible>
 			</CardContent>

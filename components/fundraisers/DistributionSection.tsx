@@ -1,8 +1,14 @@
 import React from "react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+// import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function DistributionSection() {
+import type { Player } from "types/player";
+
+type SectionProps = {
+	participants: Player & { amount: numberl };
+};
+
+export default function DistributionSection({ participants }: SectionProps) {
 	return (
 		<Card>
 			<CardHeader>
@@ -37,7 +43,6 @@ export default function DistributionSection() {
 
 			<CardContent className="space-y-1">
 				{participants.map((participant) => {
-					console.log("participant", participant);
 					return (
 						<div
 							key={participant.id}
@@ -47,9 +52,9 @@ export default function DistributionSection() {
 									{participant.firstName} {participant.lastName}
 								</p>
 
-								<p className="text-xs text-muted-foreground">
+								{/* <p className="text-xs text-muted-foreground">
 									{fundraiser.teams[0]?.team.name}
-								</p>
+								</p> */}
 							</div>
 
 							<p className="font-semibold">

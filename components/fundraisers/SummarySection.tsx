@@ -7,12 +7,23 @@ import {
 	AvatarImage,
 } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { PlusIcon, ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
-export default function SummarySection() {
+import type { Fundraiser } from "types/fundraiser";
+import type { Team } from "types/team";
+
+type SectionProps = {
+	fundraiser: Fundraiser;
+	totalRaised: number;
+	fundraiserTeams: Team[];
+	participants: Player & { amount: numberl };
+};
+export default function SummarySection({
+	fundraiser,
+	totalRaised,
+	fundraiserTeams,
+	participants,
+}: SectionProps) {
 	return (
 		<Card className="overflow-hidden bg-gray-200">
 			<CardContent className="p-5">

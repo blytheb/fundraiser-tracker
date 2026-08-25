@@ -1,7 +1,12 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Fundraiser } from "types/fundraiser";
 
-export default function DetailSection() {
+type SectionProps = {
+	fundraiser: Fundraiser;
+};
+
+export default function DetailSection({ fundraiser }: SectionProps) {
 	return (
 		<Card>
 			<CardHeader>
@@ -30,7 +35,7 @@ export default function DetailSection() {
 				<div className="flex justify-between gap-4 text-sm">
 					<span className="text-muted-foreground">Participants</span>
 
-					<span className="font-medium">{participants.length}</span>
+					{/* <span className="font-medium">{fundraiser.participants.length}</span> */}
 				</div>
 
 				<div className="flex justify-between gap-4 text-sm">

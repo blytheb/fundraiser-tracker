@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getAllFundraisers() {
-	return (fundraisers = await prisma.fundraiser.findMany({
+	return await prisma.fundraiser.findMany({
 		orderBy: {
 			name: "asc",
 		},
-	}));
+	});
 }
 
 export async function getFundraiserById(id: string) {
@@ -33,5 +33,11 @@ export async function getFundraiserById(id: string) {
 		return null;
 	}
 
-	return fundraiser;
+	return {
+		...fundraiser,
+		funds: fundraiser.funds.map((fund) => ({
+			...fund,
+			amount: Number(fund.amount),
+		})),
+	};
 }

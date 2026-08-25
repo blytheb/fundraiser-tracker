@@ -38,12 +38,13 @@ export default function RosterTabContent({ players }: TabProps) {
 								className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-muted/50">
 								<div className="flex min-w-0 items-center gap-3">
 									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold">
-										{player.firstName} A{player.lastName}
+										{player.firstName[0]}
+										{player.lastName[0]}
 									</div>
 
 									<div className="min-w-0">
 										<p className="truncate text-sm font-medium">
-											?{player.firstName} {player.lastName}
+											{player.firstName} {player.lastName}
 										</p>
 
 										<p className="text-xs text-muted-foreground">

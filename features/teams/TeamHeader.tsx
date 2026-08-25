@@ -1,13 +1,14 @@
+import type { Team } from "@prisma/client";
+
 import { Badge } from "@/components/ui/badge";
-import TeamActions from "@/components/teams/TeamActions";
-import type { Team } from "@/types/team";
 import { Card, CardContent } from "@/components/ui/card";
 
 type TeamHeaderProps = {
 	team: Team;
+	playerCount: number;
 };
 
-export default function TeamHeader({ team }: TeamHeaderProps) {
+export default function TeamHeader({ team, playerCount }: TeamHeaderProps) {
 	return (
 		<Card className="mb-4">
 			<CardContent className="p-5">
@@ -27,7 +28,7 @@ export default function TeamHeader({ team }: TeamHeaderProps) {
 						</div>
 					</div>
 
-					<Badge variant="secondary">14 Players</Badge>
+					<Badge variant="secondary">{playerCount} Players</Badge>
 				</div>
 			</CardContent>
 		</Card>

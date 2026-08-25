@@ -1,16 +1,10 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-
-import {
-	ArrowLeft,
-	CalendarDays,
-	ChevronRight,
-	Plus,
-	Users,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import type { Player } from "@/types/player";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronRight, Plus } from "lucide-react";
+
+import type { Player } from "@prisma/client";
 
 type TabProps = {
 	players: Player[];

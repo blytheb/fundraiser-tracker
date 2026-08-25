@@ -1,15 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import {
-	ArrowLeft,
-	CalendarDays,
-	ChevronRight,
-	Plus,
-	Users,
-} from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 import type { Fundraiser } from "@/types/fundraiser";
 

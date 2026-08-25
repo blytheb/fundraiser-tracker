@@ -29,7 +29,7 @@ export async function saveTeamRoster(teamId: string, playerIds: string[]) {
 		},
 	});
 
-	await prisma.teamPlayer.createMany({
+	return prisma.teamPlayer.createMany({
 		data: playerIds.map((playerId) => ({
 			teamId,
 			playerId,

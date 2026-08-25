@@ -4,10 +4,10 @@ import AddTeamDialog from "@/components/teams/forms/AddTeamDialog";
 
 import { ItemGroup } from "@/components/ui/item";
 
-import { getAllTeams } from "@/lib/data/teams";
+import { getTeams } from "@/features/teams/data/teams";
 
 export default async function AllTeamsPage() {
-	const teams = await getAllTeams();
+	const teams = await getTeams();
 
 	return (
 		<div className="mx-auto w-full max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
@@ -25,7 +25,6 @@ export default async function AllTeamsPage() {
 				<div className="grid grid-cols-1 gap-4 items-stretch sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 ">
 					<ItemGroup>
 						{teams.map((team) => (
-							// <TeamCard key={team.id} team={team} />
 							<ListItemWithImage key={team.id} team={team} />
 						))}
 					</ItemGroup>

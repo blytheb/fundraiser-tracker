@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getTeamPlayers(teamId: string) {
-	const teamPlayers = await prisma.teamPlayer.findMany({
+	return prisma.teamPlayer.findMany({
 		where: {
 			teamId,
 		},
@@ -9,6 +9,4 @@ export async function getTeamPlayers(teamId: string) {
 			player: true,
 		},
 	});
-
-	return teamPlayers.map((teamPlayer) => teamPlayer.player);
 }

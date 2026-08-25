@@ -1,14 +1,17 @@
 import React from "react";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import RosterTabContent from "@/components/teams/RosterTabContent";
-import FundraiserTabContent from "@/components/teams/FundraiserTabContent";
-import type { Team } from "@/types/team";
+
+import RosterTabContent from "@/features/teams/RosterTabContent";
+// import FundraiserTabContent from "@/features/teams/FundraiserTabContent";
+
+import type { Player } from "@prisma/client";
 
 type TabProps = {
-	team: Team;
+	players: Player[];
 };
 
-export default function TabSection({ team }: TabProps) {
+export default function TabSection({ players }: TabProps) {
 	return (
 		<Tabs defaultValue="roster" className="flex flex-col w-full">
 			<TabsList className="flex w-full flex-row">
@@ -19,10 +22,11 @@ export default function TabSection({ team }: TabProps) {
 				{/* <TabsTrigger value="trips">{`Trips (${team.trips.length})`}</TabsTrigger> */}
 			</TabsList>
 			<TabsContent value="roster" className="mt-4">
-				<RosterTabContent players={team.players} />
+				<RosterTabContent players={players} />
 			</TabsContent>
 			<TabsContent value="fundraisers" className="mt-4">
-				<FundraiserTabContent fundraisers={team.fundraisers} />
+				Fundraiser Content
+				{/* <FundraiserTabContent fundraisers={team.fundraisers} /> */}
 			</TabsContent>
 		</Tabs>
 	);

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import SummarySection from "@/components/teams/SummarySection";
 // -----------------------------
 // Types
 // -----------------------------
@@ -236,17 +236,17 @@ export default function TeamPage() {
 	return (
 		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
 			{/* Back */}
-			<div className="mb-4">
+			{/* <div className="mb-4">
 				<Button variant="ghost" size="sm" asChild className="-ml-2">
 					<Link href="/teams">
 						<ArrowLeft className="mr-2 h-4 w-4" />
 						Teams
 					</Link>
 				</Button>
-			</div>
+			</div> */}
 
 			{/* Team Header */}
-			<Card className="mb-4">
+			{/* <Card className="mb-4">
 				<CardContent className="p-5">
 					<div className="flex items-start justify-between gap-4">
 						<div className="min-w-0">
@@ -264,10 +264,10 @@ export default function TeamPage() {
 						<Badge variant="secondary">{team.players.length} Players</Badge>
 					</div>
 				</CardContent>
-			</Card>
+			</Card> */}
 
 			{/* Summary */}
-			<div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
+			{/* <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
 				<Card>
 					<CardContent className="p-4">
 						<div className="flex items-center gap-2 text-muted-foreground">
@@ -305,7 +305,7 @@ export default function TeamPage() {
 						<p className="text-xs text-muted-foreground">Upcoming</p>
 					</CardContent>
 				</Card>
-			</div>
+			</div> */}
 
 			{/* Tabs */}
 			<Tabs defaultValue="roster" className="flex flex-col w-full">

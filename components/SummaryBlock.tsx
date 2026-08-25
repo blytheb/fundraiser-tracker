@@ -1,20 +1,28 @@
-import React from 'react'
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
 type SummaryBlockProps = {
-    value: number;
-    label: string;
-}
+	title: string;
+	value: number;
+	label: string;
+};
 
 export default function SummaryBlock({
-    value,
-    label
-}: SummaryBlockProps ) {
-  return (
-		<div className="mb-6 flex items-center gap-4 border p-4">
-            <div className="flex flex-col justify-center items-center gap-3">
-                <h1 className="text-2xl font-bold">{value}</h1>
-                <p className="text-muted-foreground">{label}</p>
-            </div>
-		</div>
+	title,
+	value,
+	label,
+}: SummaryBlockProps) {
+	return (
+		<Card>
+			<CardContent className="p-4">
+				<p className="text-xs font-medium text-muted-foreground sm:text-sm">
+					{title}
+				</p>
+
+				<p className="mt-2 text-2xl font-bold">{value}</p>
+
+				<p className="text-xs text-muted-foreground">{label}</p>
+			</CardContent>
+		</Card>
 	);
 }

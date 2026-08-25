@@ -7,8 +7,9 @@ import { getTeamById } from "@/lib/data/teams";
 import { getTeamPlayers } from "@/lib/data/teamPlayers";
 import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
 import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
-import SummaryBlock from "@/components/SummaryBlock";
 import RosterSection from "@/components/teams/rosters/RosterSection";
+
+import SummarySection from "@/components/teams/SummarySection";
 
 type TeamPageProps = {
 	params: Promise<{
@@ -34,17 +35,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
 			</Button> */}
 			<TeamHeader team={team} />
 			{/* Summary */}
-			<section>
-				<h2 className="mb-3 text-lg font-semibold">Summary</h2>
+			<SummarySection />
 
-				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-					<SummaryBlock value={players.length} label="Players" />
-
-					<SummaryBlock value="3" label="Upcoming Events" />
-
-					<SummaryBlock value="$2,450" label="Fundraised" />
-				</div>
-			</section>
 			{/* Upcoming Trip */}
 			<section>
 				<div className="mb-3 flex items-center justify-between">

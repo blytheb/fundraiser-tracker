@@ -25,11 +25,11 @@ export async function getActiveFundraisers(): Promise<Fundraiser[]> {
 export async function getFundraiserById(
 	id: string,
 ): Promise<Fundraiser | null> {
-	return (fundraiser = await prisma.fundraiser.findUnique({
+	return await prisma.fundraiser.findUnique({
 		where: {
 			id,
 		},
-	}));
+	});
 }
 
 export async function getFundraiserWithTeams(

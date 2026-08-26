@@ -1,14 +1,14 @@
-import { getAllFundraisers } from "@/lib/data/fundraisers";
+import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
 
 import PageHeader from "@/components/PageHeader";
 import SearchBar from "@/components/SearchBar";
-import AddFundraiserDialog from "@/components/fundraisers/forms/AddFundraiserDialog";
+import AddFundraiserDialog from "@/features/fundraisers/forms/AddFundraiserDialog";
 import { ItemGroup } from "@/components/ui/item";
-import { Button } from "@/components/ui/button";
 import { BadgeCheckIcon, CalendarClock } from "lucide-react";
 import ListItemWithIcon from "@/components/ListItemWithIcon";
+
 export default async function AllFundraisersPage() {
-	const fundraisers = await getAllFundraisers();
+	const fundraisers = await getFundraisers();
 	return (
 		<div className="space-y-4 px-4">
 			<PageHeader heading="Fundraiser" />

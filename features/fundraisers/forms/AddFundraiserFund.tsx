@@ -26,7 +26,7 @@ import {
 
 import { Textarea } from "@/components/ui/textarea";
 
-import { addFundraiserFund } from "@/lib/actions/fundraisers";
+import { addFundraiserFund } from "@/features/fundraisers/actions/fundraiserFunds";
 
 type AddFundraiserFundProps = {
 	fundraiserId: string;

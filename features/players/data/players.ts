@@ -63,7 +63,7 @@ export async function getPlayerWithFundraisers(
 			id,
 		},
 		include: {
-			fundraiseParticipants: {
+			fundraiserParticipants: {
 				include: {
 					fundraiser: true,
 				},

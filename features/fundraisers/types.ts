@@ -2,6 +2,7 @@ import type {
 	Prisma,
 	FundraiserDistribution,
 	FundraiserStatus,
+	FundType,
 } from "@prisma/client";
 
 export type FundraiserFormData = {
@@ -10,6 +11,12 @@ export type FundraiserFormData = {
 	startDate: Date;
 	status: FundraiserStatus;
 	distributionMethod: FundraiserDistribution;
+};
+
+export type FundraiserFundFormData = {
+	type: FundType;
+	amount: number;
+	description?: string;
 };
 
 export type FundraiserWithTeams = Prisma.FundraiserGetPayload<{
@@ -37,3 +44,10 @@ export type FundraiserWithFunds = Prisma.FundraiserGetPayload<{
 		funds: true;
 	};
 }>;
+
+export type FundraiserParticipantWithPlayer =
+	Prisma.FundraiserParticipantGetPayload<{
+		include: {
+			player: true;
+		};
+	}>;

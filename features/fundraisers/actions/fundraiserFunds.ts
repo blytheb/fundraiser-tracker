@@ -64,3 +64,11 @@ export async function addFundraiserFund(data: FundraiserFundData) {
 		return fundraiser;
 	});
 }
+
+export async function deleteFund(id: string) {
+	return prisma.fundraiserFund.delete({
+		where: {
+			id,
+		},
+	});
+}

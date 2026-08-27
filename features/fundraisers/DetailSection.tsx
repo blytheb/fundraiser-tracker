@@ -1,12 +1,13 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Fundraiser } from "types/fundraiser";
+import type { Fundraiser, Team } from "@/prisma/client";
 
 type SectionProps = {
 	fundraiser: Fundraiser;
+	teams: Team;
 };
 
-export default function DetailSection({ fundraiser }: SectionProps) {
+export default function DetailSection({ fundraiser, teams }: SectionProps) {
 	return (
 		<Card>
 			<CardHeader>
@@ -26,9 +27,7 @@ export default function DetailSection({ fundraiser }: SectionProps) {
 					<span className="text-muted-foreground">Teams</span>
 
 					<span className="font-medium">
-						{fundraiser.teams
-							.map((fundraiserTeam) => fundraiserTeam.team.name)
-							.join(", ")}
+						{teams.map((team) => team.name).join(", ")}
 					</span>
 				</div>
 

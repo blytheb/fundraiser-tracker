@@ -4,6 +4,10 @@ import { getFundraiserById } from "@/features/fundraisers/data/fundraisers";
 import { getFundraiserTeams } from "@/features/fundraisers/data/fundraiserTeams";
 import { getActiveTeams } from "@/features/teams/data/teams";
 import {
+	getFundraiserFunds,
+	getFundraiserTotal,
+} from "@/features/fundraisers/data/fundraiserFunds";
+import {
 	getFundraiserParticipants,
 	getEligibleFundraiserPlayers,
 } from "@/lib/data/fundraiserParticipants";
@@ -37,8 +41,8 @@ export default async function FundraiserPage({ params }: PageProps) {
 			{/* Summary Card */}
 			<SummarySection
 				fundraiser={fundraiser}
-				totalRaised={totalRaised}
-				fundraiserTeams={fundraiserTeams}
+				totalRaised={total}
+				fundraiserTeams={teams}
 				participants={participants}
 			/>
 			{/* Money Breakdown */}

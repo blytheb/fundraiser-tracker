@@ -6,6 +6,7 @@ import TabSection from "@/features/teams/TabSection";
 
 import { getTeamById } from "@/features/teams/data/teams";
 import { getTeamPlayers } from "@/features/teams/data/teamPlayers";
+import { getTeamFundraisers } from "@/features/fundraisers/data/fundraiserTeams";
 
 // import { getAllPlayers } from "@/lib/data/players";
 // import { getTeamPlayers } from "@/lib/data/teamPlayers";
@@ -20,9 +21,10 @@ type TeamPageProps = {
 
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
-	const [team, players] = await Promise.all([
+	const [team, players, fundraisers] = await Promise.all([
 		getTeamById(teamId),
 		getTeamPlayers(teamId),
+		getTeamFundraisers(teamId),
 	]);
 
 	if (!team) {
@@ -31,14 +33,13 @@ export default async function TeamPage({ params }: TeamPageProps) {
 
 	return (
 		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
-			{/* <Button variant="ghost" size="sm">
-				<Link href="/teams"> Back to All Teams</Link>
-			</Button> */}
-
 			{/* Header */}
 			<TeamHeader team={team} playerCount={players.length} />
 			{/* Summary */}
-			<SummarySection />
+			<SummarySection
+				playerCount={players.length}
+				fundraiserCount={fundraisers.length}
+			/>
 			{/* Tabs */}
 			<TabSection team={team} players={players} />
 		</main>

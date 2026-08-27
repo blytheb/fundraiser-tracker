@@ -1,9 +1,9 @@
-import type { Team } from "@prisma/client";
+import type { Team, Fundraiser } from "@prisma/client";
 
 export async function getFundraiserTeams(
 	fundraiserId: string,
 ): Promise<Team[]> {
-	const fundraiserTeams = await prisma.fundraiserTeam.findMany({
+	const teams = await prisma.fundraiserTeam.findMany({
 		where: {
 			fundraiserId,
 		},
@@ -12,5 +12,20 @@ export async function getFundraiserTeams(
 		},
 	});
 
-	return fundraiserTeams.map((fundraiserTeam) => fundraiserTeam.team);
+	return teams.map((team) => team.team);
+}
+
+export async function getTeamFundraisers(
+	teamId: string,
+): Promise<Fundraiser[]> {
+	const allFundraisers = await prisma.fundraiserTeam.findMany({
+		where: {
+			teamId,
+		},
+		include: {
+			fundraiser: true,
+		},
+	});
+
+	return allFundraisers.map((fundraiser) => fundraiser.fundraiser);
 }

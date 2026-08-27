@@ -21,11 +21,6 @@ export default function RosterTabContent({ players }: TabProps) {
 						{players.length} players
 					</p>
 				</div>
-
-				<Button size="sm">
-					<Plus className="mr-1.5 h-4 w-4" />
-					Add Player
-				</Button>
 			</div>
 
 			<Card>

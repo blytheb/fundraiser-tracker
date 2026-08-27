@@ -20,7 +20,7 @@ type TeamRosterProps = {
 	allPlayers: Player[];
 };
 
-export default function TeamRosterDialog({
+export default function AddPlayerToTeamDialog({
 	teamId,
 	players,
 	allPlayers,

@@ -1,6 +1,7 @@
-import PageHeader from "@/components/PageHeader";
-import ListItemWithImage from "@/components/ListItemWithImage";
-import AddTeamDialog from "@/features/teams/forms/AddTeamDialog";
+import PageHeader from "@/components/ui-reusable/PageHeader";
+import ListItemWithImage from "@/components/ui-reusable/ListItemWithImage";
+
+import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
 
 import { ItemGroup } from "@/components/ui/item";
 

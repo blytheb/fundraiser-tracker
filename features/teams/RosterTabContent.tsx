@@ -4,13 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Plus } from "lucide-react";
 
+import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
+
 import type { Player } from "@prisma/client";
 
 type TabProps = {
+	teamId: string;
 	players: Player[];
+	avaiablePlayers: Player[];
 };
 
-export default function RosterTabContent({ players }: TabProps) {
+export default function RosterTabContent({
+	teamId,
+	players,
+	availablePlayers,
+}: TabProps) {
 	return (
 		<>
 			<div className="mb-3 flex items-center justify-between">
@@ -21,6 +29,11 @@ export default function RosterTabContent({ players }: TabProps) {
 						{players.length} players
 					</p>
 				</div>
+
+				<AddPlayerToTeamDialog
+					teamId={teamId}
+					availabelPlayers={availablePlayers}
+				/>
 			</div>
 
 			<Card>

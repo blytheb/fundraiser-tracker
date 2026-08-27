@@ -8,10 +8,16 @@ import RosterTabContent from "@/features/teams/RosterTabContent";
 import type { Player } from "@prisma/client";
 
 type TabProps = {
+	teamId: string;
 	players: Player[];
+	avaialbePlayers: Player[];
 };
 
-export default function TabSection({ players }: TabProps) {
+export default function TabSection({
+	teamId,
+	players,
+	availablePlayers,
+}: TabProps) {
 	return (
 		<Tabs defaultValue="roster" className="flex flex-col w-full">
 			<TabsList className="flex w-full flex-row">
@@ -22,7 +28,11 @@ export default function TabSection({ players }: TabProps) {
 				{/* <TabsTrigger value="trips">{`Trips (${team.trips.length})`}</TabsTrigger> */}
 			</TabsList>
 			<TabsContent value="roster" className="mt-4">
-				<RosterTabContent players={players} />
+				<RosterTabContent
+					teamId={teamId}
+					players={players}
+					availablePlayers={availablePlayers}
+				/>
 			</TabsContent>
 			<TabsContent value="fundraisers" className="mt-4">
 				Fundraiser Content

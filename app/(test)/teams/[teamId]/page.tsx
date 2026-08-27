@@ -5,7 +5,10 @@ import SummarySection from "@/features/teams/SummarySection";
 import TabSection from "@/features/teams/TabSection";
 
 import { getTeamById } from "@/features/teams/data/teams";
-import { getTeamPlayers } from "@/features/teams/data/teamPlayers";
+import {
+	getTeamPlayers,
+	getAvailablePlayersForTeam,
+} from "@/features/teams/data/teamPlayers";
 import { getTeamFundraisers } from "@/features/fundraisers/data/fundraiserTeams";
 
 // import { getAllPlayers } from "@/lib/data/players";
@@ -21,10 +24,11 @@ type TeamPageProps = {
 
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
-	const [team, players, fundraisers] = await Promise.all([
+	const [team, players, fundraisers, availablePlayers] = await Promise.all([
 		getTeamById(teamId),
 		getTeamPlayers(teamId),
 		getTeamFundraisers(teamId),
+		getAvailablePlayersForTeam(teamId),
 	]);
 
 	if (!team) {
@@ -41,7 +45,11 @@ export default async function TeamPage({ params }: TeamPageProps) {
 				fundraiserCount={fundraisers.length}
 			/>
 			{/* Tabs */}
-			<TabSection team={team} players={players} />
+			<TabSection
+				teamId={team.id}
+				players={players}
+				availablePlayers={availablePlayers}
+			/>
 		</main>
 	);
 }

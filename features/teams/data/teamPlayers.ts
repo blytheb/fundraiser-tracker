@@ -13,3 +13,18 @@ export async function getTeamPlayers(teamId: string): Promise<Player[]> {
 
 	return teamPlayers.map((teamPlayer) => teamPlayer.player);
 }
+
+export async function getAvaialbePlayersForTeam(
+	teamId: string,
+): Promise<Player[]> {
+	return prisma.player.findMany({
+		where: {
+			status: true,
+			teams: {
+				none: {
+					teamId,
+				},
+			},
+		},
+	});
+}

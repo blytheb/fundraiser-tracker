@@ -4,7 +4,7 @@ export type PlayerformData = {
 	firstName: string;
 	lastName: string;
 	status: TeamStatus;
-	imageUrl?: string | null;
+	imageUrl?: string;
 };
 
 export type PlayerWithTeams = Prisma.PlayerGetPayLoad<{

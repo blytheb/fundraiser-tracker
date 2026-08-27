@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type { PlayerFormData } from "@/features/players/type";
 
 export async function addPlayerToTeam(teamId: string, playerId: string) {
 	return prisma.teamPlayer.create({
@@ -22,15 +23,9 @@ export async function removePlayerFromTeam(teamId: string, playerId: string) {
 	});
 }
 
-type CreatePlayerData = {
-	firstName: string;
-	lastName: string;
-	imageUrl?: string;
-};
-
 export async function createPlayerAndAddToTeam(
 	teamId: string,
-	data: CreatePlayerData,
+	data: PlayerFormData,
 ) {
 	return prisma.$transaction(async (tx) => {
 		const player = await tx.player.create({
@@ -38,7 +33,7 @@ export async function createPlayerAndAddToTeam(
 				firstName: data.firstName,
 				lastName: data.lastName,
 				status: true,
-				imageUrl: data.imageUrl | null,
+				imageUrl: data.imageUrl,
 			},
 		});
 

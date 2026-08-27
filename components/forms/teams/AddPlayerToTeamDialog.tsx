@@ -88,9 +88,7 @@ export default function AddPlayerToTeamDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogTrigger asChild>
-				<Button>Add Player</Button>
-			</DialogTrigger>
+			<DialogTrigger render={<Button>Add Player</Button>}></DialogTrigger>
 
 			<DialogContent>
 				<DialogHeader>

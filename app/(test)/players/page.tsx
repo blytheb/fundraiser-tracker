@@ -1,5 +1,5 @@
-import PageHeader from "@/components/PageHeader";
-import SearchBar from "@/components/SearchBar";
+import PageHeader from "@/components/ui-reusable/PageHeader";
+import SearchBar from "@/components/ui-reusable/SearchBar";
 import AddPlayerDialog from "@/features/players/forms/AddPlayerDialog";
 import PlayerList from "@/features/players/PlayerList";
 

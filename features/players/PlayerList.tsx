@@ -1,5 +1,5 @@
 import React from "react";
-import ListItemWithAvatar from "@/components/ListItemWithAvatar";
+import ListItemWithAvatar from "@/components/ui-reusable/ListItemWithAvatar";
 
 import { ItemGroup } from "@/components/ui/item";
 

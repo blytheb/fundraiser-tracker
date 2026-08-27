@@ -32,7 +32,7 @@ export default function RosterTabContent({
 
 				<AddPlayerToTeamDialog
 					teamId={teamId}
-					availabelPlayers={availablePlayers}
+					availablePlayers={availablePlayers}
 				/>
 			</div>
 

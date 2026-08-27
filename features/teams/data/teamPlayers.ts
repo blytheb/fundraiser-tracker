@@ -14,7 +14,7 @@ export async function getTeamPlayers(teamId: string): Promise<Player[]> {
 	return teamPlayers.map((teamPlayer) => teamPlayer.player);
 }
 
-export async function getAvaialbePlayersForTeam(
+export async function getAvailablePlayersForTeam(
 	teamId: string,
 ): Promise<Player[]> {
 	return prisma.player.findMany({

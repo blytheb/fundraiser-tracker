@@ -7,10 +7,11 @@ import {
 	getFundraiserParticipants,
 	getEligibleFundraiserPlayers,
 } from "@/lib/data/fundraiserParticipants";
-import SummarySection from "@/components/fundraisers/SummarySection";
-import MoneyBreakdownSection from "@/components/fundraisers/MoneyBreakdownSection";
-import DistributionSection from "@/components/fundraisers/DistributionSection";
-import DetailSection from "@/components/fundraisers/DetailSection";
+
+import SummarySection from "@/features/fundraisers/SummarySection";
+import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
+import DistributionSection from "@/features/fundraisers/DistributionSection";
+import DetailSection from "@/features/fundraisers/DetailSection";
 
 type PageProps = {
 	params: Promise<{
@@ -20,18 +21,10 @@ type PageProps = {
 export default async function FundraiserPage({ params }: PageProps) {
 	const { fundraiserId } = await params;
 
-	const [
-		fundraiser,
-		fundraiserTeams,
-		activeTeams,
-		participants,
-		eligiblePlayers,
-	] = await Promise.all([
+	const [fundraiser, teams, participants] = await Promise.all([
 		getFundraiserById(fundraiserId),
 		getFundraiserTeams(fundraiserId),
-		getActiveTeams(),
 		getFundraiserParticipants(fundraiserId),
-		getEligibleFundraiserPlayers(fundraiserId),
 	]);
 
 	const funds = fundraiser.funds.map((fund) => ({
@@ -60,7 +53,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 			{/* Participant Distribution */}
 			<DistributionSection participants={participants} />
 			{/* Details */}
-			<DetailSection fundraiser={fundraiser} />
+			<DetailSection fundraiser={fundraiser} teams={teams} />
 		</main>
 	);
 }

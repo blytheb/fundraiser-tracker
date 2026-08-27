@@ -21,18 +21,16 @@ type PageProps = {
 export default async function FundraiserPage({ params }: PageProps) {
 	const { fundraiserId } = await params;
 
-	const [fundraiser, teams, participants] = await Promise.all([
+	const [fundraiser, teams, participants, funds, total] = await Promise.all([
 		getFundraiserById(fundraiserId),
 		getFundraiserTeams(fundraiserId),
 		getFundraiserParticipants(fundraiserId),
+		getFundraiserFunds(fundraiserId),
+		getFundraiserTotal(fundraiserId),
 	]);
 
-	const funds = fundraiser.funds.map((fund) => ({
-		...fund,
-		amount: Number(fund.amount),
-	}));
-	const totalRaised =
-		funds.reduce((total, fund) => total + Number(fund.amount), 0) ?? 0;
+	// const totalRaised =
+	// 	funds.reduce((total, fund) => total + Number(fund.amount), 0) ?? 0;
 
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
@@ -46,7 +44,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 			{/* Money Breakdown */}
 			<MoneyBreakdownSection
 				fundraiserId={fundraiser.id}
-				total={totalRaised}
+				total={total}
 				funds={funds}
 			/>
 

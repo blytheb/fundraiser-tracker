@@ -9,12 +9,12 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import type { Fund } from "types/fund";
+import type { FundraiserFund } from "@/prisma/client";
 
 type SectionProps = {
 	fundraiserId: string;
 	total: number;
-	funds: Fund & { amount: number };
+	funds: FundraiserFund[];
 };
 export default function MoneyBreakdownSection({
 	fundraiserId,
@@ -53,10 +53,12 @@ export default function MoneyBreakdownSection({
 									<p className="text-muted-foreground">{fund.type}</p>
 									<p className="text-muted-foreground">
 										$
-										{fund.amount.toLocaleString("en-US", {
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 2,
-										})}
+										{Number(
+											fund.amount.toLocaleString("en-US", {
+												minimumFractionDigits: 2,
+												maximumFractionDigits: 2,
+											}),
+										)}
 									</p>
 								</div>
 							);

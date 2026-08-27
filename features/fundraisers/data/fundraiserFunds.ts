@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getFundraiserFunds(fundraiserId: string) {
+import type { FundraiserFund } from "@/prisma/client";
+
+export async function getFundraiserFunds(
+	fundraiserId: string,
+): FundraiserFund[] {
 	return prisma.fundraiserFund.findMany({
 		where: {
 			fundraiserId,

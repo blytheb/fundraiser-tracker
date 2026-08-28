@@ -1,8 +1,5 @@
 import React from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, Plus } from "lucide-react";
 
 import ListItemWithAvatar from "@/components/ui-reusable/ListItemWithAvatar";
 import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
@@ -38,19 +35,15 @@ export default function RosterTabContent({
 				/>
 			</div>
 
-			<Card>
-				<CardContent className="p-0">
-					<div className="divide-y">
-						{players.map((player) => (
-							<ListItemWithAvatar
-								key={player.id}
-								player={player}
-								actions={<TeamPlayerActions player={player} teamId={teamId} />}
-							/>
-						))}
-					</div>
-				</CardContent>
-			</Card>
+			<div>
+				{players.map((player) => (
+					<ListItemWithAvatar
+						key={player.id}
+						player={player}
+						actions={<TeamPlayerActions player={player} teamId={teamId} />}
+					/>
+				))}
+			</div>
 		</>
 	);
 }

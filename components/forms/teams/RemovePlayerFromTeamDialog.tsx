@@ -48,11 +48,13 @@ export default function RemovePlayerFromTeamDialog({
 				</DialogHeader>
 
 				<DialogDescription>
-					Are you sure you want to remove this player?
+					Are you sure you want to remove this player from this team?
 				</DialogDescription>
 
 				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, remove this player</Button>
+					<Button onClick={handleDelete}>
+						Yes, remove this {player.firstName} {player.lastName}
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

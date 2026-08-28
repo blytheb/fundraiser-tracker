@@ -1,5 +1,6 @@
 import React from "react";
 import ListItemWithAvatar from "@/components/ui-reusable/ListItemWithAvatar";
+import TeamPlayerActions from "@/features/teams/TeamPlayerActions";
 
 import { ItemGroup } from "@/components/ui/item";
 
@@ -20,7 +21,11 @@ export default function PlayerList({ players }: ListProps) {
 				<div className="space-y-4">
 					<ItemGroup>
 						{players.map((player) => (
-							<ListItemWithAvatar key={player.id} player={player} />
+							<ListItemWithAvatar
+								key={player.id}
+								player={player}
+								actions={<TeamPlayerActions />}
+							/>
 						))}
 					</ItemGroup>
 				</div>

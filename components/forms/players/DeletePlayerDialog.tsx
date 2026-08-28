@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
-import { deletePlayer } from "@/lib/actions/players";
-
 import {
 	Dialog,
 	DialogDescription,
@@ -15,14 +13,8 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-
+import { deletePlayer } from "@/features/players/actions/players";
 import type { Player } from "@/types/player";
-
-type DeletePlayerDialogProps = {
-	player: Player;
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-};
 
 export default function DeletePlayerDialog({
 	player,

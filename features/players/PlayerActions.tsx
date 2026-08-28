@@ -14,8 +14,8 @@ import { MoreVertical } from "lucide-react";
 
 import Link from "next/link";
 
-import EditPlayerDialog from "@/components/players/forms/EditPlayerDialog";
-import DeletePlayerDialog from "@/components/players/forms/DeletePlayerDialog";
+import EditPlayerDialog from "@/components/forms/players/EditPlayerDialog";
+import DeletePlayerDialog from "@/components/forms/players/DeletePlayerDialog";
 
 import type { Player } from "@/types/player";
 

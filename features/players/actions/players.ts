@@ -10,7 +10,7 @@ export async function createPlayer(data: PlayerFormData): Promise<Player> {
 
 export async function updatePlayer(
 	id: string,
-	data: PlayerData,
+	data: PlayerFormData,
 ): Promise<Player> {
 	return prisma.player.update({
 		where: {

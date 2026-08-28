@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
-import { updatePlayer } from "@/lib/actions/players";
+import { updatePlayer } from "@/features/players/actions/players";
 
 import {
 	Dialog,

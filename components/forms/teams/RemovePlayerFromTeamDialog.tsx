@@ -11,46 +11,48 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
-import { deleteTeam } from "@/lib/actions/teams";
+import { removePlayerFromTeam } from "@/features/teams/actions/teamPlayers";
 
-import type { Team } from "@/types/team";
+import type { Player } from "@/prisma/client";
 
 type DeleteTeamDialogProps = {
-	team: Team;
+	teamId: string;
+	player: Player;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 };
 
 export default function RemovePlayerFromTeamDialog({
-	team,
+	teamId,
+	player,
 	open,
 	onOpenChange,
 }: DeleteTeamDialogProps) {
 	const router = useRouter();
 
 	async function handleDelete() {
-		// try {
-		// 	await deleteTeam(team.id);
-		// 	router.refresh();
-		// 	onOpenChange(false);
-		// } catch (error) {
-		// 	console.error("Failed to delete team:", error);
-		// }
+		try {
+			await removePlayerFromTeam(teamId, player.id);
+			router.refresh();
+			onOpenChange(false);
+		} catch (error) {
+			console.error("Failed to remove player from team:", error);
+		}
 	}
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Delete {team.name}</DialogTitle>
+					<DialogTitle>Remove {player.firstName}</DialogTitle>
 				</DialogHeader>
 
 				<DialogDescription>
-					Are you sure you want to delete this team?
+					Are you sure you want to remove this player?
 				</DialogDescription>
 
 				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, delete this team</Button>
+					<Button onClick={handleDelete}>Yes, remove this player</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

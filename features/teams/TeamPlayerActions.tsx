@@ -14,7 +14,7 @@ import { MoreVertical } from "lucide-react";
 
 import Link from "next/link";
 
-import EditPlayerDialog from "@/components/players/forms/EditPlayerDialog";
+// import EditPlayerDialog from "@/components/players/forms/EditPlayerDialog";
 import RemovePlayerFromTeamDialog from "@/components/forms/teams/RemovePlayerFromTeamDialog";
 
 import type { Player } from "@/types/player";
@@ -25,27 +25,18 @@ type ActionsProps = {
 };
 
 export default function TeamPlayerActions({ player, teamId }: ActionsProps) {
-	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
 	return (
 		<>
 			{/* Smaller Screens Collapsed Actions */}
-			<div className="lg:hidden">
+			<div>
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						<MoreVertical />
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem
-							onClick={(e) => {
-								e.preventDefault();
-								console.log("Edit Clicked");
-								setEditOpen(true);
-							}}>
-							Edit Player
-						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={(e) => {
 								e.preventDefault();
@@ -59,32 +50,9 @@ export default function TeamPlayerActions({ player, teamId }: ActionsProps) {
 				</DropdownMenu>
 			</div>
 
-			{/* Large Screen 3 action buttons */}
-			<div className="hidden lg:flex items-center gap-1">
-				{/* <div className="flex items-center gap-1"> */}
-				<Button variant="ghost" size="icon">
-					<Link href={`/players/${player.id}`}>
-						<Eye />
-					</Link>
-				</Button>
-
-				<Button variant="ghost" size="icon" onClick={() => setEditOpen(true)}>
-					<Pencil />
-				</Button>
-
-				<Button variant="ghost" size="icon" onClick={() => setDeleteOpen(true)}>
-					<Trash2 />
-				</Button>
-			</div>
-
-			<EditPlayerDialog
-				player={player}
-				open={editOpen}
-				onOpenChange={setEditOpen}
-			/>
-
 			<RemovePlayerFromTeamDialog
 				player={player}
+				teamId={teamId}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
 			/>

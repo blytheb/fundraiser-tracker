@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Plus } from "lucide-react";
 
+import ListItemWithAvatar from "@/components/ui-reusable/ListItemWithAvatar";
 import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
+import TeamPlayerActions from "@/features/teams/TeamPlayerActions";
 
 import type { Player } from "@prisma/client";
 
@@ -40,33 +42,11 @@ export default function RosterTabContent({
 				<CardContent className="p-0">
 					<div className="divide-y">
 						{players.map((player) => (
-							<Link
+							<ListItemWithAvatar
 								key={player.id}
-								href={`/players/${player.id}`}
-								className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-muted/50">
-								<div className="flex min-w-0 items-center gap-3">
-									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold">
-										{player.firstName[0]}
-										{player.lastName[0]}
-									</div>
-
-									<div className="min-w-0">
-										<p className="truncate text-sm font-medium">
-											{player.firstName} {player.lastName}
-										</p>
-
-										<p className="text-xs text-muted-foreground">
-											{player.jerseyNumber
-												? `#${player.jerseyNumber}`
-												: "No number"}
-
-											{player.position && ` • ${player.position}`}
-										</p>
-									</div>
-								</div>
-
-								<ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-							</Link>
+								player={player}
+								actions={<TeamPlayerActions player={player} teamId={teamId} />}
+							/>
 						))}
 					</div>
 				</CardContent>

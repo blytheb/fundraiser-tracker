@@ -24,22 +24,20 @@ type ItemProps = {
 export default function ListItemWithIcon({ fundraiser, actions }: ItemProps) {
 	return (
 		<Item variant="outline" size="sm">
-			<Link href={`/fundraisers/${fundraiser.id}`}>
-				<div className="flex w-full items-center justify-center gap-6 py-2">
-					<ItemMedia>
-						{fundraiser.status === "ACTIVE" ? (
-							<CalendarClock className="size-8" />
-						) : (
-							<BadgeCheckIcon className="size-8" />
-						)}
-					</ItemMedia>
-					<ItemContent>
-						<ItemTitle>{fundraiser.name}</ItemTitle>
-						<ItemDescription> 8/19/2026 </ItemDescription>
-					</ItemContent>
-					{actions && <ItemActions>{actions}</ItemActions>}
-				</div>
-			</Link>
+			<div className="flex w-full items-center justify-center gap-6 py-2">
+				<ItemMedia>
+					{fundraiser.status === "ACTIVE" ? (
+						<CalendarClock className="size-8" />
+					) : (
+						<BadgeCheckIcon className="size-8" />
+					)}
+				</ItemMedia>
+				<ItemContent>
+					<ItemTitle>{fundraiser.name}</ItemTitle>
+					<ItemDescription> 8/19/2026 </ItemDescription>
+				</ItemContent>
+				{actions && <ItemActions>{actions}</ItemActions>}
+			</div>
 		</Item>
 	);
 }

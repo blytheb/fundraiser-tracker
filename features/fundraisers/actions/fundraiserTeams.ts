@@ -38,7 +38,7 @@ export async function createFundraiserAndAddToTeam(
 			data: {
 				name: data.name,
 				description: "No description",
-				startDate: Date("01-01-2010"),
+				startDate: new Date("01-01-2010"),
 				status: "ACTIVE",
 				distributionMethod: "EQUAL",
 			},

@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
-import { removeFundraiserFromTeam } from "@/features/fundraisers/actions/FundraiserTeams";
+import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/fundraiserTeams";
 
 import type { Fundraiser } from "@/prisma/client";
 
@@ -32,7 +32,7 @@ export default function RemoveFundraiserFromTeamDialog({
 
 	async function handleDelete() {
 		try {
-			await removeFundraiserFromTeam(fundraiser.id, teamId);
+			await removeTeamFromFundraiser(fundraiser.id, teamId);
 			router.refresh();
 			onOpenChange(false);
 		} catch (error) {

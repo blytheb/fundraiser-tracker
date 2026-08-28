@@ -35,7 +35,7 @@ export default function FundraiserTabContent({
 				/>
 			</div>
 
-			<div className="space-y-3">
+			<div>
 				{fundraisers.map((fundraiser) => (
 					<ListItemWithIcon
 						key={fundraiser.id}

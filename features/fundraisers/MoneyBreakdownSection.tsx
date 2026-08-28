@@ -2,7 +2,7 @@ import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { ChevronsUpDown } from "lucide-react";
 
-import AddFundraiserFund from "@/features/fundraisers/forms/AddFundraiserFund";
+import AddFundraiserFund from "@/components/forms/fundraisers/AddFundraiserFund";
 import {
 	Collapsible,
 	CollapsibleContent,

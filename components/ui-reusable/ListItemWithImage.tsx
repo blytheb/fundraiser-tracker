@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/item";
 import Image from "next/image";
 import Link from "next/link";
-import TeamActions from "@/components/teams/TeamActions";
+import { ChevronRight } from "lucide-react";
 
 import type { Team } from "@/types/Team";
 
@@ -21,7 +21,7 @@ export default function ListItemWithImage({ team }: ItemProps) {
 	return (
 		<Item variant="outline" className="overflow-hidden p-0">
 			<Link href={`/teams/${team.id}`}>
-				<div className="flex min-h-32 w-full">
+				<div className="flex min-h-32 w-full justify-between items-center gap-6 px-4">
 					{/* Team Image */}
 					<ItemMedia className="w-2/5 shrink-0">
 						<Image
@@ -41,9 +41,7 @@ export default function ListItemWithImage({ team }: ItemProps) {
 
 						<ItemDescription className="mt-1">{team.status}</ItemDescription>
 					</ItemContent>
-					{/* <ItemActions>
-					<TeamActions team={team} />
-				</ItemActions> */}
+					<ChevronRight />
 				</div>
 			</Link>
 		</Item>

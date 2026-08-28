@@ -4,7 +4,7 @@ import {
 	getFundraiserFunds,
 	getFundraiserTotal,
 } from "@/features/fundraisers/data/fundraiserFunds";
-import { getFundraiserParticipants } from "@/lib/data/fundraiserParticipants";
+import { getFundraiserParticipants } from "@/features/fundraisers/data/fundraiserParticipants";
 
 import SummarySection from "@/features/fundraisers/SummarySection";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";

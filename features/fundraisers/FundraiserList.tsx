@@ -1,7 +1,7 @@
 import React from "react";
 import { ItemGroup } from "@/components/ui/item";
 import { BadgeCheckIcon, CalendarClock } from "lucide-react";
-import ListItemWithIcon from "@/components/ListItemWithIcon";
+import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
 
 import type { Fundraiser } from "@/prisma/client";
 

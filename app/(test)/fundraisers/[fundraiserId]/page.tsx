@@ -1,16 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { getFundraiserById } from "@/features/fundraisers/data/fundraisers";
 import { getFundraiserTeams } from "@/features/fundraisers/data/fundraiserTeams";
-import { getActiveTeams } from "@/features/teams/data/teams";
 import {
 	getFundraiserFunds,
 	getFundraiserTotal,
 } from "@/features/fundraisers/data/fundraiserFunds";
-import {
-	getFundraiserParticipants,
-	getEligibleFundraiserPlayers,
-} from "@/lib/data/fundraiserParticipants";
+import { getFundraiserParticipants } from "@/lib/data/fundraiserParticipants";
 
 import SummarySection from "@/features/fundraisers/SummarySection";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";

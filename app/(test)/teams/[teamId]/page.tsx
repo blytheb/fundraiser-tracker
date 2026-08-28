@@ -9,7 +9,10 @@ import {
 	getTeamPlayers,
 	getAvailablePlayersForTeam,
 } from "@/features/teams/data/teamPlayers";
-import { getTeamFundraisers } from "@/features/fundraisers/data/fundraiserTeams";
+import {
+	getTeamFundraisers,
+	getAvailableFundraisersForTeam,
+} from "@/features/fundraisers/data/fundraiserTeams";
 
 // import { getAllPlayers } from "@/lib/data/players";
 // import { getTeamPlayers } from "@/lib/data/teamPlayers";
@@ -24,12 +27,14 @@ type TeamPageProps = {
 
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
-	const [team, players, fundraisers, availablePlayers] = await Promise.all([
-		getTeamById(teamId),
-		getTeamPlayers(teamId),
-		getTeamFundraisers(teamId),
-		getAvailablePlayersForTeam(teamId),
-	]);
+	const [team, players, fundraisers, availablePlayers, availableFundraisers] =
+		await Promise.all([
+			getTeamById(teamId),
+			getTeamPlayers(teamId),
+			getTeamFundraisers(teamId),
+			getAvailablePlayersForTeam(teamId),
+			getAvailableFundraisersForTeam(teamId),
+		]);
 
 	if (!team) {
 		return <div>Team Not Found</div>;
@@ -49,6 +54,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
 				teamId={team.id}
 				players={players}
 				availablePlayers={availablePlayers}
+				fundraisers={fundraisers}
+				availableFundraisers={availableFundraisers}
 			/>
 		</main>
 	);

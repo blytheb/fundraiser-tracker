@@ -44,7 +44,7 @@ export default function TeamPlayerActions({ player, teamId }: ActionsProps) {
 								setDeleteOpen(true);
 							}}
 							className="text-destructive">
-							Remove Player from Team
+							Remove
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

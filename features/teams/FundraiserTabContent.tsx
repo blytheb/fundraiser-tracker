@@ -5,14 +5,21 @@ import { ChevronRight, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import AddFundraiserToTeamDialog from "@/components/forms/teams/AddFundraiserToTeamDialog";
 
 import type { Fundraiser } from "@/types/fundraiser";
 
 type TabProps = {
+	teamId: string;
 	fundraisers: Fundraiser[];
+	availableFundraisers: Fundraiser[];
 };
 
-export default function FundraiserTabContent({ fundraisers }: TabProps) {
+export default function FundraiserTabContent({
+	teamId,
+	fundraisers,
+	availableFundraisers,
+}: TabProps) {
 	return (
 		<>
 			<div className="mb-3 flex items-center justify-between">
@@ -24,10 +31,10 @@ export default function FundraiserTabContent({ fundraisers }: TabProps) {
 					</p>
 				</div>
 
-				<Button size="sm">
-					<Plus className="mr-1.5 h-4 w-4" />
-					Add
-				</Button>
+				<AddFundraiserToTeamDialog
+					teamId={teamId}
+					availableFundraisers={availableFundraisers}
+				/>
 			</div>
 
 			<div className="space-y-3">

@@ -1,7 +1,7 @@
 import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
 
-import PageHeader from "@/components/PageHeader";
-import SearchBar from "@/components/SearchBar";
+import PageHeader from "@/components/ui-reusable/PageHeader";
+import SearchBar from "@/components/ui-reusable/SearchBar";
 import AddFundraiserDialog from "@/features/fundraisers/forms/AddFundraiserDialog";
 import FundraiserList from "@/features/fundraisers/FundraiserList";
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type { FundraiserFormData } from "@/features/fundraisers/type";
 
 export async function addTeamToFundraiser(
 	fundraiserId: string,
@@ -25,6 +26,32 @@ export async function removeTeamFromFundraiser(
 				teamId,
 			},
 		},
+	});
+}
+
+export async function createFundraiserAndAddToTeam(
+	teamId: string,
+	data: FundraiserFormData,
+) {
+	return prisma.$transaction(async (tx) => {
+		const fundraiser = await tx.fundraiser.create({
+			data: {
+				name: data.name,
+				description: "No description",
+				startDate: Date("01-01-2010"),
+				status: "ACTIVE",
+				distributionMethod: "EQUAL",
+			},
+		});
+
+		await tx.fundraiserTeam.create({
+			data: {
+				teamId,
+				fundraiserId: fundraiser.id,
+			},
+		});
+
+		return fundraiser;
 	});
 }
 

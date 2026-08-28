@@ -29,3 +29,18 @@ export async function getTeamFundraisers(
 
 	return allFundraisers.map((fundraiser) => fundraiser.fundraiser);
 }
+
+export async function getAvailableFundraisersForTeam(
+	teamId: string,
+): Promise<Fundraiser[]> {
+	return prisma.fundraiser.findMany({
+		where: {
+			status: "ACTIVE",
+			teams: {
+				none: {
+					teamId,
+				},
+			},
+		},
+	});
+}

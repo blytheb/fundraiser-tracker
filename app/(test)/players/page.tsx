@@ -5,8 +5,15 @@ import PlayerList from "@/features/players/PlayerList";
 
 import { getPlayers } from "@/features/players/data/players";
 
-export default async function AllPlayersPage() {
-	const players = await getPlayers();
+type PageProps = {
+	searchParams: Promise<{
+		search?: string;
+	}>;
+};
+
+export default async function AllPlayersPage({ searchParams }: PageProps) {
+	const { search } = await searchParams;
+	const players = await getPlayers(search);
 
 	return (
 		<div className="space-y-4 px-4">

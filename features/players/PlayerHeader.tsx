@@ -2,6 +2,7 @@ import type { Player, Team } from "@prisma/client";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import PlayerActions from "@/features/players/PlayerActions";
 
 type HeaderProps = {
 	player: Player;
@@ -32,11 +33,12 @@ export default function PlayerHeader({ player, teams }: HeaderProps) {
 								</>
 							)}
 						</div>
+						<Badge variant="secondary">
+							{player.status ? "Active" : "Inactive"}
+						</Badge>
 					</div>
 
-					<Badge variant="secondary">
-						{player.status ? "Active" : "Inactive"}
-					</Badge>
+					<PlayerActions player={player} />
 				</div>
 			</CardContent>
 		</Card>

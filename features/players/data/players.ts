@@ -1,8 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import type { Player } from "@/prisma/client";
 
-export function getPlayers(): Promise<Player[]> {
+export function getPlayers(search?: string): Promise<Player[]> {
 	return prisma.player.findMany({
+		where: search
+			? {
+					OR: [
+						{
+							firstName: {
+								contains: search,
+								mode: "insensitive",
+							},
+						},
+						{
+							lastName: {
+								contains: search,
+								mode: "insensitive",
+							},
+						},
+					],
+				}
+			: undefined,
 		orderBy: [
 			{
 				lastName: "asc",

@@ -20,29 +20,27 @@ type ItemProps = {
 export default function ListItemWithImage({ team }: ItemProps) {
 	return (
 		<Item variant="outline" className="overflow-hidden p-0">
-			<Link href={`/teams/${team.id}`}>
-				<div className="flex min-h-32 w-full justify-between items-center gap-6 px-4">
-					{/* Team Image */}
-					<ItemMedia className="w-2/5 shrink-0">
-						<Image
-							src={team.imageUrl}
-							alt={team.name}
-							width={300}
-							height={300}
-							className="h-full w-full object-cover"
-						/>
-					</ItemMedia>
+			<Link
+				href={`/teams/${team.id}`}
+				className="flex min-h-32 w-full justify-between items-center gap-6 px-4">
+				{/* Team Image */}
+				<ItemMedia className="w-2/5 shrink-0">
+					<Image
+						src={team.imageUrl}
+						alt={team.name}
+						width={300}
+						height={300}
+						className="h-full w-full object-cover"
+					/>
+				</ItemMedia>
 
-					{/* Team Information */}
-					<ItemContent className="justify-center p-4">
-						<ItemTitle className="text-base font-semibold">
-							{team.name}
-						</ItemTitle>
+				{/* Team Information */}
+				<ItemContent className="justify-center p-4">
+					<ItemTitle className="text-base font-semibold">{team.name}</ItemTitle>
 
-						<ItemDescription className="mt-1">{team.status}</ItemDescription>
-					</ItemContent>
-					<ChevronRight />
-				</div>
+					<ItemDescription className="mt-1">{team.status}</ItemDescription>
+				</ItemContent>
+				<ChevronRight />
 			</Link>
 		</Item>
 	);

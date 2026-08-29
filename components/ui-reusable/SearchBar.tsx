@@ -3,18 +3,38 @@
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-type SearchInputProps = {
-	value: string;
-	onChange: (value: string) => void;
+type SearchBarProps = {
 	placeholder?: string;
 };
 
-export default function SearchInput({
-	value,
-	onChange,
+export default function SearchBar({
 	placeholder = "Search...",
-}: SearchInputProps) {
+}: SearchBarProps) {
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+
+	const value = searchParams.get("search") ?? "";
+
+	function handleSearch(value: string) {
+		const params = new URLSearchParams(searchParams.toString());
+
+		if (value) {
+			params.set("search", value);
+		} else {
+			params.delete("search");
+		}
+
+		router.replace(`${pathname}?${params.toString()}`);
+	}
+
+	function clearSearch() {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete("search");
+		router.replace(`${pathname}?${params.toString()}`);
+	}
 	return (
 		<div className="relative w-full">
 			<Search
@@ -24,7 +44,7 @@ export default function SearchInput({
 
 			<Input
 				value={value}
-				onChange={(event) => onChange(event.target.value)}
+				onChange={(event) => handleSearch(event.target.value)}
 				placeholder={placeholder}
 				className="pl-9 pr-9"
 			/>
@@ -34,7 +54,7 @@ export default function SearchInput({
 					type="button"
 					variant="ghost"
 					size="icon"
-					onClick={() => onChange("")}
+					onClick={clearSearch}
 					className="absolute right-1 top-1/2 size-7 -translate-y-1/2"
 					aria-label="Clear search">
 					<X className="size-4" />

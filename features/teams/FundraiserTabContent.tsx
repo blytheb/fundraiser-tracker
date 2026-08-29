@@ -4,6 +4,7 @@ import Link from "next/link";
 import AddFundraiserToTeamDialog from "@/components/forms/teams/AddFundraiserToTeamDialog";
 import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
 import TeamFundraiserActions from "@/features/teams/TeamFundraiserActions";
+import TeamFundraiserList from "@/features/teams/TeamFundraiserList";
 
 import type { Fundraiser } from "@/types/fundraiser";
 
@@ -35,17 +36,7 @@ export default function FundraiserTabContent({
 				/>
 			</div>
 
-			<div>
-				{fundraisers.map((fundraiser) => (
-					<ListItemWithIcon
-						key={fundraiser.id}
-						fundraiser={fundraiser}
-						actions={
-							<TeamFundraiserActions fundraiser={fundraiser} teamId={teamId} />
-						}
-					/>
-				))}
-			</div>
+			<TeamFundraiserList fundraisers={fundraisers} teamId={teamId} />
 		</>
 	);
 }

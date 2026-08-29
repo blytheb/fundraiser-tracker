@@ -1,7 +1,7 @@
 import React from "react";
 
 import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
-import RosterList from "@/features/teams/RosterList";
+import TeamPlayerList from "@/features/teams/TeamPlayerList";
 
 import type { Player } from "@prisma/client";
 
@@ -32,17 +32,7 @@ export default function RosterTabContent({
 					availablePlayers={availablePlayers}
 				/>
 			</div>
-			<RosterList players={players} />
-
-			{/* <div>
-				{players.map((player) => (
-					<ListItemWithAvatar
-						key={player.id}
-						player={player}
-						actions={<TeamPlayerActions player={player} teamId={teamId} />}
-					/>
-				))}
-			</div> */}
+			<TeamPlayerList players={players} teamId={teamId} />
 		</>
 	);
 }

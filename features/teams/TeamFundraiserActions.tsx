@@ -39,13 +39,10 @@ export default function TeamFundraiserActions({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem
-							onClick={(e) => {
-								e.preventDefault();
-								console.log("delete clicked");
-								setDeleteOpen(true);
-							}}>
-							View Fundraiser
+						<DropdownMenuItem>
+							<Link href={`/fundraisers/${fundraiser.id}`}>
+								View Fundraiser
+							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={(e) => {

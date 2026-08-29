@@ -7,10 +7,11 @@ import { ItemGroup } from "@/components/ui/item";
 import type { Player } from "@/prisma/client";
 
 type ListProps = {
+	teamId: string;
 	players: Player[];
 };
 
-export default function RosterList({ players }: ListProps) {
+export default function TeamPlayerList({ players, teamId }: ListProps) {
 	return (
 		<div className="space-y-2">
 			{players.length === 0 ? (
@@ -24,7 +25,7 @@ export default function RosterList({ players }: ListProps) {
 							<ListItemWithAvatar
 								key={player.id}
 								player={player}
-								action={<TeamPlayerActions player={player} />}
+								action={<TeamPlayerActions player={player} teamId={teamId} />}
 							/>
 						))}
 					</ItemGroup>

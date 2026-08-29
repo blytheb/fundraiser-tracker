@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateTeam } from "@/lib/actions/teams";
+import { updateTeam } from "@/features/teams/actions/teams";
 
 import {
 	Dialog,

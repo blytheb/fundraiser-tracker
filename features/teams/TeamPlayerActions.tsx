@@ -42,6 +42,14 @@ export default function TeamPlayerActions({ player, teamId }: ActionsProps) {
 								e.preventDefault();
 								console.log("delete clicked");
 								setDeleteOpen(true);
+							}}>
+							View Player
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={(e) => {
+								e.preventDefault();
+								console.log("delete clicked");
+								setDeleteOpen(true);
 							}}
 							className="text-destructive">
 							Remove

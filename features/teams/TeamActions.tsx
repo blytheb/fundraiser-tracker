@@ -10,8 +10,8 @@ import {
 
 import { MoreVertical } from "lucide-react";
 
-import EditTeamDialog from "@/components/teams/forms/EditTeamDialog";
-import DeleteTeamDialog from "@/components/teams/forms/DeleteTeamDialog";
+import EditTeamDialog from "@/components/forms/teams/EditTeamDialog";
+import DeleteTeamDialog from "@/components/forms/teams/DeleteTeamDialog";
 
 import type { Team } from "@/types/team";
 
@@ -39,6 +39,14 @@ export default function TeamActions({ team }: TeamActionsProps) {
 						}}>
 						Edit Team
 					</DropdownMenuItem>
+					{/* <DropdownMenuItem
+						onClick={(e) => {
+							e.preventDefault();
+							console.log("Edit Clicked");
+							setEditOpen(true);
+						}}>
+						Change Status
+					</DropdownMenuItem> */}
 					<DropdownMenuItem
 						onClick={(e) => {
 							e.preventDefault();

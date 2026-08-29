@@ -44,6 +44,14 @@ export default function TeamFundraiserActions({
 								e.preventDefault();
 								console.log("delete clicked");
 								setDeleteOpen(true);
+							}}>
+							View Fundraiser
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={(e) => {
+								e.preventDefault();
+								console.log("delete clicked");
+								setDeleteOpen(true);
 							}}
 							className="text-destructive">
 							Remove

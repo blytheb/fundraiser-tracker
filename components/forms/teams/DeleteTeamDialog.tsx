@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
-import { deleteTeam } from "@/lib/actions/teams";
+import { deleteTeam } from "@/features/teams/actions/teams";
 
 import type { Team } from "@/types/team";
 

@@ -1,9 +1,7 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 
-import ListItemWithAvatar from "@/components/ui-reusable/ListItemWithAvatar";
 import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
-import TeamPlayerActions from "@/features/teams/TeamPlayerActions";
+import RosterList from "@/features/teams/RosterList";
 
 import type { Player } from "@prisma/client";
 
@@ -34,8 +32,9 @@ export default function RosterTabContent({
 					availablePlayers={availablePlayers}
 				/>
 			</div>
+			<RosterList players={players} />
 
-			<div>
+			{/* <div>
 				{players.map((player) => (
 					<ListItemWithAvatar
 						key={player.id}
@@ -43,7 +42,7 @@ export default function RosterTabContent({
 						actions={<TeamPlayerActions player={player} teamId={teamId} />}
 					/>
 				))}
-			</div>
+			</div> */}
 		</>
 	);
 }

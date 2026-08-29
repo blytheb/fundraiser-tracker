@@ -37,14 +37,7 @@ export default function TeamPlayerActions({ player, teamId }: ActionsProps) {
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem
-							onClick={(e) => {
-								e.preventDefault();
-								console.log("delete clicked");
-								setDeleteOpen(true);
-							}}>
-							View Player
-						</DropdownMenuItem>
+						<Link href={`/players/${player.id}`}>View Player</Link>
 						<DropdownMenuItem
 							onClick={(e) => {
 								e.preventDefault();

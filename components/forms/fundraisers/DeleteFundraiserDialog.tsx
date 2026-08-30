@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { deleteFundraiser } from "@/lib/actions/fundraisers";
+import { deleteFundraiser } from "@/features/fundraisers/actions/fundraisers";
 
 import {
 	Dialog,

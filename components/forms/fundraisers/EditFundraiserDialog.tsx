@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
-import { updateFundraiser } from "@/lib/actions/fundraisers";
+import { updateFundraiser } from "@/features/fundraisers/actions/fundraisers";
 
 import {
 	Dialog,
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-import type { Fundraiser } from "@/types/fundraiser";
+import type { Fundraiser } from "@/prisma/client";
 
 type EditFundraiserDialogProps = {
 	fundraiser: Fundraiser;
@@ -36,8 +36,8 @@ export default function EditFundraiserDialog({
 	const [startDate, setStartDate] = useState(fundraiser.startDate);
 
 	// useEffect(() => {
-	// 	setName(team.name);
-	// }, [team]);
+	// 	setName(fundraiser.name);
+	// }, [fundraiser]);
 
 	async function handleEdit() {
 		try {

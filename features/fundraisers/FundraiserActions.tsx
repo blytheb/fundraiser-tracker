@@ -14,10 +14,10 @@ import { MoreVertical } from "lucide-react";
 
 import Link from "next/link";
 
-import EditFundraiserDialog from "@/components/fundraisers/forms/EditFundraiserDialog";
-import DeleteFundraiserDialog from "@/components/fundraisers/forms/DeleteFundraiserDialog";
+import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
+import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
 
-import type { Fundraiser } from "@/types/fundraiser";
+import type { Fundraiser } from "@prisma/client";
 
 type FundraiserActionsProps = {
 	fundraiser: Fundraiser;
@@ -32,7 +32,7 @@ export default function FundraiserActions({
 	return (
 		<>
 			{/* Smaller Screens Collapsed Actions */}
-			<div className="lg:hidden">
+			<div>
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						<MoreVertical />
@@ -60,9 +60,9 @@ export default function FundraiserActions({
 				</DropdownMenu>
 			</div>
 
-			{/* Large Screen 3 action buttons */}
+			{/* Large Screen 3 action buttons
 			<div className="hidden lg:flex items-center gap-1">
-				{/* <div className="flex items-center gap-1"> */}
+				{/* <div className="flex items-center gap-1"> 
 				<Button variant="ghost" size="icon">
 					<Link href={`/fundraisers/${fundraiser.id}`}>
 						<Eye />
@@ -76,7 +76,7 @@ export default function FundraiserActions({
 				<Button variant="ghost" size="icon" onClick={() => setDeleteOpen(true)}>
 					<Trash2 />
 				</Button>
-			</div>
+			</div> */}
 
 			<EditFundraiserDialog
 				fundraiser={fundraiser}

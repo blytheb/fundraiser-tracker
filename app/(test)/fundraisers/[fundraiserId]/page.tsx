@@ -6,7 +6,7 @@ import {
 } from "@/features/fundraisers/data/fundraiserFunds";
 import { getFundraiserParticipants } from "@/features/fundraisers/data/fundraiserParticipants";
 
-import SummarySection from "@/features/fundraisers/SummarySection";
+import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
 import DistributionSection from "@/features/fundraisers/DistributionSection";
 import DetailSection from "@/features/fundraisers/DetailSection";
@@ -33,7 +33,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
 			{/* Summary Card */}
-			<SummarySection
+			<FundraiserHeader
 				fundraiser={fundraiser}
 				totalRaised={total}
 				fundraiserTeams={teams}

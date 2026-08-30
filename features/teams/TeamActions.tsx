@@ -13,7 +13,7 @@ import { MoreVertical } from "lucide-react";
 import EditTeamDialog from "@/components/forms/teams/EditTeamDialog";
 import DeleteTeamDialog from "@/components/forms/teams/DeleteTeamDialog";
 
-import type { Team } from "@/types/team";
+import type { Team } from "@/prisma/client";
 
 type TeamActionsProps = {
 	team: Team;

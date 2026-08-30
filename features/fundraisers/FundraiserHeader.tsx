@@ -3,14 +3,14 @@ import {
 	Avatar,
 	AvatarFallback,
 	AvatarGroup,
-	AvatarGroupCount,
 	AvatarImage,
 } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-import type { Fundraiser } from "types/fundraiser";
-import type { Team } from "types/team";
+import FundraiserActions from "@/features/fundraisers/FundraiserActions";
+
+import type { Team, Fundraiser } from "@/prisma/client";
 
 type SectionProps = {
 	fundraiser: Fundraiser;
@@ -18,7 +18,7 @@ type SectionProps = {
 	fundraiserTeams: Team[];
 	participants: Player & { amount: numberl };
 };
-export default function SummarySection({
+export default function FundraiserHeader({
 	fundraiser,
 	totalRaised,
 	fundraiserTeams,
@@ -29,14 +29,15 @@ export default function SummarySection({
 			<CardContent className="p-5">
 				<div className="flex items-start justify-between gap-4">
 					<div>
+						<Badge variant="secondary">{fundraiser.status}</Badge>
+
 						<p className="text-lg font-semibold">{fundraiser.name}</p>
 
 						<p className="mt-1 text-sm text-muted-foreground">
 							{fundraiser.startDate.toLocaleDateString()}
 						</p>
 					</div>
-
-					<Badge variant="secondary">{fundraiser.status}</Badge>
+					<FundraiserActions fundraiser={fundraiser} />
 				</div>
 
 				<div className="mt-6">
@@ -53,43 +54,11 @@ export default function SummarySection({
 					</p>
 				</div>
 
-				<div className="space-x-2 my-4 ">
+				<div className="space-x-2 mt-4 ">
 					{fundraiserTeams.map((team) => (
 						<Badge key={team.id}>{team.name}</Badge>
 					))}
 				</div>
-				<div className="my-4 flex gap-6 text-sm items-center">
-					<AvatarGroup className="grayscale">
-						{participants.map((participant) => (
-							<Avatar key={participant.id}>
-								<AvatarImage
-									src={participant.imageUrl}
-									alt={participant.firstName}
-								/>
-								<AvatarFallback>AA</AvatarFallback>
-							</Avatar>
-						))}
-
-						<Avatar>
-							<AvatarImage
-								src="https://github.com/maxleiter.png"
-								alt="@maxleiter"
-							/>
-							<AvatarFallback>LR</AvatarFallback>
-						</Avatar>
-						<Avatar>
-							<AvatarImage
-								src="https://github.com/evilrabbit.png"
-								alt="@evilrabbit"
-							/>
-							<AvatarFallback>ER</AvatarFallback>
-						</Avatar>
-						{/* <AvatarGroupCount>
-                    <PlusIcon />
-                </AvatarGroupCount> */}
-					</AvatarGroup>
-				</div>
-				<Badge variant="secondary">Manage Participants</Badge>
 			</CardContent>
 		</Card>
 	);

@@ -1,6 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsDown, ChevronsUp } from "lucide-react";
 
 import AddFundraiserFund from "@/components/forms/fundraisers/AddFundraiserFund";
 import {
@@ -21,30 +23,33 @@ export default function MoneyBreakdownSection({
 	total,
 	funds,
 }: SectionProps) {
+	const [fundsOpen, setFundsOpen] = useState(false);
 	return (
 		<Card>
 			<CardContent className="space-y-3">
-				<Collapsible className="flex flex-col gap-2">
+				<Collapsible
+					className="flex flex-col gap-2"
+					open={fundsOpen}
+					onOpenChange={setFundsOpen}>
 					<div className="flex items-center justify-between gap-4">
 						<CardTitle className="text-base">Money Breakdown</CardTitle>
-						<CollapsibleTrigger className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted">
-							<ChevronsUpDown />
-							<span className="sr-only">Toggle details</span>
-						</CollapsibleTrigger>
+						<AddFundraiserFund fundraiserId={fundraiserId} />
 					</div>
 					<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
-						<span className="font-medium">Total Raised</span>
 						<span className="font-medium">
-							$
+							Total $
 							{total.toLocaleString("en-US", {
 								minimumFractionDigits: 2,
 								maximumFractionDigits: 2,
-							})}{" "}
+							})}
 						</span>
+						<CollapsibleTrigger className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted">
+							{fundsOpen ? <ChevronsUp /> : <ChevronsDown />}
+							<span className="sr-only">Toggle details</span>
+						</CollapsibleTrigger>
 					</div>
 
 					<CollapsibleContent className="flex flex-col gap-2">
-						<Separator />
 						{funds.map((fund) => {
 							return (
 								<div
@@ -63,7 +68,6 @@ export default function MoneyBreakdownSection({
 								</div>
 							);
 						})}
-						<AddFundraiserFund fundraiserId={fundraiserId} />
 					</CollapsibleContent>
 				</Collapsible>
 			</CardContent>

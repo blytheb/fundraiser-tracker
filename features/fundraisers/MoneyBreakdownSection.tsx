@@ -11,12 +11,12 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import type { FundraiserFund } from "@/prisma/client";
+import type { FundraiserFundListItem } from "@/features/fundraisers/types";
 
 type SectionProps = {
 	fundraiserId: string;
 	total: number;
-	funds: FundraiserFund[];
+	funds: FundraiserFundListItem[];
 };
 export default function MoneyBreakdownSection({
 	fundraiserId,
@@ -57,13 +57,10 @@ export default function MoneyBreakdownSection({
 									className="rounded-md border px-4 py-2 text-sm flex justify-between">
 									<p className="text-muted-foreground">{fund.type}</p>
 									<p className="text-muted-foreground">
-										$
-										{Number(
-											fund.amount.toLocaleString("en-US", {
-												minimumFractionDigits: 2,
-												maximumFractionDigits: 2,
-											}),
-										)}
+										{fund.amount.toLocaleString("en-US", {
+											style: "currency",
+											currency: "USD",
+										})}
 									</p>
 								</div>
 							);

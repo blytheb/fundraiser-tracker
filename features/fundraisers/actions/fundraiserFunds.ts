@@ -1,12 +1,17 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { Fundraiser } from "@/prisma/client";
-import type { FundraiserFormData } from ".../types";
+import type { FundraiserFundFormData } from ".../types";
 
-export async function addFundraiserFund(data: FundraiserFundData) {
-	return prisma.$transaction(async (tx) => {
-		// Add the new funds
+type AddFundraiserFundData = FundraiserFundFormData & {
+	fundraiserId: string;
+};
+
+export async function addFundraiserFund(
+	data: AddFundraiserFundData,
+): Promise<void> {
+	await prisma.$transaction(async (tx) => {
+		// 1. Add the fund
 		await tx.fundraiserFund.create({
 			data: {
 				fundraiserId: data.fundraiserId,
@@ -16,7 +21,7 @@ export async function addFundraiserFund(data: FundraiserFundData) {
 			},
 		});
 
-		// Get fundraiser and participants
+		// 2. Get fundraiser and participants
 		const fundraiser = await tx.fundraiser.findUnique({
 			where: {
 				id: data.fundraiserId,
@@ -31,25 +36,26 @@ export async function addFundraiserFund(data: FundraiserFundData) {
 			throw new Error("Fundraiser not found");
 		}
 
-		// Don't automatically redistribute custom fundraisers
+		// 3. Custom distributions are not automatically recalculated
 		if (fundraiser.distributionMethod !== "EQUAL") {
-			return fundraiser;
+			return;
 		}
 
+		// 4. Nothing to distribute
 		if (fundraiser.participants.length === 0) {
-			return fundraiser;
+			return;
 		}
 
-		// Calculate total
+		// 5. Calculate total raised
 		const totalRaised = fundraiser.funds.reduce(
 			(total, fund) => total + Number(fund.amount),
 			0,
 		);
 
-		// Calculate equal share
+		// 6. Calculate equal share
 		const amountPerParticipant = totalRaised / fundraiser.participants.length;
 
-		// Update each participant
+		// 7. Update each participant
 		for (const participant of fundraiser.participants) {
 			await tx.fundraiserParticipant.update({
 				where: {
@@ -60,8 +66,6 @@ export async function addFundraiserFund(data: FundraiserFundData) {
 				},
 			});
 		}
-
-		return fundraiser;
 	});
 }
 

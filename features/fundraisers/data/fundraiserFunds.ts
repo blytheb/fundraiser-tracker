@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 
-import type { FundraiserFund } from "@/prisma/client";
+// import type { FundraiserFund } from "@/prisma/client";
+import type { FundraiserFundListItem } from "@/feature/fundraisers/types";
 
 export async function getFundraiserFunds(
 	fundraiserId: string,
-): FundraiserFund[] {
-	return prisma.fundraiserFund.findMany({
+): FundraiserFundListItem[] {
+	const funds = await prisma.fundraiserFund.findMany({
 		where: {
 			fundraiserId,
 		},
@@ -13,6 +14,15 @@ export async function getFundraiserFunds(
 			createdAt: "desc",
 		},
 	});
+
+	return funds.map((fund) => ({
+		id: fund.id,
+		type: fund.type,
+		amount: Number(fund.amount),
+		description: fund.description,
+		fundraiserId: fund.fundraiserId,
+		createdAt: fund.createdAt.toISOString(),
+	}));
 }
 
 export async function getFundraiserTotal(

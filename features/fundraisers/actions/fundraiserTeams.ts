@@ -1,12 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { FundraiserFormData } from "@/features/fundraisers/type";
+import { FundraiserFormData } from "@/features/fundraisers/types";
 
 export async function addTeamToFundraiser(
 	fundraiserId: string,
 	teamId: string,
-): Promise<Team> {
+): Promise<FundraiserTeam> {
 	return prisma.fundraiserTeam.create({
 		data: {
 			fundraiserId,
@@ -18,7 +18,7 @@ export async function addTeamToFundraiser(
 export async function removeTeamFromFundraiser(
 	fundraiserId: string,
 	teamId: string,
-): Promise<Team> {
+): Promise<FundraiserTeam> {
 	return prisma.fundraiserTeam.delete({
 		where: {
 			fundraiserId_teamId: {
@@ -38,7 +38,7 @@ export async function createFundraiserAndAddToTeam(
 			data: {
 				name: data.name,
 				description: "No description",
-				startDate: new Date("01-01-2010"),
+				startDate: new Date("2010-01-01"),
 				status: "ACTIVE",
 				distributionMethod: "EQUAL",
 			},
@@ -58,19 +58,34 @@ export async function createFundraiserAndAddToTeam(
 export async function saveFundraiserTeams(
 	fundraiserId: string,
 	teamIds: string[],
-) {
-	await prisma.fundraiserTeam.deleteMany({
-		where: {
-			fundraiserId,
-		},
-	});
-
-	if (teamIds.length > 0) {
-		await prisma.fundraiserTeam.createMany({
-			data: teamIds.map((teamId) => ({
+): Promise<Fundraiser> {
+	return prisma.$transaction(async (tx) => {
+		await tx.fundraiserTeam.deleteMany({
+			where: {
 				fundraiserId,
-				teamId,
-			})),
+			},
 		});
-	}
+
+		if (teamIds.length > 0) {
+			await tx.fundraiserTeam.createMany({
+				data: teamIds.map((teamId) => ({
+					fundraiserId,
+					teamId,
+				})),
+			});
+		}
+
+		return tx.fundraiser.findUnique({
+			where: {
+				id: fundraiserId,
+			},
+			include: {
+				teams: {
+					include: {
+						team: true,
+					},
+				},
+			},
+		});
+	});
 }

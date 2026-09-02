@@ -1,18 +1,32 @@
 import type { Team, Fundraiser } from "@prisma/client";
 
+// export async function getFundraiserTeams(
+// 	fundraiserId: string,
+// ): Promise<Team[]> {
+// 	const teams = await prisma.fundraiserTeam.findMany({
+// 		where: {
+// 			fundraiserId,
+// 		},
+// 		include: {
+// 			team: true,
+// 		},
+// 	});
+
+// 	return teams.map((team) => team.team);
+// }
+
 export async function getFundraiserTeams(
 	fundraiserId: string,
 ): Promise<Team[]> {
-	const teams = await prisma.fundraiserTeam.findMany({
+	return prisma.team.findMany({
 		where: {
-			fundraiserId,
-		},
-		include: {
-			team: true,
+			fundraiserTeams: {
+				some: {
+					fundraiserId,
+				},
+			},
 		},
 	});
-
-	return teams.map((team) => team.team);
 }
 
 export async function getTeamFundraisers(
@@ -30,17 +44,17 @@ export async function getTeamFundraisers(
 	return allFundraisers.map((fundraiser) => fundraiser.fundraiser);
 }
 
-export async function getAvailableFundraisersForTeam(
-	teamId: string,
-): Promise<Fundraiser[]> {
-	return prisma.fundraiser.findMany({
-		where: {
-			status: "ACTIVE",
-			teams: {
-				none: {
-					teamId,
-				},
-			},
-		},
-	});
-}
+// export async function getAvailableTeamsForFundraiser(
+// 	fundraiserId: string,
+// ): Promise<Team[]> {
+// 	return prisma.team.findMany({
+// 		where: {
+// 			status: "IN_SEASON",
+// 			fundraiserTeams: {
+// 				none: {
+// 					fundraiserId,
+// 				},
+// 			},
+// 		},
+// 	});
+// }

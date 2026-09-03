@@ -6,6 +6,7 @@ import {
 	getActiveTeams,
 } from "@/features/teams/data/teams";
 
+import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 import SelectTeamsDialog from "@/components/forms/fundraisers/SelectTeamsDialog";
 import SelectParticipantsDialog from "@/components/forms/fundraisers/SelectParticipantsDialog";
 import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
@@ -39,18 +40,17 @@ export default async function FundraiserPage({ params }: PageProps) {
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
 			{/* Summary Card */}
-			<SelectTeamsDialog
+
+			<SelectFundraiserRoster
 				fundraiserId={fundraiser.id}
 				selectedTeamIds={teams.map((team) => team.id)}
-				availableTeams={activeTeams}
-			/>
-			<SelectParticipantsDialog
-				fundraiserId={fundraiser.id}
 				selectedParticipantIds={participants.map(
 					(participant) => participant.playerId,
 				)}
-				availableRosters={fundraiserRosters}
+				availableTeams={activeTeams}
+				availableRosters={activeTeamsWithPlayers}
 			/>
+
 			<FundraiserHeader
 				fundraiser={fundraiser}
 				totalRaised={100}

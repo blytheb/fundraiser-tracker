@@ -26,6 +26,9 @@ export async function getFundraiserTeams(
 				},
 			},
 		},
+		orderBy: {
+			name: "asc",
+		},
 	});
 }
 

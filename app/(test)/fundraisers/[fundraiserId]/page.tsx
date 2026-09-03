@@ -1,9 +1,13 @@
 import { getFundraiserById } from "@/features/fundraisers/data/fundraisers";
 import { getFundraiserTeams } from "@/features/fundraisers/data/fundraiserTeams";
 import { getFundraiserParticipants } from "@/features/fundraisers/data/fundraiserParticipants";
-import { getActiveTeams } from "@/features/teams/data/teams";
+import {
+	getActiveTeamsWithPlayers,
+	getActiveTeams,
+} from "@/features/teams/data/teams";
 
 import SelectTeamsDialog from "@/components/forms/fundraisers/SelectTeamsDialog";
+import SelectParticipantsDialog from "@/components/forms/fundraisers/SelectParticipantsDialog";
 import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
 import DistributionSection from "@/features/fundraisers/DistributionSection";
@@ -17,15 +21,20 @@ type PageProps = {
 export default async function FundraiserPage({ params }: PageProps) {
 	const { fundraiserId } = await params;
 
-	const [fundraiser, teams, participants, activeTeams] = await Promise.all([
-		getFundraiserById(fundraiserId),
-		getFundraiserTeams(fundraiserId),
-		getFundraiserParticipants(fundraiserId),
-		getActiveTeams(),
-	]);
+	const [fundraiser, teams, participants, activeTeams, activeTeamsWithPlayers] =
+		await Promise.all([
+			getFundraiserById(fundraiserId), //fundraiser info
+			getFundraiserTeams(fundraiserId), //teams associated with fundraiser
+			getFundraiserParticipants(fundraiserId), //participants associated with fundraiser
+			getActiveTeams(),
+			getActiveTeamsWithPlayers(), //all active teams with players in the system
+		]);
 
-	// const totalRaised =
-	// 	funds.reduce((total, fund) => total + Number(fund.amount), 0) ?? 0;
+	const selectedTeamIds = new Set(teams.map((team) => team.id));
+
+	const fundraiserRosters = activeTeamsWithPlayers.filter((team) =>
+		selectedTeamIds.has(team.id),
+	);
 
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
@@ -34,6 +43,13 @@ export default async function FundraiserPage({ params }: PageProps) {
 				fundraiserId={fundraiser.id}
 				selectedTeamIds={teams.map((team) => team.id)}
 				availableTeams={activeTeams}
+			/>
+			<SelectParticipantsDialog
+				fundraiserId={fundraiser.id}
+				selectedParticipantIds={participants.map(
+					(participant) => participant.playerId,
+				)}
+				availableRosters={fundraiserRosters}
 			/>
 			<FundraiserHeader
 				fundraiser={fundraiser}

@@ -61,3 +61,10 @@ export type FundraiserParticipantWithPlayer =
 			player: true;
 		};
 	}>;
+
+export type FundraiserParticipantWithPlayerSerialized = Omit<
+	FundraiserParticipantWithPlayer,
+	"allocatedAmount"
+> & {
+	allocatedAmount: number;
+};

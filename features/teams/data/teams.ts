@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import type { Team } from "@prisma/client";
 
+type TeamWithPlayers = Team & {
+	players: Player[];
+};
+
 export async function getTeams(): Promise<Team[]> {
 	return prisma.team.findMany({
 		orderBy: {
@@ -14,10 +18,34 @@ export async function getActiveTeams(): Promise<Team[]> {
 		where: {
 			status: "IN_SEASON",
 		},
+
 		orderBy: {
 			name: "asc",
 		},
 	});
+}
+
+export async function getActiveTeamsWithPlayers(): Promise<TeamWithPlayers[]> {
+	const teams = await prisma.team.findMany({
+		where: {
+			status: "IN_SEASON",
+		},
+		include: {
+			players: {
+				include: {
+					player: true,
+				},
+			},
+		},
+		orderBy: {
+			name: "asc",
+		},
+	});
+
+	return teams.map((team) => ({
+		...team,
+		players: team.players.map((player) => player.player),
+	}));
 }
 
 export async function getTeamById(id: string): Promise<Team | null> {
@@ -43,6 +71,14 @@ export async function getTeamWithPlayers(
 			},
 		},
 	});
+	if (!team) {
+		return null;
+	}
+
+	return {
+		...team,
+		players: team.players.map((teamPlayer) => teamPlayer.player),
+	};
 }
 
 export async function getTeamWithFundraisers(

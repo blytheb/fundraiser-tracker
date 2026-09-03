@@ -59,7 +59,7 @@ export default function DistributionSection({ participants }: SectionProps) {
 
 							<p className="font-semibold">
 								$
-								{participant.amount.toLocaleString("en-US", {
+								{Number(participant.allocatedAmount).toLocaleString("en-US", {
 									minimumFractionDigits: 2,
 									maximumFractionDigits: 2,
 								})}

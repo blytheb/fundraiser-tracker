@@ -60,6 +60,24 @@ export async function saveFundraiserTeams(
 	teamIds: string[],
 ): Promise<Fundraiser> {
 	return prisma.$transaction(async (tx) => {
+		// 1. Find all players who are eligible based on
+		//    the NEW set of selected teams.
+		const eligiblePlayers = await tx.teamPlayer.findMany({
+			where: {
+				teamId: {
+					in: teamIds,
+				},
+			},
+			select: {
+				playerId: true,
+			},
+		});
+
+		const eligiblePlayerIds = eligiblePlayers.map(
+			(teamPlayer) => teamPlayer.playerId,
+		);
+
+		// 2. Replace the fundraiser's selected teams.
 		await tx.fundraiserTeam.deleteMany({
 			where: {
 				fundraiserId,
@@ -75,6 +93,26 @@ export async function saveFundraiserTeams(
 			});
 		}
 
+		// 3. Remove participants who are no longer eligible.
+		//    If no teams are selected, remove all participants.
+		if (eligiblePlayerIds.length === 0) {
+			await tx.fundraiserParticipant.deleteMany({
+				where: {
+					fundraiserId,
+				},
+			});
+		} else {
+			await tx.fundraiserParticipant.deleteMany({
+				where: {
+					fundraiserId,
+					playerId: {
+						notIn: eligiblePlayerIds,
+					},
+				},
+			});
+		}
+
+		// 4. Return the updated fundraiser.
 		return tx.fundraiser.findUnique({
 			where: {
 				id: fundraiserId,

@@ -47,33 +47,6 @@ export async function saveFundraiserParticipants(
 		});
 
 		if (playerIds.length > 0) {
-			console.log("playerIds:", playerIds);
-
-			const existingPlayers = await tx.player.findMany({
-				where: {
-					id: {
-						in: playerIds,
-					},
-				},
-				select: {
-					id: true,
-					firstName: true,
-					lastName: true,
-				},
-			});
-
-			console.log("existingPlayers:", existingPlayers);
-
-			const existingPlayerIds = new Set(
-				existingPlayers.map((player) => player.id),
-			);
-
-			const missingPlayerIds = playerIds.filter(
-				(id) => !existingPlayerIds.has(id),
-			);
-
-			console.log("missingPlayerIds:", missingPlayerIds);
-
 			await tx.fundraiserParticipant.createMany({
 				data: playerIds.map((playerId) => ({
 					fundraiserId,

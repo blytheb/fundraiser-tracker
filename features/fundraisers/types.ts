@@ -19,14 +19,16 @@ export type FundraiserFundFormData = {
 	description?: string;
 };
 
-//UI safe type for passing fundraiser funds to Client Components
-export type FundraiserFundListItem = {
+export type FundraiserContributionListItem = {
 	id: string;
-	type: FundType;
 	amount: number;
+	paymentMethod: PaymentMethod;
+	source: ContributionType;
+	date: Date;
 	description: string | null;
 	fundraiserId: string;
-	createdAt: string;
+	createdAt: Date;
+	updatedAt: Date;
 };
 
 export type FundraiserWithTeams = Prisma.FundraiserGetPayload<{

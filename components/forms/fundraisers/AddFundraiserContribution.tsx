@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,21 +26,23 @@ import {
 } from "@/components/ui/select";
 
 import { Textarea } from "@/components/ui/textarea";
+import type { ContributionType, PaymentMethod } from "@prisma/client";
+import { addContribution } from "@/features/fundraisers/actions/fundraiserContributions";
 
 type AddFundraiserFundProps = {
 	fundraiserId: string;
 };
 
-export default function AddFundraiserFund({
+export default function AddFundraiserContribution({
 	fundraiserId,
 }: AddFundraiserFundProps) {
 	const [open, setOpen] = useState(false);
-
-	const [type, setType] = useState<"SALES" | "EVENT_PROFIT" | "TIPS" | "OTHER">(
-		"EVENT_PROFIT",
-	);
+	const router = useRouter();
 
 	const [amount, setAmount] = useState("");
+	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
+	const [source, setSource] = useState<ContributionType>("EVENT_PROFIT");
+	const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 	const [description, setDescription] = useState("");
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,20 +59,26 @@ export default function AddFundraiserFund({
 		try {
 			setIsSubmitting(true);
 
-			await addFundraiserFund({
+			await addContribution({
 				fundraiserId,
-				type,
+				source,
 				amount: parsedAmount,
+				paymentMethod,
+				date,
 				description: description || undefined,
 			});
 
 			// Reset form
 			setAmount("");
+			setPaymentMethod("CASH");
+			setSource("EVENT_PROFIT");
+
 			setDescription("");
-			setType("EVENT_PROFIT");
+			setDate(new Date().toISOString().split("T")[0]);
 
 			// Close dialog
 			setOpen(false);
+			router.refresh();
 		} catch (error) {
 			console.error("Failed to add fundraiser fund:", error);
 		} finally {
@@ -83,30 +92,42 @@ export default function AddFundraiserFund({
 				render={
 					<Button size="sm">
 						<Plus className="mr-2 h-4 w-4" />
-						Add Funds
+						Add Contribution
 					</Button>
 				}></DialogTrigger>
 
 			<DialogContent>
 				<form onSubmit={handleSubmit}>
 					<DialogHeader>
-						<DialogTitle>Add Funds</DialogTitle>
+						<DialogTitle>Contribution</DialogTitle>
 
 						<DialogDescription>
-							Add additional money collected from this fundraiser.
+							Add money collected from this fundraiser.
 						</DialogDescription>
 					</DialogHeader>
 
 					<div className="space-y-4 py-4">
-						{/* Type */}
+						{/* Amount */}
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Fund Type</label>
+							<label className="text-sm font-medium">Amount</label>
+
+							<Input
+								type="number"
+								step="1.00"
+								min="0"
+								placeholder="0.00"
+								value={amount}
+								onChange={(event) => setAmount(event.target.value)}
+							/>
+						</div>
+
+						{/* Contribution Type */}
+						<div className="space-y-2">
+							<label className="text-sm font-medium">Contribution Type</label>
 
 							<Select
-								value={type}
-								onValueChange={(value) =>
-									setType(value as "SALES" | "EVENT_PROFIT" | "TIPS" | "OTHER")
-								}>
+								value={source}
+								onValueChange={(value) => setSource(value as ContributionType)}>
 								<SelectTrigger>
 									<SelectValue />
 								</SelectTrigger>
@@ -123,18 +144,28 @@ export default function AddFundraiserFund({
 							</Select>
 						</div>
 
-						{/* Amount */}
+						{/* Payment method */}
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Amount</label>
+							<label className="text-sm font-medium">Payment Method</label>
 
-							<Input
-								type="number"
-								step="0.01"
-								min="0"
-								placeholder="0.00"
-								value={amount}
-								onChange={(event) => setAmount(event.target.value)}
-							/>
+							<Select
+								value={paymentMethod}
+								onValueChange={(value) =>
+									setPaymentMethod(value as PaymentMethod)
+								}>
+								<SelectTrigger>
+									<SelectValue />
+								</SelectTrigger>
+
+								<SelectContent>
+									<SelectItem value="CASH">Cash</SelectItem>
+
+									<SelectItem value="CHECK">Check</SelectItem>
+
+									<SelectItem value="VENMO">Venmo</SelectItem>
+									<SelectItem value="OTHER">Other</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 
 						{/* Description */}
@@ -163,7 +194,7 @@ export default function AddFundraiserFund({
 						<Button
 							type="submit"
 							disabled={isSubmitting || !amount || Number(amount) <= 0}>
-							{isSubmitting ? "Adding..." : "Add Funds"}
+							{isSubmitting ? "Adding..." : "Add Contribution"}
 						</Button>
 					</DialogFooter>
 				</form>

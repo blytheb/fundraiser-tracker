@@ -232,7 +232,8 @@ model PlayerTransaction {
 }
 
 enum PlayerTransactionType {
-  EXPENSE
-  PAYMENT
-  ADJUSTMENT
+  DISTRIBUTION //fundraiser money depositied into player acct
+  EXPENSE // money spent from players acct
+  PAYMENT // money paid to player acct
+  ADJUSTMENT // manual adjustment to player acct
 }

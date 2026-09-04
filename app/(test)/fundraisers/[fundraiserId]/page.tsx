@@ -1,14 +1,14 @@
 import { getFundraiserById } from "@/features/fundraisers/data/fundraisers";
 import { getFundraiserTeams } from "@/features/fundraisers/data/fundraiserTeams";
+import { getFundraiserContributions } from "@/features/fundraisers/data/fundraiserContributions";
 import { getFundraiserParticipants } from "@/features/fundraisers/data/fundraiserParticipants";
 import {
 	getActiveTeamsWithPlayers,
 	getActiveTeams,
 } from "@/features/teams/data/teams";
 
+import AddFundraiserContribution from "@/components/forms/fundraisers/AddFundraiserContribution";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
-import SelectTeamsDialog from "@/components/forms/fundraisers/SelectTeamsDialog";
-import SelectParticipantsDialog from "@/components/forms/fundraisers/SelectParticipantsDialog";
 import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
 import DistributionSection from "@/features/fundraisers/DistributionSection";
@@ -22,19 +22,31 @@ type PageProps = {
 export default async function FundraiserPage({ params }: PageProps) {
 	const { fundraiserId } = await params;
 
-	const [fundraiser, teams, participants, activeTeams, activeTeamsWithPlayers] =
-		await Promise.all([
-			getFundraiserById(fundraiserId), //fundraiser info
-			getFundraiserTeams(fundraiserId), //teams associated with fundraiser
-			getFundraiserParticipants(fundraiserId), //participants associated with fundraiser
-			getActiveTeams(),
-			getActiveTeamsWithPlayers(), //all active teams with players in the system
-		]);
+	const [
+		fundraiser,
+		teams,
+		participants,
+		contributions,
+		activeTeams,
+		activeTeamsWithPlayers,
+	] = await Promise.all([
+		getFundraiserById(fundraiserId), //fundraiser info
+		getFundraiserTeams(fundraiserId), //teams associated with fundraiser
+		getFundraiserParticipants(fundraiserId), //participants associated with fundraiser
+		getFundraiserContributions(fundraiserId), //contributions associated with fundraiser
+		getActiveTeams(),
+		getActiveTeamsWithPlayers(), //all active teams with players in the system
+	]);
 
 	const selectedTeamIds = new Set(teams.map((team) => team.id));
 
 	const fundraiserRosters = activeTeamsWithPlayers.filter((team) =>
 		selectedTeamIds.has(team.id),
+	);
+
+	const totalRaised = contributions.reduce(
+		(total, contribution) => total + contribution.amount,
+		0,
 	);
 
 	return (
@@ -51,17 +63,19 @@ export default async function FundraiserPage({ params }: PageProps) {
 				availableRosters={activeTeamsWithPlayers}
 			/>
 
+			<AddFundraiserContribution fundraiserId={fundraiser.id} />
+
 			<FundraiserHeader
 				fundraiser={fundraiser}
-				totalRaised={100}
+				totalRaised={totalRaised}
 				fundraiserTeams={teams}
 				participants={participants}
 			/>
 			{/* Money Breakdown */}
 			<MoneyBreakdownSection
 				fundraiserId={fundraiser.id}
-				total={100}
-				funds={[]}
+				total={totalRaised}
+				funds={contributions}
 			/>
 
 			{/* Participant Distribution */}

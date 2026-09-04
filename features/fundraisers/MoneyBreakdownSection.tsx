@@ -4,19 +4,19 @@ import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { ChevronsDown, ChevronsUp } from "lucide-react";
 
-import AddFundraiserFund from "@/components/forms/fundraisers/AddFundraiserFund";
+// import AddFundraiserCon from "@/components/forms/fundraisers/AddFundraiserFund";
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import type { FundraiserFundListItem } from "@/features/fundraisers/types";
+import type { FundraiserContributionListItem } from "@/features/fundraisers/types";
 
 type SectionProps = {
 	fundraiserId: string;
 	total: number;
-	funds: FundraiserFundListItem[];
+	funds: FundraiserContributionListItem[];
 };
 export default function MoneyBreakdownSection({
 	fundraiserId,
@@ -33,7 +33,7 @@ export default function MoneyBreakdownSection({
 					onOpenChange={setFundsOpen}>
 					<div className="flex items-center justify-between gap-4">
 						<CardTitle className="text-base">Money Breakdown</CardTitle>
-						<AddFundraiserFund fundraiserId={fundraiserId} />
+						{/* <AddFundraiserFund fundraiserId={fundraiserId} /> */}
 					</div>
 					<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
 						<span className="font-medium">
@@ -55,7 +55,7 @@ export default function MoneyBreakdownSection({
 								<div
 									key={fund.id}
 									className="rounded-md border px-4 py-2 text-sm flex justify-between">
-									<p className="text-muted-foreground">{fund.type}</p>
+									<p className="text-muted-foreground">{fund.source}</p>
 									<p className="text-muted-foreground">
 										{fund.amount.toLocaleString("en-US", {
 											style: "currency",

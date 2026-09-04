@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { ChevronsDown, ChevronsUp } from "lucide-react";
+import ContributionActions from "@/features/fundraisers/ContributionActions";
 
 // import AddFundraiserCon from "@/components/forms/fundraisers/AddFundraiserFund";
 import {
@@ -62,6 +63,7 @@ export default function MoneyBreakdownSection({
 											currency: "USD",
 										})}
 									</p>
+									<ContributionActions contribution={fund} />
 								</div>
 							);
 						})}

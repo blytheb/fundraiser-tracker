@@ -49,7 +49,9 @@ export default function EditContributionDialog({
 	const [date, setDate] = useState(
 		contribution.date.toISOString().split("T")[0],
 	);
-	const [description, setDescription] = useState(contribution.description);
+	const [description, setDescription] = useState(
+		contribution.description ?? "",
+	);
 
 	// useEffect(() => {
 	// 	setName(fundraiser.name);

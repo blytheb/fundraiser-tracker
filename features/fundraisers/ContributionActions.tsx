@@ -15,7 +15,7 @@ import { MoreVertical } from "lucide-react";
 import Link from "next/link";
 
 import EditContributionDialog from "@/components/forms/fundraisers/EditContributionDialog";
-import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
+import DeleteContributionDialog from "@/components/forms/fundraisers/DeleteContributionDialog";
 
 import type { FundraiserContribution } from "@prisma/client";
 
@@ -76,23 +76,17 @@ export default function ContributionActions({ contribution }: ActionsProps) {
 				</Button>
 			</div> */}
 
-			{/* <EditFundraiserDialog
-				fundraiser={fundraiser}
-				open={editOpen}
-				onOpenChange={setEditOpen}
-			/> */}
-
 			<EditContributionDialog
 				contribution={contribution}
 				open={editOpen}
 				onOpenChange={setEditOpen}
 			/>
 
-			{/* <DeleteFundraiserDialog
-				fundraiser={fundraiser}
+			<DeleteContributionDialog
+				contribution={contribution}
 				open={deleteOpen}
 				onOpenChange={setDeleteOpen}
-			/> */}
+			/>
 		</>
 	);
 }

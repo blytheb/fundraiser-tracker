@@ -33,7 +33,7 @@ type AddFundraiserFundProps = {
 	fundraiserId: string;
 };
 
-export default function AddFundraiserContribution({
+export default function AddContribution({
 	fundraiserId,
 }: AddFundraiserFundProps) {
 	const [open, setOpen] = useState(false);
@@ -65,7 +65,7 @@ export default function AddFundraiserContribution({
 				amount: parsedAmount,
 				paymentMethod,
 				date,
-				description: description || undefined,
+				description: description || "",
 			});
 
 			// Reset form

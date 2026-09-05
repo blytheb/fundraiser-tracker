@@ -7,7 +7,7 @@ import {
 	getActiveTeams,
 } from "@/features/teams/data/teams";
 
-import AddFundraiserContribution from "@/components/forms/fundraisers/AddFundraiserContribution";
+import AddContribution from "@/components/forms/fundraisers/AddContribution";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
@@ -63,7 +63,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 				availableRosters={activeTeamsWithPlayers}
 			/>
 
-			<AddFundraiserContribution fundraiserId={fundraiser.id} />
+			<AddContribution fundraiserId={fundraiser.id} />
 
 			<FundraiserHeader
 				fundraiser={fundraiser}

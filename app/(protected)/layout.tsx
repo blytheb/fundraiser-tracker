@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
-import LogoutButton from "@/components/logout-button";
-import Sidebar from "@/components/sidebar";
+import LogoutButton from "@/components/ui-reusable/logout-button";
+import Sidebar from "@/components/ui-reusable/sidebar";
 
 export default async function DashboardLayout({
 	children,

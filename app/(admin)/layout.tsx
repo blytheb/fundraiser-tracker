@@ -20,7 +20,7 @@ import {
 	HandCoins,
 	Mail,
 } from "lucide-react";
-import LogoutButton from "../../components/logout-button";
+import LogoutButton from "../../components/ui-reusable/logout-button";
 
 export default async function AdminLayout({
 	children,

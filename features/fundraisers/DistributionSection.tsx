@@ -2,10 +2,10 @@ import React from "react";
 // import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import type { Player } from "types/player";
+import type { FundraiserParticipantWithPlayerSerialized } from ".../types";
 
 type SectionProps = {
-	participants: Player & { amount: numberl };
+	participants: FundraiserParticipantWithPlayerSerialized[];
 };
 
 export default function DistributionSection({ participants }: SectionProps) {
@@ -43,13 +43,14 @@ export default function DistributionSection({ participants }: SectionProps) {
 
 			<CardContent className="space-y-1">
 				{participants.map((participant) => {
+					console.log("participant", participant);
 					return (
 						<div
 							key={participant.id}
 							className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50">
 							<div>
 								<p className="text-sm font-medium">
-									{participant.firstName} {participant.lastName}
+									{participant.player.firstName} {participant.player.lastName}
 								</p>
 
 								{/* <p className="text-xs text-muted-foreground">

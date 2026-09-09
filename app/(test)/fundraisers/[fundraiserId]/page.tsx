@@ -79,7 +79,11 @@ export default async function FundraiserPage({ params }: PageProps) {
 			/>
 
 			{/* Participant Distribution */}
-			<DistributionSection participants={participants} />
+			<DistributionSection
+				fundraiserId={fundraiser.id}
+				participants={participants}
+				totalRaised={totalRaised}
+			/>
 			{/* Details */}
 			<DetailSection fundraiser={fundraiser} teams={teams} />
 		</main>

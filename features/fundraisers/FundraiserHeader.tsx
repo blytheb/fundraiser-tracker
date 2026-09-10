@@ -10,13 +10,14 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 
-import type { Team, Fundraiser, Player } from "@prisma/client";
+import type { Team, Fundraiser } from "@prisma/client";
+import type { FundraiserParticipantWithPlayerSerialized } from "@/features/fundraisers/types";
 
 type SectionProps = {
 	fundraiser: Fundraiser;
 	totalRaised: number;
 	fundraiserTeams: Team[];
-	participants: Player & { amount: number };
+	participants: FundraiserParticipantWithPlayerSerialized;
 };
 export default function FundraiserHeader({
 	fundraiser,

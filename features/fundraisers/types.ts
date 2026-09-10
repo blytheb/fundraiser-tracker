@@ -1,4 +1,10 @@
-import type { Prisma, ContributionType, PaymentMethod } from "@prisma/client";
+import type {
+	Prisma,
+	ContributionType,
+	PaymentMethod,
+	FundraiserDistribution,
+	FundraiserStatus,
+} from "@prisma/client";
 
 export type FundraiserFormData = {
 	name: string;

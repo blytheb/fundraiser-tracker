@@ -11,9 +11,10 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-import TeamActions from "@/components/teams/TeamActions";
+import TeamActions from "@/features/teams/TeamActions";
 
-import type { Team } from "@/types/team";
+import type { Team } from "@prisma/client";
+
 type TeamCardProps = {
 	team: Team;
 };

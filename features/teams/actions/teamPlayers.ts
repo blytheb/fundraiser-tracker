@@ -33,7 +33,7 @@ export async function createPlayerAndAddToTeam(
 				firstName: data.firstName,
 				lastName: data.lastName,
 				status: true,
-				imageUrl: data.imageUrl,
+				imageUrl: data.imageUrl ?? null,
 			},
 		});
 

@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { FundraiserFormData } from "@/features/fundraisers/types";
+import type { FundraiserTeam, Fundraiser } from "@prisma/client";
 
 export async function addTeamToFundraiser(
 	fundraiserId: string,
@@ -58,8 +59,8 @@ export async function createFundraiserAndAddToTeam(
 export async function saveFundraiserTeams(
 	fundraiserId: string,
 	teamIds: string[],
-): Promise<Fundraiser> {
-	return prisma.$transaction(async (tx) => {
+): Promise<void> {
+	await prisma.$transaction(async (tx) => {
 		// 1. Find all players who are eligible based on
 		//    the NEW set of selected teams.
 		const eligiblePlayers = await tx.teamPlayer.findMany({

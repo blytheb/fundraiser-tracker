@@ -5,7 +5,7 @@ import { CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import type { Fundraiser } from "@/types/fundraisers";
+import type { Fundraiser } from "@prisma/client";
 
 type Props = {
 	fundraiser: Fundraiser;

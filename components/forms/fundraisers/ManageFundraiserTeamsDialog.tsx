@@ -17,9 +17,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { saveFundraiserTeams } from "@/lib/actions/fundraiserTeams";
+import { saveFundraiserTeams } from "@/features/fundraisers/actions/fundraiserTeams";
 
-import type { Team } from "@/types/team";
+import type { Team } from "@prisma/client";
 
 type DialogProps = {
 	fundraiserId: string;

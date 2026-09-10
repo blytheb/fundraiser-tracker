@@ -1,9 +1,9 @@
 "use client";
 
-import AddFundraiserDialog from "@/components/fundraisers/forms/AddFundraiserDialog";
-import FundraiserTable from "@/components/fundraisers/FundraiserTable";
+import AddFundraiserDialog from "@/components/forms/fundraisers/AddFundraiserDialog";
+import FundraiserTable from "@/components/resources/FundraiserTable";
 
-import type { Fundraiser } from "@/types/fundraisers";
+import type { Fundraiser } from "@prisma/client";
 
 type LayoutProps = {
 	fundraisers: Fundraiser[];

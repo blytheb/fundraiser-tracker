@@ -27,7 +27,7 @@ export async function addContribution(data: ContributionData) {
 
 export async function updateContribution(
 	id: string,
-	data: Omit<AddContributionData, "fundraiserId">,
+	data: Omit<ContributionData, "fundraiserId">,
 ) {
 	await prisma.fundraiserContribution.update({
 		where: {
@@ -36,7 +36,7 @@ export async function updateContribution(
 		data: {
 			amount: data.amount,
 			paymentMethod: data.paymentMethod,
-			source: data.contribution,
+			source: data.source,
 			date: new Date(data.date),
 			description: data.description,
 		},

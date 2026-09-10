@@ -38,11 +38,15 @@ export default async function FundraiserPage({ params }: PageProps) {
 		getActiveTeamsWithPlayers(), //all active teams with players in the system
 	]);
 
-	const selectedTeamIds = new Set(teams.map((team) => team.id));
+	if (!fundraiser) {
+		return <div> Fundraiser Not Found </div>;
+	}
 
-	const fundraiserRosters = activeTeamsWithPlayers.filter((team) =>
-		selectedTeamIds.has(team.id),
-	);
+	// const selectedTeamIds = new Set(teams.map((team) => team.id));
+
+	// const fundraiserRosters = activeTeamsWithPlayers.filter((team) =>
+	// 	selectedTeamIds.has(team.id),
+	// );
 
 	const totalRaised = contributions.reduce(
 		(total, contribution) => total + contribution.amount,

@@ -1,12 +1,11 @@
 import React from "react";
 
-import ManageFundraiserParticipantsDialog from "@/components/fundraisers/forms/ManageFundraiserParticipantsDialog";
+import ManageFundraiserParticipantsDialog from "@/components/forms/fundraisers/ManageFundraiserParticipantsDialog";
 
 import { UsersRound } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import type { Fundraiser } from "@/types/fundraisers";
-import type { Player } from "@/types/players";
+import type { Fundraiser, Player } from "@prisma/client";
 
 type CardProps = {
 	fundraiserId: string;

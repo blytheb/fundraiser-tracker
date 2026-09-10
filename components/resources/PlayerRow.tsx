@@ -1,9 +1,10 @@
 import React from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
-import PlayerActions from "@/components/players/PlayerActions";
+import PlayerActions from "@/features/players/PlayerActions";
+import type { Player } from "@prisma/client";
 
 type PlayerRowProps = {
-	player: PlayerWithTeams;
+	player: Player;
 };
 
 export default function PlayerRow({ player }: PlayerRowProps) {

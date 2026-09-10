@@ -14,11 +14,6 @@ import {
 	getAvailableFundraisersForTeam,
 } from "@/features/fundraisers/data/fundraiserTeams";
 
-// import { getAllPlayers } from "@/lib/data/players";
-// import { getTeamPlayers } from "@/lib/data/teamPlayers";
-// import { getFundraisersByTeamId } from "@/lib/data/fundraisers";
-// import FundraiserSmallCard from "@/components/fundraisers/FundraiserSmallCard";
-
 type TeamPageProps = {
 	params: Promise<{
 		teamId: string;

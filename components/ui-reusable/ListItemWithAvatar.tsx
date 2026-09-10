@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import type { Player } from "@/types/player";
+import type { Player } from "@prisma/client";
 
 type ListItemWithAvatarProps = {
 	player: Player;

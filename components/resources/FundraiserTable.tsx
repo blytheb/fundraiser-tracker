@@ -6,8 +6,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import FundraiserRow from "@/components/fundraisers/FundraiserRow";
-import type { Fundraiser } from "@/types/fundraiser";
+import FundraiserRow from "@/components/resources/FundraiserRow";
+import type { Fundraiser } from "@prisma/client";
 
 type FundraiserTableProps = {
 	fundraisers: Fundraiser[];

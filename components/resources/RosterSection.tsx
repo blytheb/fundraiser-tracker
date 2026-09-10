@@ -1,14 +1,14 @@
 "use client";
 
-import RosterGrid from "@/components/teams/rosters/RosterGrid";
-import TeamRosterDialog from "@/components/teams/rosters/TeamRosterDialog";
+import RosterGrid from "@/components/resources/RosterGrid";
+// import TeamRosterDialog from "@/components/teams/rosters/TeamRosterDialog";
 
-import type { Player } from "@/lib/types/player";
+import type { Player } from "@prisma/client";
 
 type RosterSectionProps = {
 	teamId: string;
 	players: Player[];
-	allPlayers: Players[];
+	allPlayers: Player[];
 };
 
 export default function RosterSection({
@@ -20,11 +20,11 @@ export default function RosterSection({
 		<div className="pt-6">
 			<div className="flex justify-between">
 				<h2>Roster</h2>
-				<TeamRosterDialog
+				{/* <TeamRosterDialog
 					teamId={teamId}
 					players={players}
 					allPlayers={allPlayers}
-				/>
+				/> */}
 			</div>
 			<RosterGrid players={players} />
 		</div>

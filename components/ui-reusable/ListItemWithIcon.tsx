@@ -1,7 +1,6 @@
 import React from "react";
 import {
 	Item,
-	ItemActions,
 	ItemContent,
 	ItemDescription,
 	ItemMedia,
@@ -9,11 +8,10 @@ import {
 } from "@/components/ui/item";
 import Link from "next/link";
 
-import type { LucideIcon } from "lucide-react";
 import { BadgeCheckIcon, CalendarClock } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 
-import type { Fundraiser } from "@/types/fundraiser";
+import type { Fundraiser } from "@prisma/client";
 
 type ItemProps = {
 	fundraiser: Fundraiser;

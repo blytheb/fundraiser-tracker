@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import type { Fundraiser } from "@prisma/client";
+import type {
+	FundraiserWithTeams,
+	FundraiserWithParticipants,
+} from "@/features/fundraisers/types";
 
 //get All fundraisers
 export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
@@ -66,7 +70,7 @@ export async function getFundraiserWithParticipants(
 			id,
 		},
 		include: {
-			fundraiserParticipants: {
+			participants: {
 				include: {
 					player: true,
 				},

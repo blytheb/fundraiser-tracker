@@ -1,7 +1,7 @@
 "use client";
 
-import PlayerSmallCard from "@/components/players/PlayerSmallCard";
-import type { Player } from "@/lib/types/player";
+import PlayerSmallCard from "@/components/resources/PlayerSmallCard";
+import type { Player } from "@prisma/client";
 
 type RosterGridProps = {
 	players: Player[];

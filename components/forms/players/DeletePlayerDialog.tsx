@@ -14,7 +14,13 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { deletePlayer } from "@/features/players/actions/players";
-import type { Player } from "@/types/player";
+import type { Player } from "@prisma/client";
+
+type DeletePlayerDialogProps = {
+	player: Player;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+};
 
 export default function DeletePlayerDialog({
 	player,

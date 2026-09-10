@@ -7,11 +7,12 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import PlayerRow from "@/components/players/PlayerRow";
-import type { Player } from "@/types/Player";
+import PlayerRow from "@/components/resources/PlayerRow";
+// import type { PlayerWithTeams } from "../../features/players/types";
+import type { Player } from "@prisma/client";
 
 type PlayerTableProps = {
-	players: PlayersWithTeams[];
+	players: Player[];
 };
 
 export default function PlayerTable({ players }: PlayerTableProps) {

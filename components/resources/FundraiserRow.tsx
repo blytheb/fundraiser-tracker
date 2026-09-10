@@ -2,10 +2,11 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import Link from "next/link";
-import FundraiserActions from "@/components/fundraisers/FundraiserActions";
+import FundraiserActions from "@/features/fundraisers/FundraiserActions";
+import type { Fundraiser } from "@prisma/client";
 
 type FundraiserRowProps = {
-	fundraiser: Fundrlaiser;
+	fundraiser: Fundraiser;
 };
 
 export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
@@ -23,7 +24,6 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 				</Link>
 			</TableCell>
 			<TableCell>All Teams</TableCell>
-			<TableCell>${fundraiser.amount}</TableCell>
 			<TableCell>
 				<FundraiserActions fundraiser={fundraiser} />
 			</TableCell>

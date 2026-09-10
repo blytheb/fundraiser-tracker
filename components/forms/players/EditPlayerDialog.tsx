@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-import type { Player } from "@/types/player";
+import type { Player } from "@prisma/client";
 
 type EditPlayerDialogProps = {
 	player: Player;

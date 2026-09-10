@@ -14,10 +14,10 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import type { FundraiserContribution } from "@prisma/client";
+import type { FundraiserContributionListItem } from "@/features/fundraisers/types";
 
 type DialogProps = {
-	contribution: FundraiserContribution;
+	contribution: FundraiserContributionListItem;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 };

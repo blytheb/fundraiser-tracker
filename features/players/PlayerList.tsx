@@ -4,7 +4,7 @@ import PlayerActions from "@/features/players/PlayerActions";
 
 import { ItemGroup } from "@/components/ui/item";
 
-import type { Player } from "@/prisma/client";
+import type { Player } from "@prisma/client";
 
 type ListProps = {
 	players: Player[];
@@ -24,7 +24,7 @@ export default function PlayerList({ players }: ListProps) {
 							<ListItemWithAvatar
 								key={player.id}
 								player={player}
-								actions={<PlayerActions player={player} />}
+								action={<PlayerActions player={player} />}
 							/>
 						))}
 					</ItemGroup>

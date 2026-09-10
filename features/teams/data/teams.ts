@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Team } from "@prisma/client";
+import type { Team, Player } from "@prisma/client";
 
 type TeamWithPlayers = Team & {
 	players: Player[];
@@ -59,7 +59,7 @@ export async function getTeamById(id: string): Promise<Team | null> {
 export async function getTeamWithPlayers(
 	id: string,
 ): Promise<TeamWithPlayers | null> {
-	return prisma.team.findUnique({
+	const team = await prisma.team.findUnique({
 		where: {
 			id,
 		},
@@ -81,41 +81,41 @@ export async function getTeamWithPlayers(
 	};
 }
 
-export async function getTeamWithFundraisers(
-	id: string,
-): Promise<TeamWithFundraisers | null> {
-	return prisma.team.findUnique({
-		where: {
-			id,
-		},
-		include: {
-			fundraiserTeams: {
-				include: {
-					fundraiser: true,
-				},
-			},
-		},
-	});
-}
+// export async function getTeamWithFundraisers(
+// 	id: string,
+// ): Promise<TeamWithFundraisers | null> {
+// 	return prisma.team.findUnique({
+// 		where: {
+// 			id,
+// 		},
+// 		include: {
+// 			fundraiserTeams: {
+// 				include: {
+// 					fundraiser: true,
+// 				},
+// 			},
+// 		},
+// 	});
+// }
 
-export async function getTeamData(
-	id: string,
-): Promise<TeamWithPlayersAndFundraisers> {
-	return prisma.team.findUnique({
-		where: {
-			id,
-		},
-		include: {
-			players: {
-				include: {
-					player: true,
-				},
-			},
-			fundraiserTeams: {
-				include: {
-					fundraiser: true,
-				},
-			},
-		},
-	});
-}
+// export async function getTeamData(
+// 	id: string,
+// ): Promise<TeamWithPlayersAndFundraisers> {
+// 	return prisma.team.findUnique({
+// 		where: {
+// 			id,
+// 		},
+// 		include: {
+// 			players: {
+// 				include: {
+// 					player: true,
+// 				},
+// 			},
+// 			fundraiserTeams: {
+// 				include: {
+// 					fundraiser: true,
+// 				},
+// 			},
+// 		},
+// 	});
+// }

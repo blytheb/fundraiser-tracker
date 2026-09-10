@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { removePlayerFromTeam } from "@/features/teams/actions/teamPlayers";
 
-import type { Player } from "@/prisma/client";
+import type { Player } from "@prisma/client";
 
 type DeleteTeamDialogProps = {
 	teamId: string;

@@ -3,7 +3,7 @@ import { ItemGroup } from "@/components/ui/item";
 import { BadgeCheckIcon, CalendarClock } from "lucide-react";
 import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
 import TeamFundraiserActions from "@/features/teams/TeamFundraiserActions";
-import type { Fundraiser } from "@/prisma/client";
+import type { Fundraiser } from "@prisma/client";
 
 type ListProps = {
 	teamId: string;

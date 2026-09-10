@@ -16,7 +16,7 @@ import Link from "next/link";
 
 import RemoveFundraiserFromTeamDialog from "@/components/forms/teams/RemoveFundraiserFromTeamDialog";
 
-import type { Fundraiser } from "@/types/fundraiser";
+import type { Fundraiser } from "@prisma/client";
 
 type ActionsProps = {
 	fundraiser: Fundraiser;

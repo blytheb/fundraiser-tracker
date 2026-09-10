@@ -1,9 +1,8 @@
 import React from "react";
 import { ItemGroup } from "@/components/ui/item";
-import { BadgeCheckIcon, CalendarClock } from "lucide-react";
 import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
 
-import type { Fundraiser } from "@/prisma/client";
+import type { Fundraiser } from "@prisma/client";
 
 type ListProps = {
 	fundraisers: Fundraiser[];
@@ -19,12 +18,7 @@ export default function FundraiserList({ fundraisers }: ListProps) {
 				<div className="space-y-4">
 					<ItemGroup>
 						{fundraisers.map((fundraiser) => (
-							<ListItemWithIcon
-								key={fundraiser.id}
-								fundraiser={fundraiser}
-								activeIcon={CalendarClock}
-								inactiveIcon={BadgeCheckIcon}
-							/>
+							<ListItemWithIcon key={fundraiser.id} fundraiser={fundraiser} />
 						))}
 					</ItemGroup>
 				</div>

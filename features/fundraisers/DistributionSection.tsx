@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import CalculateDistributionButton from "@/components/buttons/CalculateDistributionButton";
-import type { FundraiserParticipantWithPlayerSerialized } from ".../types";
+import type { FundraiserParticipantWithPlayerSerialized } from "./types";
 
 type SectionProps = {
 	fundraiserId: string;

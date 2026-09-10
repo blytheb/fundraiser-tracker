@@ -10,7 +10,7 @@ import type { Player, Fundraiser } from "@prisma/client";
 type TabProps = {
 	teamId: string;
 	players: Player[];
-	avaialbePlayers: Player[];
+	availablePlayers: Player[];
 	fundraisers: Fundraiser[];
 	availableFundraisers: Fundraiser[];
 };

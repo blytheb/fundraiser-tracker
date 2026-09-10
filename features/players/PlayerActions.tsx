@@ -17,7 +17,7 @@ import Link from "next/link";
 import EditPlayerDialog from "@/components/forms/players/EditPlayerDialog";
 import DeletePlayerDialog from "@/components/forms/players/DeletePlayerDialog";
 
-import type { Player } from "@/types/player";
+import type { Player } from "@prisma/client";
 
 type PlayerActionsProps = {
 	player: Player;

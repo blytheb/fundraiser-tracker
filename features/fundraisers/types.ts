@@ -1,9 +1,4 @@
-import type {
-	Prisma,
-	FundraiserDistribution,
-	FundraiserStatus,
-	FundType,
-} from "@prisma/client";
+import type { Prisma, ContributionType, PaymentMethod } from "@prisma/client";
 
 export type FundraiserFormData = {
 	name: string;
@@ -13,11 +8,11 @@ export type FundraiserFormData = {
 	distributionMethod: FundraiserDistribution;
 };
 
-export type FundraiserFundFormData = {
-	type: FundType;
-	amount: number;
-	description?: string;
-};
+// export type FundraiserFundFormData = {
+// 	type: FundType;
+// 	amount: number;
+// 	description?: string;
+// };
 
 export type FundraiserContributionListItem = {
 	id: string;
@@ -48,12 +43,6 @@ export type FundraiserWithParticipants = Prisma.FundraiserGetPayload<{
 				player: true;
 			};
 		};
-	};
-}>;
-
-export type FundraiserWithFunds = Prisma.FundraiserGetPayload<{
-	include: {
-		funds: true;
 	};
 }>;
 

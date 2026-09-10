@@ -8,7 +8,7 @@ import type { Player } from "@prisma/client";
 type TabProps = {
 	teamId: string;
 	players: Player[];
-	avaiablePlayers: Player[];
+	availablePlayers: Player[];
 };
 
 export default function RosterTabContent({

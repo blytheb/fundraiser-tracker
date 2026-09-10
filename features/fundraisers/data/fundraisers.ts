@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Fundraiser } from "@/prisma/client";
+import type { Fundraiser } from "@prisma/client";
 
 //get All fundraisers
 export async function getFundraisers(search?: string): Promise<Fundraiser[]> {

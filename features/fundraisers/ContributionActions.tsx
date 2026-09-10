@@ -17,10 +17,10 @@ import Link from "next/link";
 import EditContributionDialog from "@/components/forms/fundraisers/EditContributionDialog";
 import DeleteContributionDialog from "@/components/forms/fundraisers/DeleteContributionDialog";
 
-import type { FundraiserContribution } from "@prisma/client";
+import type { FundraiserContributionListItem } from "./types";
 
 type ActionsProps = {
-	contribution: FundraiserContribution;
+	contribution: FundraiserContributionListItem;
 };
 
 export default function ContributionActions({ contribution }: ActionsProps) {

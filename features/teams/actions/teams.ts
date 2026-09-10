@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import type { TeamFormData } from "../types";
+import type { Team } from "@prisma/client";
 
 export async function createTeam(data: TeamFormData): Promise<Team> {
 	return prisma.team.create({

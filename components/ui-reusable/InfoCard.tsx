@@ -79,9 +79,9 @@ export default function InfoCard({
 			{/* Action */}
 			{href && (
 				<CardFooter className="px-4 pb-4 sm:px-6">
-					<Button asChild className="w-full">
-						<Link href={href}>{actionLabel}</Link>
-					</Button>
+					<Link className="w-full" href={href}>
+						{actionLabel}
+					</Link>
 				</CardFooter>
 			)}
 		</Card>

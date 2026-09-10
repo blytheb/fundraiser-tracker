@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Player } from "@/prisma/client";
+import type { Player } from "@prisma/client";
 
 export function getPlayers(search?: string): Promise<Player[]> {
 	return prisma.player.findMany({

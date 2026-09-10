@@ -6,7 +6,7 @@ import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
 import TeamFundraiserActions from "@/features/teams/TeamFundraiserActions";
 import TeamFundraiserList from "@/features/teams/TeamFundraiserList";
 
-import type { Fundraiser } from "@/types/fundraiser";
+import type { Fundraiser } from "@prisma/client";
 
 type TabProps = {
 	teamId: string;

@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { PlayerFormData } from "@/features/players/type";
+import type { PlayerFormData } from "@/features/players/types";
 
 export async function addPlayerToTeam(teamId: string, playerId: string) {
 	return prisma.teamPlayer.create({

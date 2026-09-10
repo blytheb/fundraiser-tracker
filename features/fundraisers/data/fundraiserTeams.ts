@@ -1,3 +1,5 @@
+import { prisma } from "@/lib/prisma";
+
 import type { Team, Fundraiser } from "@prisma/client";
 
 export async function getFundraiserTeams(

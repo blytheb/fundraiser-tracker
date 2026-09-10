@@ -1,8 +1,8 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { Fundraiser } from "@/prisma/client";
-import type { FundraiserFormData } from ".../types";
+import type { Fundraiser } from "@prisma/client";
+import type { FundraiserFormData } from "../types";
 
 export async function createFundraiser(
 	data: FundraiserFormData,

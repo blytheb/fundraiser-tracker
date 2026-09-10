@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-import type { Fundraiser } from "@/prisma/client";
+import type { Fundraiser } from "@prisma/client";
 
 type EditFundraiserDialogProps = {
 	fundraiser: Fundraiser;

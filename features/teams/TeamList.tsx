@@ -4,6 +4,7 @@ import ListItemWithImage from "@/components/ui-reusable/ListItemWithImage";
 import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
 
 import { ItemGroup } from "@/components/ui/item";
+import type { Team } from "@prisma/client";
 
 type TeamListProps = {
 	teams: Team[];

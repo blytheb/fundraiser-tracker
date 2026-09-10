@@ -1,13 +1,13 @@
-import type { Prisma } from "@/prisma/client";
+import type { Prisma, TeamStatus } from "@prisma/client";
 
-export type PlayerformData = {
+export type PlayerFormData = {
 	firstName: string;
 	lastName: string;
-	status: TeamStatus;
+	status: boolean;
 	imageUrl?: string;
 };
 
-export type PlayerWithTeams = Prisma.PlayerGetPayLoad<{
+export type PlayerWithTeams = Prisma.PlayerGetPayload<{
 	include: {
 		teams: {
 			include: {
@@ -17,7 +17,7 @@ export type PlayerWithTeams = Prisma.PlayerGetPayLoad<{
 	};
 }>;
 
-export type PlayerWithFundraisers = Prisma.PlayerGetPayLoad<{
+export type PlayerWithFundraisers = Prisma.PlayerGetPayload<{
 	include: {
 		fundraiserParticipants: {
 			include: {

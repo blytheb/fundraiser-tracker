@@ -4,7 +4,7 @@ import TeamPlayerActions from "@/features/teams/TeamPlayerActions";
 
 import { ItemGroup } from "@/components/ui/item";
 
-import type { Player } from "@/prisma/client";
+import type { Player } from "@prisma/client";
 
 type ListProps = {
 	teamId: string;

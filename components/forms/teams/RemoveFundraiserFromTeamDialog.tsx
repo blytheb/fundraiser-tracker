@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/fundraiserTeams";
 
-import type { Fundraiser } from "@/prisma/client";
+import type { Fundraiser } from "@prisma/client";
 
 type DialogProps = {
 	teamId: string;

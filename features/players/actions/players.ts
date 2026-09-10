@@ -1,8 +1,8 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { Player } from "@/prisma/client";
-import type { PlayerFormData } from ".../types";
+import type { Player } from "@prisma/client";
+import type { PlayerFormData } from "../types";
 
 export async function createPlayer(data: PlayerFormData): Promise<Player> {
 	return prisma.player.create({ data });

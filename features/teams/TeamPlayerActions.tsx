@@ -14,7 +14,7 @@ import Link from "next/link";
 
 import RemovePlayerFromTeamDialog from "@/components/forms/teams/RemovePlayerFromTeamDialog";
 
-import type { Player } from "@/types/player";
+import type { Player } from "@prisma/client";
 
 type ActionsProps = {
 	player: Player;

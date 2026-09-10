@@ -1,10 +1,10 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Fundraiser, Team } from "@/prisma/client";
+import type { Fundraiser, Team } from "@prisma/client";
 
 type SectionProps = {
 	fundraiser: Fundraiser;
-	teams: Team;
+	teams: Team[];
 };
 
 export default function DetailSection({ fundraiser, teams }: SectionProps) {

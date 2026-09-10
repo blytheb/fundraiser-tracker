@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-import type { FundraiserContribution } from "@/prisma/client";
+import type { FundraiserContribution } from "@prisma/client";
 
 type DialogProps = {
 	contribution: FundraiserContribution;

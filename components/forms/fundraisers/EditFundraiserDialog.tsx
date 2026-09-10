@@ -33,7 +33,9 @@ export default function EditFundraiserDialog({
 	const router = useRouter();
 	const [name, setName] = useState(fundraiser.name);
 	const [description, setDescription] = useState(fundraiser.description);
-	const [startDate, setStartDate] = useState(fundraiser.startDate);
+	const [startDate, setStartDate] = useState(
+		fundraiser.startDate.toISOString().split("T")[0],
+	);
 
 	// useEffect(() => {
 	// 	setName(fundraiser.name);
@@ -44,7 +46,7 @@ export default function EditFundraiserDialog({
 			await updateFundraiser(fundraiser.id, {
 				name,
 				description,
-				startDate,
+				startDate: new Date(startDate),
 				status: "ACTIVE",
 				distributionMethod: "EQUAL",
 			});

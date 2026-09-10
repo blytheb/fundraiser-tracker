@@ -71,7 +71,7 @@ export async function getTeamWithPlayers(
 
 	return {
 		...team,
-		players: team.players.map((teamPlayer) => teamPlayer.player),
+		players: team.players,
 	};
 }
 

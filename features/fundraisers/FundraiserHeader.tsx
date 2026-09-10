@@ -17,7 +17,7 @@ type SectionProps = {
 	fundraiser: Fundraiser;
 	totalRaised: number;
 	fundraiserTeams: Team[];
-	participants: FundraiserParticipantWithPlayerSerialized;
+	participants: FundraiserParticipantWithPlayerSerialized[];
 };
 export default function FundraiserHeader({
 	fundraiser,

@@ -14,7 +14,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import type { Fundraiser } from "@/types/fundraiser";
+import type { Fundraiser } from "@prisma/client";
 
 type DeleteFundraiserDialogProps = {
 	fundraiser: Fundraiser;

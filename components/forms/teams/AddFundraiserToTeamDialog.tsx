@@ -60,6 +60,10 @@ export default function AddFundraiserToTeamDialog({
 		try {
 			await createFundraiserAndAddToTeam(teamId, {
 				name: name.trim(),
+				description: "",
+				startDate: new Date(),
+				status: "ACTIVE",
+				distributionMethod: "EQUAL",
 			});
 
 			router.refresh();

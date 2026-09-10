@@ -44,7 +44,7 @@ export default function EditPlayerDialog({
 				firstName,
 				lastName,
 				status: player.status,
-				imageUrl: player.imageUrl,
+				imageUrl: player.imageUrl ?? undefined,
 			});
 			router.refresh();
 			onOpenChange(false);

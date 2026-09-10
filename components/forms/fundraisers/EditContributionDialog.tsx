@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
+import type { PaymentMethod, ContributionType } from "@prisma/client";
 import { updateContribution } from "@/features/fundraisers/actions/fundraiserContributions";
 
 import {
@@ -41,7 +42,7 @@ export default function EditContributionDialog({
 }: DialogProps) {
 	const router = useRouter();
 
-	const [amount, setAmount] = useState(contribution.amount);
+	const [amount, setAmount] = useState<number>(contribution.amount);
 	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
 		contribution.paymentMethod,
 	);
@@ -91,7 +92,7 @@ export default function EditContributionDialog({
 							min="0"
 							placeholder="0.00"
 							value={amount}
-							onChange={(event) => setAmount(event.target.value)}
+							onChange={(event) => setAmount(Number(event.target.value))}
 						/>
 					</div>
 

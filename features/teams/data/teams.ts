@@ -39,10 +39,7 @@ export async function getActiveTeamsWithPlayers(): Promise<TeamWithPlayers[]> {
 		},
 	});
 
-	return teams.map((team) => ({
-		...team,
-		players: team.players.map((player) => player.player),
-	}));
+	return teams;
 }
 
 export async function getTeamById(id: string): Promise<Team | null> {

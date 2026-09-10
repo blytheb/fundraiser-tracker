@@ -62,6 +62,7 @@ export default function AddPlayerToTeamDialog({
 			await createPlayerAndAddToTeam(teamId, {
 				firstName: firstName.trim(),
 				lastName: lastName.trim(),
+				status: true,
 			});
 
 			router.refresh();

@@ -18,9 +18,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { saveFundraiserParticipants } from "@/lib/actions/fundraiserParticipants";
+import { saveFundraiserParticipants } from "@/features/fundraisers/actions/fundraiserParticipants";
 
-import type { Player } from "@/types/player";
+import type { Player } from "@prisma/client";
 
 type DialogProps = {
 	fundraiserId: string;

@@ -35,14 +35,14 @@ export async function getTeamFundraisers(
 }
 
 export async function getAvailableFundraisersForTeam(
-	fundraiserId: string,
-): Promise<Team[]> {
-	return prisma.team.findMany({
+	teamId: string,
+): Promise<Fundraiser[]> {
+	return prisma.fundraiser.findMany({
 		where: {
-			status: "IN_SEASON",
-			fundraiserTeams: {
+			status: "ACTIVE",
+			teams: {
 				none: {
-					fundraiserId,
+					teamId,
 				},
 			},
 		},

@@ -63,7 +63,9 @@ export default function SelectFundraiserRoster({
 	// Get all players who are currently eligible
 	// based on the selected teams.
 	const eligiblePlayerIds = new Set(
-		selectedRosters.flatMap((team) => team.players.map((player) => player.id)),
+		selectedRosters.flatMap((team) =>
+			team.players.map((teamPlayer) => teamPlayer.player.id),
+		),
 	);
 
 	function toggleTeam(teamId: string) {
@@ -188,24 +190,27 @@ export default function SelectFundraiserRoster({
 										<h3 className="font-semibold">{team.name}</h3>
 
 										<div className="space-y-2">
-											{team.players.map((player) => (
-												<div
-													key={player.id}
-													className="flex items-center gap-2">
-													<input
-														type="checkbox"
-														id={`player-${player.id}`}
-														checked={selectedParticipantIdsState.includes(
-															player.id,
-														)}
-														onChange={() => toggleParticipant(player.id)}
-													/>
+											{team.players.map((teamPlayer) => {
+												const player = teamPlayer.player;
+												return (
+													<div
+														key={player.id}
+														className="flex items-center gap-2">
+														<input
+															type="checkbox"
+															id={`player-${player.id}`}
+															checked={selectedParticipantIdsState.includes(
+																player.id,
+															)}
+															onChange={() => toggleParticipant(player.id)}
+														/>
 
-													<label htmlFor={`player-${player.id}`}>
-														{player.firstName} {player.lastName}
-													</label>
-												</div>
-											))}
+														<label htmlFor={`player-${player.id}`}>
+															{player.firstName} {player.lastName}
+														</label>
+													</div>
+												);
+											})}
 										</div>
 									</div>
 								))

@@ -7,9 +7,11 @@ import {
 	NavigationMenuList,
 	NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import LogoutButton from "@/components/ui-reusable/logout-button";
+
 import Link from "next/link";
 
-export default function Navbar() {
+export default function Navbar({ user }: { user: any }) {
 	return (
 		<nav className="border-b mb-4">
 			<NavigationMenu className="mx-auto h-14 max-w-7xl px-4">
@@ -30,18 +32,16 @@ export default function Navbar() {
 								Fundraisers
 							</NavigationMenuLink>
 						</NavigationMenuItem>
-						<NavigationMenuItem>
+						{/* <NavigationMenuItem>
 							<NavigationMenuLink render={<Link href="/trips" />}>
 								Trips
 							</NavigationMenuLink>
-						</NavigationMenuItem>
+						</NavigationMenuItem> */}
 					</div>
 					<div className="flex">
-						<NavigationMenuItem>
-							<NavigationMenuLink render={<Link href="/login" />}>
-								Log In
-							</NavigationMenuLink>
-						</NavigationMenuItem>
+						<h1>Welcome</h1>
+						<p>{user.email}</p>
+						<LogoutButton />
 					</div>
 				</NavigationMenuList>
 			</NavigationMenu>

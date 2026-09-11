@@ -7,27 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//Better Auth USER
 model User {
-  id            String  @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String  @unique
-  emailVerified Boolean @default(false)
+  email         String    @unique
+  emailVerified Boolean   @default(false)
   image         String?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  sessions  Session[]
-  accounts  Account[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
 
   @@map("user")
 }
 
-//Better Auth Session
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
@@ -35,18 +32,15 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@index([userId])
   @@map("session")
 }
 
-//Better Auth Account
 model Account {
   id                    String    @id
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -56,12 +50,12 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("account")
 }
 
-//Better Auth Verification
 model Verification {
   id         String   @id
   identifier String
@@ -75,66 +69,112 @@ model Verification {
 }
 
 model Team {
-  id       String     @id @default(cuid())
-  name     String
-  status   TeamStatus @default(IN_SEASON)
-  imageUrl String?
-
-  players         TeamPlayer[]
+  id              String           @id @default(cuid())
+  name            String
+  status          TeamStatus       @default(IN_SEASON)
+  imageUrl        String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   fundraiserTeams FundraiserTeam[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum TeamStatus {
-  IN_SEASON
-  SEASON_ENDED
+  players         TeamPlayer[]
 }
 
 model Player {
-  id        String  @id @default(cuid())
-  firstName String
-  lastName  String
-  status    Boolean @default(true)
-  imageUrl  String?
-
-  teams                  TeamPlayer[]
+  id                     String                  @id @default(cuid())
+  firstName              String
+  lastName               String
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  imageUrl               String?
+  status                 Boolean                 @default(true)
   fundraiserParticipants FundraiserParticipant[]
   transactions           PlayerTransaction[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  teams                  TeamPlayer[]
 }
 
 model TeamPlayer {
-  id String @id @default(cuid())
-
-  teamId String
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-
+  id        String   @id @default(cuid())
+  teamId    String
+  playerId  String
   createdAt DateTime @default(now())
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, playerId])
 }
 
 model Fundraiser {
-  id                 String                 @id @default(cuid())
+  id                 String                   @id @default(cuid())
   name               String
-  description        String
-  startDate          DateTime
   status             FundraiserStatus
-  distributionMethod FundraiserDistribution @default(EQUAL)
+  description        String
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  startDate          DateTime
+  distributionMethod FundraiserDistribution   @default(EQUAL)
+  contributions      FundraiserContribution[]
+  participants       FundraiserParticipant[]
+  teams              FundraiserTeam[]
+}
 
-  teams         FundraiserTeam[]
-  participants  FundraiserParticipant[]
-  contributions FundraiserContribution[]
+model FundraiserContribution {
+  id            String           @id @default(cuid())
+  amount        Decimal          @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  source        ContributionType
+  date          DateTime         @default(now())
+  description   String?
+  fundraiserId  String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  fundraiser    Fundraiser       @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@index([fundraiserId])
+}
+
+model FundraiserParticipant {
+  id              String     @id @default(cuid())
+  fundraiserId    String
+  playerId        String
+  createdAt       DateTime   @default(now())
+  allocatedAmount Decimal    @default(0) @db.Decimal(10, 2)
+  updatedAt       DateTime   @default(now()) @updatedAt
+  fundraiser      Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+  player          Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([fundraiserId, playerId])
+  @@index([fundraiserId])
+}
+
+model FundraiserTeam {
+  id           String     @id @default(cuid())
+  fundraiserId String
+  teamId       String
+  createdAt    DateTime   @default(now())
+  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+  team         Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([fundraiserId, teamId])
+  @@index([teamId])
+}
+
+model PlayerTransaction {
+  id          String                @id @default(cuid())
+  playerId    String
+  amount      Decimal               @db.Decimal(10, 2)
+  type        PlayerTransactionType
+  description String?
+  date        DateTime              @default(now())
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  player      Player                @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId])
+}
+
+enum TeamStatus {
+  IN_SEASON
+  SEASON_ENDED
 }
 
 enum FundraiserStatus {
@@ -145,24 +185,6 @@ enum FundraiserStatus {
 enum FundraiserDistribution {
   EQUAL
   CUSTOM
-}
-
-model FundraiserContribution {
-  id String @id @default(cuid())
-
-  amount        Decimal          @db.Decimal(10, 2)
-  paymentMethod PaymentMethod
-  source        ContributionType
-  date          DateTime         @default(now())
-  description   String?
-
-  fundraiserId String
-  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([fundraiserId])
 }
 
 enum ContributionType {
@@ -179,61 +201,9 @@ enum PaymentMethod {
   OTHER
 }
 
-model FundraiserParticipant {
-  id String @id @default(cuid())
-
-  fundraiserId String
-  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-
-  allocatedAmount Decimal  @default(0) @db.Decimal(10, 2)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now()) @updatedAt
-
-  @@unique([fundraiserId, playerId])
-  @@index([fundraiserId])
-}
-
-model FundraiserTeam {
-  id String @id @default(cuid())
-
-  fundraiserId String
-  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-
-  teamId String
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@unique([fundraiserId, teamId])
-  @@index([teamId])
-}
-
-model PlayerTransaction {
-  id String @id @default(cuid())
-
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-
-  amount Decimal @db.Decimal(10, 2)
-
-  type PlayerTransactionType
-
-  description String?
-
-  date DateTime @default(now())
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([playerId])
-}
-
 enum PlayerTransactionType {
-  DISTRIBUTION //fundraiser money depositied into player acct
-  EXPENSE // money spent from players acct
-  PAYMENT // money paid to player acct
-  ADJUSTMENT // manual adjustment to player acct
+  EXPENSE
+  PAYMENT
+  ADJUSTMENT
+  DISTRIBUTION
 }

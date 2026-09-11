@@ -11,7 +11,7 @@ import LogoutButton from "@/components/ui-reusable/logout-button";
 
 import Link from "next/link";
 
-export default function Navbar({ user }: { user: any }) {
+export default function Navbar() {
 	return (
 		<nav className="border-b mb-4">
 			<NavigationMenu className="mx-auto h-14 max-w-7xl px-4">
@@ -40,7 +40,6 @@ export default function Navbar({ user }: { user: any }) {
 					</div>
 					<div className="flex">
 						<h1>Welcome</h1>
-						<p>{user.email}</p>
 						<LogoutButton />
 					</div>
 				</NavigationMenuList>

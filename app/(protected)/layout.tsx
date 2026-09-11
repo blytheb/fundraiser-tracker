@@ -54,7 +54,7 @@ export default async function ProtectedLayout({
 
 	return (
 		<div className="flex h-screen flex-col">
-			<Navbar user={session.user} />
+			<Navbar />
 
 			<main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
 		</div>

@@ -44,7 +44,7 @@ export function RegisterForm() {
 			return;
 		}
 
-		router.push("/onboarding");
+		router.push("/teams");
 		router.refresh();
 	}
 
@@ -87,11 +87,11 @@ export function RegisterForm() {
 						<div className="flex items-center justify-between">
 							<Label htmlFor="password">Password</Label>
 
-							<Link
+							{/* <Link
 								href="/forgot-password"
 								className="text-sm text-muted-foreground hover:text-primary">
 								Forgot password?
-							</Link>
+							</Link> */}
 						</div>
 
 						<Input

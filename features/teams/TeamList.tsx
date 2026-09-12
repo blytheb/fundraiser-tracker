@@ -23,14 +23,12 @@ export default function TeamList({ teams }: TeamListProps) {
 					</div>
 				</div>
 			) : (
-				<div className="grid grid-cols-1 gap-4 items-stretch sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 ">
-					<ItemGroup>
-						{teams.map((team) => (
-							<ListItemWithImage key={team.id} team={team} />
-						))}
-					</ItemGroup>
+				<ItemGroup className="grid grid-cols-1 gap-4 items-stretch sm:grid-cols-2 lg:grid-cols-4">
+					{teams.map((team) => (
+						<ListItemWithImage key={team.id} team={team} />
+					))}
 					<AddTeamDialog />
-				</div>
+				</ItemGroup>
 			)}
 		</div>
 	);

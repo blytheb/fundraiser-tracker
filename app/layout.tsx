@@ -13,7 +13,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 		<html lang="en" className="h-full antialiased">
 			<body className="h-full flex flex-col">
 				<TooltipProvider>
-					<PublicNavbar />
+					{/* <PublicNavbar /> */}
 					<main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
 				</TooltipProvider>
 			</body>

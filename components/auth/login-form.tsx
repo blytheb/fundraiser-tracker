@@ -76,11 +76,11 @@ export function LoginForm() {
 						<div className="flex items-center justify-between">
 							<Label htmlFor="password">Password</Label>
 
-							<Link
+							{/* <Link
 								href="/forgot-password"
 								className="text-sm text-muted-foreground hover:text-primary">
 								Forgot password?
-							</Link>
+							</Link> */}
 						</div>
 
 						<Input
@@ -98,14 +98,14 @@ export function LoginForm() {
 						{loading ? "Signing in..." : "Sign in"}
 					</Button>
 
-					<p className="text-center text-sm text-muted-foreground">
+					{/* <p className="text-center text-sm text-muted-foreground">
 						Don&apos;t have an account?
 						<Link
 							href="/register"
 							className="font-medium text-foreground hover:underline">
 							Create one
 						</Link>
-					</p>
+					</p> */}
 				</form>
 			</CardContent>
 		</Card>

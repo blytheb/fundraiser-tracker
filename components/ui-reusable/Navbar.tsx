@@ -38,7 +38,7 @@ export default function Navbar() {
 							</NavigationMenuLink>
 						</NavigationMenuItem> */}
 					</div>
-					<div className="flex">
+					<div className="flex justify-center items-center gap-4">
 						<h1>Welcome</h1>
 						<LogoutButton />
 					</div>

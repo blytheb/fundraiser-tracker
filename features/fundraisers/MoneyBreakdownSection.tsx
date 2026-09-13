@@ -28,6 +28,7 @@ export default function MoneyBreakdownSection({
 	total,
 	funds,
 }: SectionProps) {
+	const isDraft = status === "DRAFT";
 	const [fundsOpen, setFundsOpen] = useState(false);
 	return (
 		<Card>
@@ -38,9 +39,25 @@ export default function MoneyBreakdownSection({
 					onOpenChange={setFundsOpen}>
 					<div className="flex items-center justify-between gap-4">
 						<CardTitle className="text-base">Money Breakdown</CardTitle>
-						<AddContribution fundraiserId={fundraiserId} />
+						{isDraft && <AddContribution fundraiserId={fundraiserId} />}
 					</div>
-					<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
+					{funds.map((fund) => {
+						return (
+							<div
+								key={fund.id}
+								className="rounded-md border px-4 py-2 text-sm flex justify-between">
+								<p className="text-muted-foreground">{fund.source}</p>
+								<p className="text-muted-foreground">
+									{fund.amount.toLocaleString("en-US", {
+										style: "currency",
+										currency: "USD",
+									})}
+								</p>
+								{isDraft && <ContributionActions contribution={fund} />}
+							</div>
+						);
+					})}
+					{/* <div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
 						<span className="font-medium">
 							Total $
 							{total.toLocaleString("en-US", {
@@ -48,30 +65,9 @@ export default function MoneyBreakdownSection({
 								maximumFractionDigits: 2,
 							})}
 						</span>
-						<CollapsibleTrigger className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted">
-							{fundsOpen ? <ChevronsUp /> : <ChevronsDown />}
-							<span className="sr-only">Toggle details</span>
-						</CollapsibleTrigger>
-					</div>
+					</div> */}
 
-					<CollapsibleContent className="flex flex-col gap-2">
-						{funds.map((fund) => {
-							return (
-								<div
-									key={fund.id}
-									className="rounded-md border px-4 py-2 text-sm flex justify-between">
-									<p className="text-muted-foreground">{fund.source}</p>
-									<p className="text-muted-foreground">
-										{fund.amount.toLocaleString("en-US", {
-											style: "currency",
-											currency: "USD",
-										})}
-									</p>
-									<ContributionActions contribution={fund} />
-								</div>
-							);
-						})}
-					</CollapsibleContent>
+					<CollapsibleContent className="flex flex-col gap-2"></CollapsibleContent>
 				</Collapsible>
 			</CardContent>
 		</Card>

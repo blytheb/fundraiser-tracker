@@ -67,32 +67,18 @@ export default function DistributionSection({
 						)}
 					</div>
 					<div className="flex items-center gap-2">
-						<SelectFundraiserRoster
-							fundraiserId={fundraiserId}
-							selectedTeamIds={selectedTeamIds}
-							selectedParticipantIds={participants.map(
-								(participant) => participant.playerId,
-							)}
-							availableTeams={activeTeams}
-							availableRosters={activeRosters}
-						/>
+						{isDraft && (
+							<SelectFundraiserRoster
+								fundraiserId={fundraiserId}
+								selectedTeamIds={selectedTeamIds}
+								selectedParticipantIds={participants.map(
+									(participant) => participant.playerId,
+								)}
+								availableTeams={activeTeams}
+								availableRosters={activeRosters}
+							/>
+						)}
 					</div>
-
-					{/* <ToggleGroup
-						type="single"
-						className="h-8 overflow-hidden rounded-md border gap-0">
-						<ToggleGroupItem
-							value="equal"
-							className="h-8 rounded-none border-0 px-3 bg-amber-200">
-							Equal
-						</ToggleGroupItem>
-
-						<ToggleGroupItem
-							value="custom"
-							className=" h-8 rounded-none border-0 px-3 bg-green-500">
-							Custom
-						</ToggleGroupItem>
-					</ToggleGroup> */}
 				</div>
 			</CardHeader>
 
@@ -117,19 +103,23 @@ export default function DistributionSection({
 										{fundraiser.teams[0]?.team.name}
 									</p> */}
 								</div>
-								<Input
-									type="number"
-									min="0"
-									step="0.01"
-									value={amounts[participant.id] ?? ""}
-									onChange={(e) => {
-										setAmounts((prev) => ({
-											...prev,
-											[participant.id]: e.target.value,
-										}));
-									}}
-									className="w-28 text-right"
-								/>
+								{isDraft ? (
+									<Input
+										type="number"
+										min="0"
+										step="0.01"
+										value={amounts[participant.id] ?? ""}
+										onChange={(e) => {
+											setAmounts((prev) => ({
+												...prev,
+												[participant.id]: e.target.value,
+											}));
+										}}
+										className="w-28 text-right"
+									/>
+								) : (
+									<p>${participant.allocatedAmount.toFixed(2)}</p>
+								)}
 							</div>
 						);
 					})}

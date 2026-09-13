@@ -104,17 +104,16 @@ model TeamPlayer {
 }
 
 model Fundraiser {
-  id                 String                   @id @default(cuid())
-  name               String
-  status             FundraiserStatus
-  description        String
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
-  startDate          DateTime
-  distributionMethod FundraiserDistribution   @default(EQUAL)
-  contributions      FundraiserContribution[]
-  participants       FundraiserParticipant[]
-  teams              FundraiserTeam[]
+  id            String                   @id @default(cuid())
+  name          String
+  status        FundraiserStatus         @default(DRAFT)
+  description   String
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  startDate     DateTime
+  contributions FundraiserContribution[]
+  participants  FundraiserParticipant[]
+  teams         FundraiserTeam[]
 }
 
 model FundraiserContribution {
@@ -178,13 +177,9 @@ enum TeamStatus {
 }
 
 enum FundraiserStatus {
-  ACTIVE
+  DRAFT
   COMPLETED
-}
-
-enum FundraiserDistribution {
-  EQUAL
-  CUSTOM
+  PUBLISHED
 }
 
 enum ContributionType {

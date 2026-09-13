@@ -1,10 +1,12 @@
-import React from "react";
-// import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
-import CalculateDistributionButton from "@/components/buttons/CalculateDistributionButton";
+import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
 import type { FundraiserParticipantWithPlayerSerialized } from "./types";
 import { TeamWithPlayers } from "@/features/teams/types";
 import type { Team } from "@prisma/client";
@@ -26,12 +28,23 @@ export default function DistributionSection({
 	activeRosters,
 	totalRaised,
 }: SectionProps) {
-	const totalDistributed = participants.reduce(
-		(total, participant) => total + participant.allocatedAmount,
-		0,
-	);
+	const [amounts, setAmounts] = useState<Record<string, string>>({});
+
+	const totalDistributed = participants.reduce((total, participant) => {
+		return total + (Number(amounts[participant.id]) || 0);
+	}, 0);
 
 	const totalRemaining = totalRaised - totalDistributed;
+
+	useEffect(() => {
+		const initialAmounts: Record<string, string> = {};
+
+		participants.forEach((participant) => {
+			initialAmounts[participant.id] = participant.allocatedAmount.toFixed(2);
+		});
+
+		setAmounts(initialAmounts);
+	}, [participants]);
 	return (
 		<Card>
 			<CardHeader>
@@ -50,19 +63,17 @@ export default function DistributionSection({
 							</p>
 						)}
 					</div>
-					<CalculateDistributionButton
-						fundraiserId={fundraiserId}
-						totalRaised={totalRaised}
-					/>
-					<SelectFundraiserRoster
-						fundraiserId={fundraiserId}
-						selectedTeamIds={selectedTeamIds}
-						selectedParticipantIds={participants.map(
-							(participant) => participant.playerId,
-						)}
-						availableTeams={activeTeams}
-						availableRosters={activeRosters}
-					/>
+					<div className="flex items-center gap-2">
+						<SelectFundraiserRoster
+							fundraiserId={fundraiserId}
+							selectedTeamIds={selectedTeamIds}
+							selectedParticipantIds={participants.map(
+								(participant) => participant.playerId,
+							)}
+							availableTeams={activeTeams}
+							availableRosters={activeRosters}
+						/>
+					</div>
 
 					{/* <ToggleGroup
 						type="single"
@@ -103,12 +114,51 @@ export default function DistributionSection({
 										{fundraiser.teams[0]?.team.name}
 									</p> */}
 								</div>
-								<p className="text-right text-sm">
-									${participant.allocatedAmount.toFixed(2)}
-								</p>
+								<Input
+									type="number"
+									min="0"
+									step="0.01"
+									value={amounts[participant.id] ?? ""}
+									onChange={(e) => {
+										setAmounts((prev) => ({
+											...prev,
+											[participant.id]: e.target.value,
+										}));
+									}}
+									className="w-28 text-right"
+								/>
 							</div>
 						);
 					})}
+				</div>
+				<div className="border-t pt-3">
+					<div className="flex justify-between px-3 text-sm">
+						<span className="font-medium">Total</span>
+						<span className="font-medium">
+							${totalDistributed.toFixed(2)} / ${totalRaised.toFixed(2)}
+						</span>
+					</div>
+
+					{totalRemaining > 0 && (
+						<p className="px-3 pt-1 text-sm text-muted-foreground">
+							${totalRemaining.toFixed(2)} remaining
+						</p>
+					)}
+
+					{totalRemaining < 0 && (
+						<p className="px-3 pt-1 text-sm text-destructive">
+							${Math.abs(totalRemaining).toFixed(2)} over the available amount
+						</p>
+					)}
+				</div>
+				<div className="flex flex-col">
+					<CalculateEqualDistributionButton
+						fundraiserId={fundraiserId}
+						totalRaised={totalRaised}
+					/>
+					<Button disabled={Math.abs(totalRemaining) > 0.001}>
+						Save Distribution
+					</Button>
 				</div>
 			</CardContent>
 		</Card>

@@ -10,7 +10,7 @@ type Props = {
 	totalRaised: number;
 };
 
-export default function CalculateDistributionButton({
+export default function CalculateEqualDistributionButton({
 	fundraiserId,
 	totalRaised,
 }: Props) {
@@ -26,7 +26,7 @@ export default function CalculateDistributionButton({
 
 	return (
 		<Button onClick={handleCalculate} disabled={isPending}>
-			{isPending ? "Calculating..." : "Calculate"}
+			{isPending ? "Calculating..." : "Equal Split"}
 		</Button>
 	);
 }

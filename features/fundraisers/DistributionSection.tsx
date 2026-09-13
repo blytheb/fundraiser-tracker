@@ -3,27 +3,35 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 import CalculateDistributionButton from "@/components/buttons/CalculateDistributionButton";
 import type { FundraiserParticipantWithPlayerSerialized } from "./types";
+import { TeamWithPlayers } from "@/features/teams/types";
+import type { Team } from "@prisma/client";
 
 type SectionProps = {
 	fundraiserId: string;
+	selectedTeamIds: string[];
 	participants: FundraiserParticipantWithPlayerSerialized[];
+	activeTeams: Team[];
+	activeRosters: TeamWithPlayers[];
 	totalRaised: number;
 };
 
 export default function DistributionSection({
 	fundraiserId,
+	selectedTeamIds,
 	participants,
+	activeTeams,
+	activeRosters,
 	totalRaised,
 }: SectionProps) {
-	const totalAllocated = participants.reduce(
+	const totalDistributed = participants.reduce(
 		(total, participant) => total + participant.allocatedAmount,
 		0,
 	);
 
-	const totalDistributed = 0;
-	const totalRemaining = totalRaised - totalAllocated;
+	const totalRemaining = totalRaised - totalDistributed;
 	return (
 		<Card>
 			<CardHeader>
@@ -32,14 +40,28 @@ export default function DistributionSection({
 						<CardTitle className="text-base">
 							Participant Distribution
 						</CardTitle>
-
-						<p className="mt-1 text-sm text-muted-foreground">
-							{participants.length} participants
-						</p>
+						{totalRemaining > 0 ? (
+							<p className="mt-1 text-sm text-muted-foreground">
+								${totalRemaining.toFixed(2)} remaining
+							</p>
+						) : (
+							<p className="mt-1 text-sm text-muted-foreground">
+								All funds are distributed
+							</p>
+						)}
 					</div>
 					<CalculateDistributionButton
 						fundraiserId={fundraiserId}
 						totalRaised={totalRaised}
+					/>
+					<SelectFundraiserRoster
+						fundraiserId={fundraiserId}
+						selectedTeamIds={selectedTeamIds}
+						selectedParticipantIds={participants.map(
+							(participant) => participant.playerId,
+						)}
+						availableTeams={activeTeams}
+						availableRosters={activeRosters}
 					/>
 
 					{/* <ToggleGroup
@@ -61,60 +83,29 @@ export default function DistributionSection({
 			</CardHeader>
 
 			<CardContent className="space-y-1">
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-					<div>
-						<p className="text-sm text-muted-foreground">Total Raised:</p>
-						<p className="text-lg font-semibold">${totalRaised.toFixed(2)}</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Allocated:</p>
-						<p className="text-lg font-semibold">
-							${totalAllocated.toFixed(2)}
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Distributed:</p>
-						<p className="text-lg font-semibold">
-							${totalDistributed.toFixed(2)}
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Remaining</p>
-						<p className="text-lg font-semibold">
-							{" "}
-							${totalRemaining.toFixed(2)}
-						</p>
-					</div>
-				</div>
 				<div className="space-y-1">
-					<div className="grid grid-cols-4 px-3 py-2 text-xs font-medium text-muted-foreground">
-						<span>Planyer</span>
-						<span className="text-right">Allocated</span>
-						<span className="text-right">Distributed</span>
-						<span className="text-right">Remaining</span>
+					<div className="flex justify-between px-3 py-2 text-xs font-medium text-muted-foreground">
+						<span>Player</span>
+						<span className="text-right">Amount</span>
 					</div>
 					{participants.map((participant) => {
-						const allocated = participant.allocatedAmount;
-						const distributed = 0;
-						const remaining = allocated - distributed;
 						return (
 							<div
 								key={participant.id}
-								className="grid grid-cols-4 items-center rounded-lg px-3 py-2 hover:bg-muted/50">
-								{/* className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50" */}
-
+								// className="grid grid-cols-3 items-center rounded-lg px-3 py-2 hover:bg-muted/50">
+								className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50">
 								<div>
 									<p className="text-sm font-medium">
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
 
 									{/* <p className="text-xs text-muted-foreground">
-									{fundraiser.teams[0]?.team.name}
-								</p> */}
+										{fundraiser.teams[0]?.team.name}
+									</p> */}
 								</div>
-								<p className="text-right text-sm">${allocated.toFixed(2)}</p>
-								<p className="text-right text-sm">${distributed.toFixed(2)}</p>
-								<p className="text-right text-sm">${remaining.toFixed(2)}</p>
+								<p className="text-right text-sm">
+									${participant.allocatedAmount.toFixed(2)}
+								</p>
 							</div>
 						);
 					})}

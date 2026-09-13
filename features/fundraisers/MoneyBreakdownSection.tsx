@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import type { FundraiserContributionListItem } from "@/features/fundraisers/types";
+import AddContribution from "@/components/forms/fundraisers/AddContribution";
 
 type SectionProps = {
 	fundraiserId: string;
@@ -34,7 +35,7 @@ export default function MoneyBreakdownSection({
 					onOpenChange={setFundsOpen}>
 					<div className="flex items-center justify-between gap-4">
 						<CardTitle className="text-base">Money Breakdown</CardTitle>
-						{/* <AddFundraiserFund fundraiserId={fundraiserId} /> */}
+						<AddContribution fundraiserId={fundraiserId} />
 					</div>
 					<div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm">
 						<span className="font-medium">

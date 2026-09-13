@@ -25,6 +25,12 @@ export default function FundraiserHeader({
 	fundraiserTeams,
 	participants,
 }: SectionProps) {
+	const totalDistributed = participants.reduce(
+		(total, participant) => total + participant.allocatedAmount,
+		0,
+	);
+	const totalRemaining = totalRaised - totalDistributed;
+
 	return (
 		<Card className="overflow-hidden bg-gray-200">
 			<CardContent className="p-5">
@@ -59,6 +65,21 @@ export default function FundraiserHeader({
 					{fundraiserTeams.map((team) => (
 						<Badge key={team.id}>{team.name}</Badge>
 					))}
+				</div>
+				<div className="pt-4 grid gap-4 grid-cols-3">
+					<div>
+						<p className="text-sm text-muted-foreground">Distributed:</p>
+						<p className="text-lg font-semibold">
+							${totalDistributed.toFixed(2)}
+						</p>
+					</div>
+					<div>
+						<p className="text-sm text-muted-foreground">Remaining</p>
+						<p className="text-lg font-semibold">
+							{" "}
+							${totalRemaining.toFixed(2)}
+						</p>
+					</div>
 				</div>
 			</CardContent>
 		</Card>

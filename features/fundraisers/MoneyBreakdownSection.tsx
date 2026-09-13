@@ -14,14 +14,17 @@ import {
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import type { FundraiserContributionListItem } from "@/features/fundraisers/types";
 import AddContribution from "@/components/forms/fundraisers/AddContribution";
+import { FundraiserStatus } from "@prisma/client";
 
 type SectionProps = {
 	fundraiserId: string;
+	status: FundraiserStatus;
 	total: number;
 	funds: FundraiserContributionListItem[];
 };
 export default function MoneyBreakdownSection({
 	fundraiserId,
+	status,
 	total,
 	funds,
 }: SectionProps) {

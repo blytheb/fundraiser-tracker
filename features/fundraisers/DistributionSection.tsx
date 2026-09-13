@@ -9,10 +9,11 @@ import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundrai
 import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
 import type { FundraiserParticipantWithPlayerSerialized } from "./types";
 import { TeamWithPlayers } from "@/features/teams/types";
-import type { Team } from "@prisma/client";
+import type { Team, FundraiserStatus } from "@prisma/client";
 
 type SectionProps = {
 	fundraiserId: string;
+	status: FundraiserStatus;
 	selectedTeamIds: string[];
 	participants: FundraiserParticipantWithPlayerSerialized[];
 	activeTeams: Team[];
@@ -22,12 +23,14 @@ type SectionProps = {
 
 export default function DistributionSection({
 	fundraiserId,
+	status,
 	selectedTeamIds,
 	participants,
 	activeTeams,
 	activeRosters,
 	totalRaised,
 }: SectionProps) {
+	const isDraft = status === "DRAFT";
 	const [amounts, setAmounts] = useState<Record<string, string>>({});
 
 	const totalDistributed = participants.reduce((total, participant) => {
@@ -151,15 +154,17 @@ export default function DistributionSection({
 						</p>
 					)}
 				</div>
-				<div className="flex flex-col">
-					<CalculateEqualDistributionButton
-						fundraiserId={fundraiserId}
-						totalRaised={totalRaised}
-					/>
-					<Button disabled={Math.abs(totalRemaining) > 0.001}>
-						Save Distribution
-					</Button>
-				</div>
+				{isDraft && (
+					<div className="flex flex-col">
+						<CalculateEqualDistributionButton
+							fundraiserId={fundraiserId}
+							totalRaised={totalRaised}
+						/>
+						<Button disabled={Math.abs(totalRemaining) > 0.001}>
+							Save Distribution
+						</Button>
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	);

@@ -64,6 +64,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 			{/* Money Breakdown */}
 			<MoneyBreakdownSection
 				fundraiserId={fundraiser.id}
+				status={fundraiser.status}
 				total={totalRaised}
 				funds={contributions}
 			/>
@@ -71,6 +72,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 			{/* Participant Distribution */}
 			<DistributionSection
 				fundraiserId={fundraiser.id}
+				status={fundraiser.status}
 				selectedTeamIds={teams.map((team) => team.id)}
 				participants={participants}
 				activeTeams={activeTeams}
@@ -78,7 +80,11 @@ export default async function FundraiserPage({ params }: PageProps) {
 				totalRaised={totalRaised}
 			/>
 			{/* Details */}
-			<DetailSection fundraiser={fundraiser} teams={teams} />
+			<DetailSection
+				fundraiser={fundraiser}
+				status={fundraiser.status}
+				teams={teams}
+			/>
 		</main>
 	);
 }

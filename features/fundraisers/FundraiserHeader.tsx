@@ -4,9 +4,11 @@ import {
 	AvatarFallback,
 	AvatarGroup,
 	AvatarImage,
+	AvatarGroupCount,
 } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import PageHeader from "@/components/ui-reusable/PageHeader";
 
 import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 
@@ -37,36 +39,42 @@ export default function FundraiserHeader({
 				<div className="flex items-start justify-between gap-4">
 					<div>
 						<Badge variant="secondary">{fundraiser.status}</Badge>
-
-						<p className="text-lg font-semibold">{fundraiser.name}</p>
-
-						<p className="mt-1 text-sm text-muted-foreground">
-							{fundraiser.startDate.toLocaleDateString()}
-						</p>
+						<PageHeader
+							heading={fundraiser.name}
+							subheading={fundraiser.startDate.toLocaleDateString()}
+						/>
 					</div>
 					<FundraiserActions fundraiser={fundraiser} />
 				</div>
 
-				<div className="mt-6">
-					<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-						Total Raised
-					</p>
-
-					<p className="mt-1 text-4xl font-bold tracking-tight">
-						$
-						{totalRaised.toLocaleString("en-US", {
-							minimumFractionDigits: 2,
-							maximumFractionDigits: 2,
-						})}
-					</p>
-				</div>
-
-				<div className="space-x-2 mt-4 ">
+				<div className="space-x-2 my-4 ">
 					{fundraiserTeams.map((team) => (
 						<Badge key={team.id}>{team.name}</Badge>
 					))}
 				</div>
-				<div className="pt-4 grid gap-4 grid-cols-3">
+				<AvatarGroup>
+					<Avatar>
+						<AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+						<AvatarFallback>CN</AvatarFallback>
+					</Avatar>
+					<Avatar>
+						<AvatarImage
+							src="https://github.com/maxleiter.png"
+							alt="@maxleiter"
+						/>
+						<AvatarFallback>LR</AvatarFallback>
+					</Avatar>
+					<Avatar>
+						<AvatarImage
+							src="https://github.com/evilrabbit.png"
+							alt="@evilrabbit"
+						/>
+						<AvatarFallback>ER</AvatarFallback>
+					</Avatar>
+					<AvatarGroupCount>+3</AvatarGroupCount>
+				</AvatarGroup>
+
+				{/* <div className="pt-4 grid gap-4 grid-cols-3">
 					<div>
 						<p className="text-sm text-muted-foreground">Distributed:</p>
 						<p className="text-lg font-semibold">
@@ -80,7 +88,7 @@ export default function FundraiserHeader({
 							${totalRemaining.toFixed(2)}
 						</p>
 					</div>
-				</div>
+				</div> */}
 			</CardContent>
 		</Card>
 	);

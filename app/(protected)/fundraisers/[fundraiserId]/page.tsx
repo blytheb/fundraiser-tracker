@@ -7,6 +7,18 @@ import {
 	getActiveTeams,
 } from "@/features/teams/data/teams";
 
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarGroup,
+	AvatarGroupCount,
+	AvatarImage,
+} from "@/components/ui/avatar";
+import FundraiserActions from "@/features/fundraisers/FundraiserActions";
+import PageHeader from "@/components/ui-reusable/PageHeader";
+import SummaryBlock from "@/components/ui-reusable/SummaryBlock";
 import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
 import DistributionSection from "@/features/fundraisers/DistributionSection";
@@ -40,12 +52,6 @@ export default async function FundraiserPage({ params }: PageProps) {
 		return <div> Fundraiser Not Found </div>;
 	}
 
-	// const selectedTeamIds = new Set(teams.map((team) => team.id));
-
-	// const fundraiserRosters = activeTeamsWithPlayers.filter((team) =>
-	// 	selectedTeamIds.has(team.id),
-	// );
-
 	const totalRaised = contributions.reduce(
 		(total, contribution) => total + contribution.amount,
 		0,
@@ -54,13 +60,13 @@ export default async function FundraiserPage({ params }: PageProps) {
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
 			{/* Summary Card */}
-
 			<FundraiserHeader
 				fundraiser={fundraiser}
 				totalRaised={totalRaised}
 				fundraiserTeams={teams}
 				participants={participants}
 			/>
+
 			{/* Money Breakdown */}
 			<MoneyBreakdownSection
 				fundraiserId={fundraiser.id}

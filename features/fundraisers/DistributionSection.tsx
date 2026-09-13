@@ -53,18 +53,7 @@ export default function DistributionSection({
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
-						<CardTitle className="text-base">
-							Participant Distribution
-						</CardTitle>
-						{totalRemaining > 0 ? (
-							<p className="mt-1 text-sm text-muted-foreground">
-								${totalRemaining.toFixed(2)} remaining
-							</p>
-						) : (
-							<p className="mt-1 text-sm text-muted-foreground">
-								All funds are distributed
-							</p>
-						)}
+						<CardTitle className="text-base">Participant Breakdown</CardTitle>
 					</div>
 					<div className="flex items-center gap-2">
 						{isDraft && (
@@ -77,7 +66,7 @@ export default function DistributionSection({
 								availableTeams={activeTeams}
 								availableRosters={activeRosters}
 							/>
-						)}
+						)}{" "}
 					</div>
 				</div>
 			</CardHeader>
@@ -98,10 +87,6 @@ export default function DistributionSection({
 									<p className="text-sm font-medium">
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
-
-									{/* <p className="text-xs text-muted-foreground">
-										{fundraiser.teams[0]?.team.name}
-									</p> */}
 								</div>
 								{isDraft ? (
 									<Input
@@ -124,6 +109,7 @@ export default function DistributionSection({
 						);
 					})}
 				</div>
+
 				<div className="border-t pt-3">
 					<div className="flex justify-between px-3 text-sm">
 						<span className="font-medium">Total</span>
@@ -143,6 +129,11 @@ export default function DistributionSection({
 							${Math.abs(totalRemaining).toFixed(2)} over the available amount
 						</p>
 					)}
+				</div>
+				<div className="border-t pt-3">
+					<p> Total Raised</p>
+					<p> Total Assigned</p>
+					<p> Remaining Amount </p>
 				</div>
 				{isDraft && (
 					<div className="flex flex-col">

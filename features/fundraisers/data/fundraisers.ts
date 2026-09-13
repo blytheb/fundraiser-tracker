@@ -23,10 +23,10 @@ export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
 	});
 }
 
-export async function getActiveFundraisers(): Promise<Fundraiser[]> {
+export async function getDraftFundraisers(): Promise<Fundraiser[]> {
 	return prisma.fundraiser.findMany({
 		where: {
-			status: "ACTIVE",
+			status: "DRAFT",
 		},
 		orderBy: {
 			startDate: "desc",

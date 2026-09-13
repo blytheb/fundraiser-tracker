@@ -2,7 +2,6 @@ import type {
 	Prisma,
 	ContributionType,
 	PaymentMethod,
-	FundraiserDistribution,
 	FundraiserStatus,
 } from "@prisma/client";
 
@@ -11,7 +10,6 @@ export type FundraiserFormData = {
 	description: string;
 	startDate: Date;
 	status: FundraiserStatus;
-	distributionMethod: FundraiserDistribution;
 };
 
 // export type FundraiserFundFormData = {

@@ -22,7 +22,7 @@ export default function ListItemWithIcon({ fundraiser, action }: ItemProps) {
 	const content = (
 		<>
 			<ItemMedia>
-				{fundraiser.status === "ACTIVE" ? (
+				{fundraiser.status === "DRAFT" ? (
 					<CalendarClock className="size-8" />
 				) : (
 					<BadgeCheckIcon className="size-8" />

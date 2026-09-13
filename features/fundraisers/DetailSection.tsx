@@ -1,10 +1,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Fundraiser, Team } from "@prisma/client";
+import type { Fundraiser, FundraiserStatus, Team } from "@prisma/client";
 
 type SectionProps = {
 	fundraiser: Fundraiser;
 	teams: Team[];
+	status: FundraiserStatus;
 };
 
 export default function DetailSection({ fundraiser, teams }: SectionProps) {
@@ -34,13 +35,7 @@ export default function DetailSection({ fundraiser, teams }: SectionProps) {
 				<div className="flex justify-between gap-4 text-sm">
 					<span className="text-muted-foreground">Participants</span>
 
-					{/* <span className="font-medium">{fundraiser.participants.length}</span> */}
-				</div>
-
-				<div className="flex justify-between gap-4 text-sm">
-					<span className="text-muted-foreground">Distribution</span>
-
-					<span className="font-medium">Equal</span>
+					{/* <span className="font-medium">{participants.length}</span> */}
 				</div>
 			</CardContent>
 		</Card>

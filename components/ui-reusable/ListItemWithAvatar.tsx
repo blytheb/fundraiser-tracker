@@ -1,9 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import PlayerAvatar from "@/components/ui-reusable/PlayerAvatar";
 
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import type { Player } from "@prisma/client";
 
@@ -19,18 +19,7 @@ export default function ListItemWithAvatar({
 	const content = (
 		<>
 			<ItemMedia>
-				<Avatar className="size-10">
-					<AvatarImage
-						src={
-							player.imageUrl ?? `https://robohash.org/${player.id}?set=set2`
-						}
-						alt={`${player.firstName} ${player.lastName}`}
-					/>
-					<AvatarFallback>
-						{player.firstName[0]}
-						{player.lastName[0]}
-					</AvatarFallback>
-				</Avatar>
+				<PlayerAvatar player={player} />
 			</ItemMedia>
 
 			<ItemContent>

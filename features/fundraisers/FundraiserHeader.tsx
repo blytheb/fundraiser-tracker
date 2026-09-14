@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import PageHeader from "@/components/ui-reusable/PageHeader";
 
+import PlayerAvatar from "@/components/ui-reusable/PlayerAvatar";
 import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 
 import type { Team, Fundraiser } from "@prisma/client";
@@ -55,51 +56,28 @@ export default function FundraiserHeader({
 				</div>
 				{participants.length > 3 ? (
 					<AvatarGroup>
-						<Avatar key={participants[0].id}>
-							<AvatarImage
-								src={participants[0].player.imageUrl}
-								alt={participants[0].player.firstName}
-							/>
-							<AvatarFallback>
-								{participants[0].player.firstName[0]}
-								{participants[0].player.lastName[0]}
-							</AvatarFallback>
-						</Avatar>
-						<Avatar key={participants[1].id}>
-							<AvatarImage
-								src={participants[1].player.imageUrl}
-								alt={participants[1].player.firstname}
-							/>
-							<AvatarFallback>
-								{participants[1].player.firstName[0]}
-								{participants[1].player.lastName[0]}
-							</AvatarFallback>
-						</Avatar>
-						<Avatar key={participants[2].id}>
-							<AvatarImage
-								src={participants[1].player.imageUrl}
-								alt={participants[1].player.firstname}
-							/>
-							<AvatarFallback>
-								{participants[2].player.firstName[0]}
-								{participants[2].player.lastName[0]}
-							</AvatarFallback>
-						</Avatar>
+						<PlayerAvatar
+							key={participants[0].id}
+							player={participants[0].player}
+						/>
+						<PlayerAvatar
+							key={participants[1].id}
+							player={participants[1].player}
+						/>
+						<PlayerAvatar
+							key={participants[2].id}
+							player={participants[2].player}
+						/>
+
 						<AvatarGroupCount>+{participants.length - 3}</AvatarGroupCount>
 					</AvatarGroup>
 				) : (
 					<div className="flex">
 						{participants.map((participant) => (
-							<Avatar key={participant.id}>
-								<AvatarImage
-									src={participant.player.imageUrl ?? undefined}
-									alt={participant.player.firstName}
-								/>
-								<AvatarFallback>
-									{participant.player.firstName[0].toUpperCase()}
-									{participant.player.lastName[0].toUpperCase()}
-								</AvatarFallback>
-							</Avatar>
+							<PlayerAvatar
+								key={participant.player.id}
+								player={participant.player}
+							/>
 						))}
 					</div>
 				)}

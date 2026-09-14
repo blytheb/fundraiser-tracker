@@ -32,6 +32,14 @@ export default function MoneyBreakdownSection({
 }: SectionProps) {
 	const isDraft = status === "DRAFT";
 	const [listOpen, setListOpen] = useState(false);
+
+	const sourceLabels = {
+		EVENT_PROFIT: "Event Profit",
+		SALES: "Sales",
+		TIPS: "Tips",
+		OTHER: "Other",
+	};
+
 	return (
 		<Card>
 			<CardHeader>
@@ -78,7 +86,10 @@ export default function MoneyBreakdownSection({
 								<div
 									key={fund.id}
 									className="rounded-md border px-4 py-2 text-sm flex justify-between items-center">
-									<p className="text-muted-foreground">{fund.source}</p>
+									<p className="text-muted-foreground">
+										{sourceLabels[fund.source]}
+									</p>
+
 									<div className="flex gap-4 items-center justify-center">
 										<p className="text-muted-foreground">
 											{fund.amount.toLocaleString("en-US", {

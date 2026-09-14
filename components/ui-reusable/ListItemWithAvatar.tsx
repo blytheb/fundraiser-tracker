@@ -20,7 +20,12 @@ export default function ListItemWithAvatar({
 		<>
 			<ItemMedia>
 				<Avatar className="size-10">
-					<AvatarImage src={player.imageUrl ?? undefined} />
+					<AvatarImage
+						src={
+							player.imageUrl ?? `https://robohash.org/${player.id}?set=set2`
+						}
+						alt={`${player.firstName} ${player.lastName}`}
+					/>
 					<AvatarFallback>
 						{player.firstName[0]}
 						{player.lastName[0]}

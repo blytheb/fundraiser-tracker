@@ -30,7 +30,6 @@ export default function AddPlayerDialog() {
 				firstName,
 				lastName,
 				status: true,
-				imageUrl: "https://robohash.org/1?set=set2",
 			});
 			router.refresh();
 			setOpen(false);

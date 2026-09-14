@@ -29,7 +29,6 @@ export default function AddTeamDialog() {
 			await createTeam({
 				name,
 				status: "IN_SEASON",
-				imageUrl: "https://robohash.org/1",
 			});
 			router.refresh();
 			setOpen(false);

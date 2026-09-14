@@ -6,7 +6,10 @@ import type { Team } from "@prisma/client";
 
 export async function createTeam(data: TeamFormData): Promise<Team> {
 	return prisma.team.create({
-		data,
+		data: {
+			...data,
+			imageUrl: null,
+		},
 	});
 }
 

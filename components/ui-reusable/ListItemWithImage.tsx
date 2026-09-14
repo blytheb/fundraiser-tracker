@@ -24,18 +24,13 @@ export default function ListItemWithImage({ team }: ItemProps) {
 				className="flex min-h-32 w-full justify-between items-center gap-6 px-4">
 				{/* Team Image */}
 				<ItemMedia className="w-2/5 shrink-0">
-					{team.imageUrl ? (
-						<Image
-							src={team.imageUrl}
-							alt={team.name}
-							width={300}
-							height={300}
-							className="h-full w-full object-cover"
-						/>
-					) : (
-						<div className="h-full w-full bg-muted" />
-					)}
-					{/* src={team.imageUrl ?? "/placeholder.png"} */}
+					<Image
+						src={team.imageUrl ?? "/MenehuneBasketballLogo.png"}
+						alt={team.name}
+						width={300}
+						height={300}
+						className="h-full w-full object-cover"
+					/>
 				</ItemMedia>
 
 				{/* Team Information */}

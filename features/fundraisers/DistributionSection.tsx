@@ -66,25 +66,24 @@ export default function DistributionSection({
 								availableTeams={activeTeams}
 								availableRosters={activeRosters}
 							/>
-						)}{" "}
+						)}
 					</div>
 				</div>
 			</CardHeader>
 
-			<CardContent className="space-y-1">
-				<div className="space-y-1">
-					<div className="flex justify-between px-3 py-2 text-xs font-medium text-muted-foreground">
-						<span>Player</span>
+			<CardContent>
+				<div>
+					<div className="flex justify-between p-2 text-md font-semibold">
+						<span>Player Name ({participants.length})</span>
 						<span className="text-right">Amount</span>
 					</div>
 					{participants.map((participant) => {
 						return (
 							<div
 								key={participant.id}
-								// className="grid grid-cols-3 items-center rounded-lg px-3 py-2 hover:bg-muted/50">
-								className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50">
+								className="flex items-center justify-between text-sm rounded-lg p-2 hover:bg-muted/50">
 								<div>
-									<p className="text-sm font-medium">
+									<p className="font-medium">
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
 								</div>
@@ -109,34 +108,34 @@ export default function DistributionSection({
 						);
 					})}
 				</div>
-
 				<div className="border-t pt-3">
-					<div className="flex justify-between px-3 text-sm">
-						<span className="font-medium">Total</span>
-						<span className="font-medium">
-							${totalDistributed.toFixed(2)} / ${totalRaised.toFixed(2)}
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">Total Raised</span>
+						<span className="font-semibold">${totalRaised.toFixed(2)}</span>
+					</div>
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">Total Assigned</span>
+						<span className="font-semibold">
+							${totalDistributed.toFixed(2)}
 						</span>
 					</div>
 
 					{totalRemaining > 0 && (
-						<p className="px-3 pt-1 text-sm text-muted-foreground">
-							${totalRemaining.toFixed(2)} remaining
+						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
+							${Math.abs(totalRemaining).toFixed(2)} needs to be assigned
 						</p>
 					)}
 
 					{totalRemaining < 0 && (
-						<p className="px-3 pt-1 text-sm text-destructive">
+						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
 							${Math.abs(totalRemaining).toFixed(2)} over the available amount
 						</p>
 					)}
 				</div>
-				<div className="border-t pt-3">
-					<p> Total Raised</p>
-					<p> Total Assigned</p>
-					<p> Remaining Amount </p>
-				</div>
+				<div className="pt-3"></div>
+
 				{isDraft && (
-					<div className="flex flex-col">
+					<div className="flex justify-end">
 						<CalculateEqualDistributionButton
 							fundraiserId={fundraiserId}
 							totalRaised={totalRaised}

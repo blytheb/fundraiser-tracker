@@ -85,12 +85,6 @@ export default async function FundraiserPage({ params }: PageProps) {
 				activeRosters={activeTeamsWithPlayers}
 				totalRaised={totalRaised}
 			/>
-			{/* Details */}
-			<DetailSection
-				fundraiser={fundraiser}
-				status={fundraiser.status}
-				teams={teams}
-			/>
 		</main>
 	);
 }

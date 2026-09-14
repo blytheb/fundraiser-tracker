@@ -32,17 +32,18 @@ export default function FundraiserHeader({
 		0,
 	);
 	const totalRemaining = totalRaised - totalDistributed;
-
+	console.log(participants);
 	return (
 		<Card className="overflow-hidden bg-gray-200">
 			<CardContent className="p-5">
 				<div className="flex items-start justify-between gap-4">
-					<div>
+					<div className="space-y-4">
 						<Badge variant="secondary">{fundraiser.status}</Badge>
 						<PageHeader
 							heading={fundraiser.name}
-							subheading={fundraiser.startDate.toLocaleDateString()}
+							subheading={fundraiser.description}
 						/>
+						<p>Event Date: {fundraiser.startDate.toLocaleDateString()}</p>
 					</div>
 					<FundraiserActions fundraiser={fundraiser} />
 				</div>
@@ -52,43 +53,56 @@ export default function FundraiserHeader({
 						<Badge key={team.id}>{team.name}</Badge>
 					))}
 				</div>
-				<AvatarGroup>
-					<Avatar>
-						<AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-						<AvatarFallback>CN</AvatarFallback>
-					</Avatar>
-					<Avatar>
-						<AvatarImage
-							src="https://github.com/maxleiter.png"
-							alt="@maxleiter"
-						/>
-						<AvatarFallback>LR</AvatarFallback>
-					</Avatar>
-					<Avatar>
-						<AvatarImage
-							src="https://github.com/evilrabbit.png"
-							alt="@evilrabbit"
-						/>
-						<AvatarFallback>ER</AvatarFallback>
-					</Avatar>
-					<AvatarGroupCount>+3</AvatarGroupCount>
-				</AvatarGroup>
-
-				{/* <div className="pt-4 grid gap-4 grid-cols-3">
-					<div>
-						<p className="text-sm text-muted-foreground">Distributed:</p>
-						<p className="text-lg font-semibold">
-							${totalDistributed.toFixed(2)}
-						</p>
+				{participants.length > 3 ? (
+					<AvatarGroup>
+						<Avatar key={participants[0].id}>
+							<AvatarImage
+								src={participants[0].player.imageUrl}
+								alt={participants[0].player.firstName}
+							/>
+							<AvatarFallback>
+								{participants[0].player.firstName[0]}
+								{participants[0].player.lastName[0]}
+							</AvatarFallback>
+						</Avatar>
+						<Avatar key={participants[1].id}>
+							<AvatarImage
+								src={participants[1].player.imageUrl}
+								alt={participants[1].player.firstname}
+							/>
+							<AvatarFallback>
+								{participants[1].player.firstName[0]}
+								{participants[1].player.lastName[0]}
+							</AvatarFallback>
+						</Avatar>
+						<Avatar key={participants[2].id}>
+							<AvatarImage
+								src={participants[1].player.imageUrl}
+								alt={participants[1].player.firstname}
+							/>
+							<AvatarFallback>
+								{participants[2].player.firstName[0]}
+								{participants[2].player.lastName[0]}
+							</AvatarFallback>
+						</Avatar>
+						<AvatarGroupCount>+{participants.length - 3}</AvatarGroupCount>
+					</AvatarGroup>
+				) : (
+					<div className="flex">
+						{participants.map((participant) => (
+							<Avatar key={participant.id}>
+								<AvatarImage
+									src={participant.player.imageUrl ?? undefined}
+									alt={participant.player.firstName}
+								/>
+								<AvatarFallback>
+									{participant.player.firstName[0].toUpperCase()}
+									{participant.player.lastName[0].toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
+						))}
 					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Remaining</p>
-						<p className="text-lg font-semibold">
-							{" "}
-							${totalRemaining.toFixed(2)}
-						</p>
-					</div>
-				</div> */}
+				)}
 			</CardContent>
 		</Card>
 	);

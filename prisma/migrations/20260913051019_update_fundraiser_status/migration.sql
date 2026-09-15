@@ -21,4 +21,4 @@ DROP TYPE "FundraiserDistribution";
 ALTER TABLE "Fundraiser"
 ALTER COLUMN "status" SET DEFAULT 'DRAFT';
 
-COMMIT;s
+COMMIT;

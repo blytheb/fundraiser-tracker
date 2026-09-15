@@ -17,5 +17,9 @@ export const auth = betterAuth({
 
 	secret: process.env.BETTER_AUTH_SECRET,
 
-	trustedOrigins: ["http://localhost:3000", process.env.BETTER_AUTH_URL!],
+	trustedOrigins: [
+		"http://localhost:3000",
+		process.env.BETTER_AUTH_URL!,
+		"https://fundraiser-tracker-git-feature-distribution-blythe3.vercel.app/",
+	],
 });

@@ -4,10 +4,13 @@ import {
 	AvatarFallback,
 	AvatarGroup,
 	AvatarImage,
+	AvatarGroupCount,
 } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import PageHeader from "@/components/ui-reusable/PageHeader";
 
+import PlayerAvatar from "@/components/ui-reusable/PlayerAvatar";
 import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 
 import type { Team, Fundraiser } from "@prisma/client";
@@ -25,41 +28,59 @@ export default function FundraiserHeader({
 	fundraiserTeams,
 	participants,
 }: SectionProps) {
+	const totalDistributed = participants.reduce(
+		(total, participant) => total + participant.allocatedAmount,
+		0,
+	);
+	const totalRemaining = totalRaised - totalDistributed;
+	console.log(participants);
 	return (
 		<Card className="overflow-hidden bg-gray-200">
 			<CardContent className="p-5">
 				<div className="flex items-start justify-between gap-4">
-					<div>
+					<div className="space-y-4">
 						<Badge variant="secondary">{fundraiser.status}</Badge>
-
-						<p className="text-lg font-semibold">{fundraiser.name}</p>
-
-						<p className="mt-1 text-sm text-muted-foreground">
-							{fundraiser.startDate.toLocaleDateString()}
-						</p>
+						<PageHeader
+							heading={fundraiser.name}
+							subheading={fundraiser.description}
+						/>
+						<p>Event Date: {fundraiser.startDate.toLocaleDateString()}</p>
 					</div>
 					<FundraiserActions fundraiser={fundraiser} />
 				</div>
 
-				<div className="mt-6">
-					<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-						Total Raised
-					</p>
-
-					<p className="mt-1 text-4xl font-bold tracking-tight">
-						$
-						{totalRaised.toLocaleString("en-US", {
-							minimumFractionDigits: 2,
-							maximumFractionDigits: 2,
-						})}
-					</p>
-				</div>
-
-				<div className="space-x-2 mt-4 ">
+				<div className="space-x-2 my-4 ">
 					{fundraiserTeams.map((team) => (
 						<Badge key={team.id}>{team.name}</Badge>
 					))}
 				</div>
+				{participants.length > 3 ? (
+					<AvatarGroup>
+						<PlayerAvatar
+							key={participants[0].id}
+							player={participants[0].player}
+						/>
+						<PlayerAvatar
+							key={participants[1].id}
+							player={participants[1].player}
+						/>
+						<PlayerAvatar
+							key={participants[2].id}
+							player={participants[2].player}
+						/>
+
+						<AvatarGroupCount>+{participants.length - 3}</AvatarGroupCount>
+					</AvatarGroup>
+				) : (
+					<div className="flex">
+						{participants.map((participant) => (
+							<PlayerAvatar
+								key={participant.player.id}
+								player={participant.player}
+							/>
+						))}
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	);

@@ -62,8 +62,7 @@ export default function AddFundraiserToTeamDialog({
 				name: name.trim(),
 				description: "",
 				startDate: new Date(),
-				status: "ACTIVE",
-				distributionMethod: "EQUAL",
+				status: "DRAFT",
 			});
 
 			router.refresh();

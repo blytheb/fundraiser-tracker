@@ -6,11 +6,7 @@ type PageHeaderProps = {
 	action?: React.ReactNode;
 };
 
-export default function PageHeader({
-	heading,
-	subheading,
-	action,
-}: PageHeaderProps) {
+export default function PageHeader({ heading, subheading }: PageHeaderProps) {
 	return (
 		<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 			<div className="min-w-0">
@@ -24,8 +20,6 @@ export default function PageHeader({
 					</p>
 				)}
 			</div>
-
-			{action && <div className="shrink-0">{action}</div>}
 		</div>
 	);
 }

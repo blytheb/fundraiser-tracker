@@ -5,7 +5,12 @@ import type { Player } from "@prisma/client";
 import type { PlayerFormData } from "../types";
 
 export async function createPlayer(data: PlayerFormData): Promise<Player> {
-	return prisma.player.create({ data });
+	return prisma.player.create({
+		data: {
+			...data,
+			imageUrl: null,
+		},
+	});
 }
 
 export async function updatePlayer(

@@ -47,8 +47,7 @@ export default function EditFundraiserDialog({
 				name,
 				description,
 				startDate: new Date(startDate),
-				status: "ACTIVE",
-				distributionMethod: "EQUAL",
+				status: "DRAFT",
 			});
 			router.refresh();
 			onOpenChange(false);

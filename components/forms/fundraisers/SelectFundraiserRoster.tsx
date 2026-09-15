@@ -130,7 +130,7 @@ export default function SelectFundraiserRoster({
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger render={<Button>Manage Participants</Button>} />
+			<DialogTrigger render={<Button size="sm">Manage Participants</Button>} />
 
 			<DialogContent>
 				{step === "teams" ? (

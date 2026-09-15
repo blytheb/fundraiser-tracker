@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,7 +14,7 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import { MoreVertical } from "lucide-react";
 
 import Link from "next/link";
-
+import { changeStatus } from "@/features/fundraisers/actions/fundraisers";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
 import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
 
@@ -28,7 +29,24 @@ export default function FundraiserActions({
 }: FundraiserActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
+	const router = useRouter();
 
+	async function handleDraft() {
+		try {
+			await changeStatus(fundraiser.id, "DRAFT");
+			router.refresh();
+		} catch (error) {
+			console.error(error);
+		}
+	}
+	async function handleComplete() {
+		try {
+			await changeStatus(fundraiser.id, "COMPLETED");
+			router.refresh();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 	return (
 		<>
 			{/* Smaller Screens Collapsed Actions */}
@@ -39,6 +57,12 @@ export default function FundraiserActions({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
+						<DropdownMenuItem onClick={handleDraft}>
+							DRAFT STATUS
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={handleComplete}>
+							COMPLETED STATUS
+						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={(e) => {
 								e.preventDefault();

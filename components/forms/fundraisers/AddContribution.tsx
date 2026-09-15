@@ -91,7 +91,7 @@ export default function AddContribution({
 			<DialogTrigger
 				render={
 					<Button size="sm">
-						<Plus className="mr-2 h-4 w-4" />
+						<Plus className="h-3 w-3" />
 						Add Contribution
 					</Button>
 				}></DialogTrigger>

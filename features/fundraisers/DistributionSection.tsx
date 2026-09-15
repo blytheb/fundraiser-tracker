@@ -1,124 +1,150 @@
-import React from "react";
-// import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import CalculateDistributionButton from "@/components/buttons/CalculateDistributionButton";
+import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
+import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
 import type { FundraiserParticipantWithPlayerSerialized } from "./types";
+import { TeamWithPlayers } from "@/features/teams/types";
+import type { Team, FundraiserStatus } from "@prisma/client";
 
 type SectionProps = {
 	fundraiserId: string;
+	status: FundraiserStatus;
+	selectedTeamIds: string[];
 	participants: FundraiserParticipantWithPlayerSerialized[];
+	activeTeams: Team[];
+	activeRosters: TeamWithPlayers[];
 	totalRaised: number;
 };
 
 export default function DistributionSection({
 	fundraiserId,
+	status,
+	selectedTeamIds,
 	participants,
+	activeTeams,
+	activeRosters,
 	totalRaised,
 }: SectionProps) {
-	const totalAllocated = participants.reduce(
-		(total, participant) => total + participant.allocatedAmount,
-		0,
-	);
+	const isDraft = status === "DRAFT";
+	const [amounts, setAmounts] = useState<Record<string, string>>({});
 
-	const totalDistributed = 0;
-	const totalRemaining = totalRaised - totalAllocated;
+	const totalDistributed = participants.reduce((total, participant) => {
+		return total + (Number(amounts[participant.id]) || 0);
+	}, 0);
+
+	const totalRemaining = totalRaised - totalDistributed;
+
+	useEffect(() => {
+		const initialAmounts: Record<string, string> = {};
+
+		participants.forEach((participant) => {
+			initialAmounts[participant.id] = participant.allocatedAmount.toFixed(2);
+		});
+
+		setAmounts(initialAmounts);
+	}, [participants]);
 	return (
 		<Card>
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
-						<CardTitle className="text-base">
-							Participant Distribution
-						</CardTitle>
-
-						<p className="mt-1 text-sm text-muted-foreground">
-							{participants.length} participants
-						</p>
+						<CardTitle className="text-base">Participant Breakdown</CardTitle>
 					</div>
-					<CalculateDistributionButton
-						fundraiserId={fundraiserId}
-						totalRaised={totalRaised}
-					/>
-
-					{/* <ToggleGroup
-						type="single"
-						className="h-8 overflow-hidden rounded-md border gap-0">
-						<ToggleGroupItem
-							value="equal"
-							className="h-8 rounded-none border-0 px-3 bg-amber-200">
-							Equal
-						</ToggleGroupItem>
-
-						<ToggleGroupItem
-							value="custom"
-							className=" h-8 rounded-none border-0 px-3 bg-green-500">
-							Custom
-						</ToggleGroupItem>
-					</ToggleGroup> */}
+					<div className="flex items-center gap-2">
+						{isDraft && (
+							<SelectFundraiserRoster
+								fundraiserId={fundraiserId}
+								selectedTeamIds={selectedTeamIds}
+								selectedParticipantIds={participants.map(
+									(participant) => participant.playerId,
+								)}
+								availableTeams={activeTeams}
+								availableRosters={activeRosters}
+							/>
+						)}
+					</div>
 				</div>
 			</CardHeader>
 
-			<CardContent className="space-y-1">
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-					<div>
-						<p className="text-sm text-muted-foreground">Total Raised:</p>
-						<p className="text-lg font-semibold">${totalRaised.toFixed(2)}</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Allocated:</p>
-						<p className="text-lg font-semibold">
-							${totalAllocated.toFixed(2)}
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Distributed:</p>
-						<p className="text-lg font-semibold">
-							${totalDistributed.toFixed(2)}
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Remaining</p>
-						<p className="text-lg font-semibold">
-							{" "}
-							${totalRemaining.toFixed(2)}
-						</p>
-					</div>
-				</div>
-				<div className="space-y-1">
-					<div className="grid grid-cols-4 px-3 py-2 text-xs font-medium text-muted-foreground">
-						<span>Planyer</span>
-						<span className="text-right">Allocated</span>
-						<span className="text-right">Distributed</span>
-						<span className="text-right">Remaining</span>
+			<CardContent>
+				<div>
+					<div className="flex justify-between p-2 text-md font-semibold">
+						<span>Player Name ({participants.length})</span>
+						<span className="text-right">Amount</span>
 					</div>
 					{participants.map((participant) => {
-						const allocated = participant.allocatedAmount;
-						const distributed = 0;
-						const remaining = allocated - distributed;
 						return (
 							<div
 								key={participant.id}
-								className="grid grid-cols-4 items-center rounded-lg px-3 py-2 hover:bg-muted/50">
-								{/* className="flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/50" */}
-
+								className="flex items-center justify-between text-sm rounded-lg p-2 hover:bg-muted/50">
 								<div>
-									<p className="text-sm font-medium">
+									<p className="font-medium">
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
-
-									{/* <p className="text-xs text-muted-foreground">
-									{fundraiser.teams[0]?.team.name}
-								</p> */}
 								</div>
-								<p className="text-right text-sm">${allocated.toFixed(2)}</p>
-								<p className="text-right text-sm">${distributed.toFixed(2)}</p>
-								<p className="text-right text-sm">${remaining.toFixed(2)}</p>
+								{isDraft ? (
+									<Input
+										type="number"
+										min="0"
+										step="0.01"
+										value={amounts[participant.id] ?? ""}
+										onChange={(e) => {
+											setAmounts((prev) => ({
+												...prev,
+												[participant.id]: e.target.value,
+											}));
+										}}
+										className="w-28 text-right"
+									/>
+								) : (
+									<p>${participant.allocatedAmount.toFixed(2)}</p>
+								)}
 							</div>
 						);
 					})}
 				</div>
+				<div className="border-t pt-3">
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">Total Raised</span>
+						<span className="font-semibold">${totalRaised.toFixed(2)}</span>
+					</div>
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">Total Assigned</span>
+						<span className="font-semibold">
+							${totalDistributed.toFixed(2)}
+						</span>
+					</div>
+
+					{totalRemaining > 0 && (
+						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
+							${Math.abs(totalRemaining).toFixed(2)} needs to be assigned
+						</p>
+					)}
+
+					{totalRemaining < 0 && (
+						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
+							${Math.abs(totalRemaining).toFixed(2)} over the available amount
+						</p>
+					)}
+				</div>
+				<div className="pt-3"></div>
+
+				{isDraft && (
+					<div className="flex justify-end">
+						<CalculateEqualDistributionButton
+							fundraiserId={fundraiserId}
+							totalRaised={totalRaised}
+						/>
+						<Button disabled={Math.abs(totalRemaining) > 0.001}>
+							Save Distribution
+						</Button>
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	);

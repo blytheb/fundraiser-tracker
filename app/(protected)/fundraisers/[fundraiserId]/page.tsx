@@ -7,8 +7,18 @@ import {
 	getActiveTeams,
 } from "@/features/teams/data/teams";
 
-import AddContribution from "@/components/forms/fundraisers/AddContribution";
-import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarGroup,
+	AvatarGroupCount,
+	AvatarImage,
+} from "@/components/ui/avatar";
+import FundraiserActions from "@/features/fundraisers/FundraiserActions";
+import PageHeader from "@/components/ui-reusable/PageHeader";
+import SummaryBlock from "@/components/ui-reusable/SummaryBlock";
 import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
 import DistributionSection from "@/features/fundraisers/DistributionSection";
@@ -42,12 +52,6 @@ export default async function FundraiserPage({ params }: PageProps) {
 		return <div> Fundraiser Not Found </div>;
 	}
 
-	// const selectedTeamIds = new Set(teams.map((team) => team.id));
-
-	// const fundraiserRosters = activeTeamsWithPlayers.filter((team) =>
-	// 	selectedTeamIds.has(team.id),
-	// );
-
 	const totalRaised = contributions.reduce(
 		(total, contribution) => total + contribution.amount,
 		0,
@@ -56,28 +60,17 @@ export default async function FundraiserPage({ params }: PageProps) {
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
 			{/* Summary Card */}
-
-			<SelectFundraiserRoster
-				fundraiserId={fundraiser.id}
-				selectedTeamIds={teams.map((team) => team.id)}
-				selectedParticipantIds={participants.map(
-					(participant) => participant.playerId,
-				)}
-				availableTeams={activeTeams}
-				availableRosters={activeTeamsWithPlayers}
-			/>
-
-			<AddContribution fundraiserId={fundraiser.id} />
-
 			<FundraiserHeader
 				fundraiser={fundraiser}
 				totalRaised={totalRaised}
 				fundraiserTeams={teams}
 				participants={participants}
 			/>
+
 			{/* Money Breakdown */}
 			<MoneyBreakdownSection
 				fundraiserId={fundraiser.id}
+				status={fundraiser.status}
 				total={totalRaised}
 				funds={contributions}
 			/>
@@ -85,11 +78,13 @@ export default async function FundraiserPage({ params }: PageProps) {
 			{/* Participant Distribution */}
 			<DistributionSection
 				fundraiserId={fundraiser.id}
+				status={fundraiser.status}
+				selectedTeamIds={teams.map((team) => team.id)}
 				participants={participants}
+				activeTeams={activeTeams}
+				activeRosters={activeTeamsWithPlayers}
 				totalRaised={totalRaised}
 			/>
-			{/* Details */}
-			<DetailSection fundraiser={fundraiser} teams={teams} />
 		</main>
 	);
 }

@@ -1,3 +1,7 @@
+// ============================================================
+// PRISMA CONFIGURATION
+// ============================================================
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,6 +11,12 @@ datasource db {
   url      = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+// ============================================================
+// AUTHENTICATION
+// ============================================================
+// These models are used by Better Auth.
+// They handle user accounts, login sessions, and verification.
 
 model User {
   id            String    @id @default(cuid())
@@ -69,29 +79,56 @@ model Verification {
   @@map("verification")
 }
 
-model Team {
-  id              String           @id @default(cuid())
-  name            String
-  status          TeamStatus       @default(IN_SEASON)
-  imageUrl        String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  fundraiserTeams FundraiserTeam[]
-  players         TeamPlayer[]
-}
+// ============================================================
+// PLAYERS & TEAMS
+// ============================================================
+// Players exist independently of any fundraiser.
+// A player can participate in multiple fundraisers and belong
+// to multiple teams over time.
 
 model Player {
   id                     String                  @id @default(cuid())
   firstName              String
   lastName               String
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
   imageUrl               String?
   status                 Boolean                 @default(true)
-  fundraiserParticipants FundraiserParticipant[]
-  transactions           PlayerTransaction[]
-  teams                  TeamPlayer[]
+
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  fundraiserParticipants FundraiserParticipant[]    // fundraisers this player has participated in
+  transactions           PlayerTransaction[]        //financial transactions belonging to this player
+  teams                  TeamPlayer[]               //teams this player belongs to
 }
+
+
+// ------------------------------------------------------------
+// Team
+// ------------------------------------------------------------
+// Represents a team/roster.
+// Teams can be used across different fundraisers.
+
+model Team {
+  id              String           @id @default(cuid())
+  name            String
+  status          TeamStatus       @default(IN_SEASON)
+  imageUrl        String?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  fundraiserTeams FundraiserTeam[] // fundraisers that includes this team
+  players         TeamPlayer[]     //players currently assiciated with team (aka roster)
+}
+
+
+// ------------------------------------------------------------
+// TeamPlayer
+// ------------------------------------------------------------
+// Join table connecting Players and Teams.
+//
+// This allows a player to belong to multiple teams and keeps
+// team membership separate from fundraiser participation.
 
 model TeamPlayer {
   id        String   @id @default(cuid())
@@ -101,50 +138,49 @@ model TeamPlayer {
   player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  @@unique([teamId, playerId])
+  @@unique([teamId, playerId]) // a player can only be added to the same team once
 }
+
+// ============================================================
+// FUNDRAISERS
+// ============================================================
+// A Fundraiser represents one fundraising campaign.
+//
+// Example:
+// "2026 Florida Travel Fundraiser"
+//
+// A fundraiser contains:
+// - Teams
+// - Participants
+// - Money coming into the fundraiser
+// - Money allocated to players
+// - Player financial transactions
 
 model Fundraiser {
   id            String                   @id @default(cuid())
   name          String
-  status        FundraiserStatus         @default(DRAFT)
   description   String
+  status        FundraiserStatus         @default(DRAFT)
+  startDate     DateTime
+
   createdAt     DateTime                 @default(now())
   updatedAt     DateTime                 @updatedAt
-  startDate     DateTime
-  contributions FundraiserContribution[]
-  participants  FundraiserParticipant[]
-  teams         FundraiserTeam[]
+
+  contributions FundraiserContribution[]  //money contributed INTO the fundraiser
+  participants  FundraiserParticipant[]   //players participating in the fundraiser
+  teams         FundraiserTeam[]          //teams associated with the fundraiser  
+  transactions  PlayerTransaction[]       //player financial transactions associated with the fundraiser
 }
 
-model FundraiserContribution {
-  id            String           @id @default(cuid())
-  amount        Decimal          @db.Decimal(10, 2)
-  paymentMethod PaymentMethod
-  source        ContributionType
-  date          DateTime         @default(now())
-  description   String?
-  fundraiserId  String
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  fundraiser    Fundraiser       @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+// ------------------------------------------------------------
+// FundraiserTeam
+// ------------------------------------------------------------
+// Join table connecting a fundraiser to the teams participating
+// in that fundraiser.
+//
+// A team can participate in many fundraisers.
+// A fundraiser can contain many teams.
 
-  @@index([fundraiserId])
-}
-
-model FundraiserParticipant {
-  id              String     @id @default(cuid())
-  fundraiserId    String
-  playerId        String
-  createdAt       DateTime   @default(now())
-  allocatedAmount Decimal    @default(0) @db.Decimal(10, 2)
-  updatedAt       DateTime   @default(now()) @updatedAt
-  fundraiser      Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-  player          Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
-
-  @@unique([fundraiserId, playerId])
-  @@index([fundraiserId])
-}
 
 model FundraiserTeam {
   id           String     @id @default(cuid())
@@ -154,34 +190,205 @@ model FundraiserTeam {
   fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
   team         Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  @@unique([fundraiserId, teamId])
+  @@unique([fundraiserId, teamId]) //prevent the same team from being added twice to a fundraiser
   @@index([teamId])
 }
+
+// ------------------------------------------------------------
+// FundraiserParticipant
+// ------------------------------------------------------------
+// Connects a Player to a Fundraiser.
+//
+// This answers:
+// "Who is participating in this fundraiser?"
+//
+// It intentionally does NOT store the player's current
+// allocation amount. Allocations are stored separately so
+// allocation history can be preserved.
+
+model FundraiserParticipant {
+  id              String     @id @default(cuid())
+  fundraiserId    String
+  playerId        String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @default(now()) @updatedAt
+
+  fundraiser      Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+  player          Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  allocations     Allocation[]      //allocations for this player in this fundraiser
+
+  @@unique([fundraiserId, playerId]) //prevent the same player from being added twice to a fundraiser
+  @@index([fundraiserId])
+}
+
+
+// ============================================================
+// FUNDRAISER MONEY
+// ============================================================
+// These models describe money entering the fundraiser and how
+// that money is assigned to players.
+
+
+// ------------------------------------------------------------
+// FundraiserContribution
+// ------------------------------------------------------------
+// Represents money coming INTO a fundraiser.
+//
+// Examples:
+// - $500 from sales
+// - $1,000 from an event
+// - $100 in tips
+//
+// This is fundraiser-level money, not money belonging to
+// an individual player.
+
+model FundraiserContribution {
+  id            String           @id @default(cuid())
+  fundraiserId  String
+
+  amount        Decimal          @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  source        ContributionType
+  date          DateTime         @default(now())
+  description   String?
+  
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  
+  fundraiser    Fundraiser       @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+
+  @@index([fundraiserId])
+}
+
+// ------------------------------------------------------------
+// Allocation
+// ------------------------------------------------------------
+// Represents how fundraiser money is assigned to a participant.
+//
+// Example:
+//
+// Fundraiser has $3,000 available.
+//
+// Jane   → $1,000
+// Sarah  → $1,000
+// Mia    → $1,000
+//
+// An allocation is NOT necessarily an actual transaction.
+// It represents what the player is allocated/entitled to.
+//
+// Allocations can be VOID when a fundraiser is unpublished,
+// allowing the history to remain in the database.
+
+model Allocation {
+  id                       String                   @id @default(cuid())
+  fundraiserParticipantId  String
+
+  amount                   Decimal                  @db.Decimal(10, 2)
+  status                   AllocationStatus         @default(ACTIVE)
+  
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @default(now()) @updatedAt
+
+  fundraiserParticipant    FundraiserParticipant    @relation(fields: [fundraiserParticipantId], references: [id], onDelete: Cascade)
+
+  transactions              PlayerTransaction[]      //financial transactions created from this allocation
+  @@index([fundraiserParticipantId])
+}
+
+// ============================================================
+// PLAYER FINANCES
+// ============================================================
+// PlayerTransaction represents actual financial activity
+// associated with an individual player.
+//
+// This is separate from Allocation.
+//
+// Allocation:
+// "Jane is allocated $1,000."
+//
+// Transaction:
+// "Jane received/was credited $1,000."
 
 model PlayerTransaction {
   id          String                @id @default(cuid())
   playerId    String
+
+  fundraiserId String?              //optional since some transactions may not be associated with a fundraiser
+  allocationId String?              //optional because not every transaction comes from an allocation
+    
   amount      Decimal               @db.Decimal(10, 2)
   type        PlayerTransactionType
   description String?
   date        DateTime              @default(now())
+
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
+
   player      Player                @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  fundraiser  Fundraiser?           @relation(fields: [fundraiserId], references: [id], onDelete: SetNull)
+  allocation  Allocation?           @relation(fields: [allocationId], references: [id], onDelete: SetNull)
 
   @@index([playerId])
+  @@index([fundraiserId])
+  @@index([allocationId])
 }
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+
+// ------------------------------------------------------------
+// TeamStatus
+// ------------------------------------------------------------
+// Controls whether a team is currently active.
 
 enum TeamStatus {
   IN_SEASON
   SEASON_ENDED
 }
 
+// ------------------------------------------------------------
+// FundraiserStatus
+// ------------------------------------------------------------
+// DRAFT:
+//   Fundraiser is being configured. Participants and financial
+//   setup can still be changed.
+//
+// PUBLISHED:
+//   Fundraiser is active. Its allocations have been generated
+//   and the fundraiser is available to users.
+//
+// COMPLETED:
+//   Fundraiser is finished and should no longer be modified
+//   through normal editing.
+
 enum FundraiserStatus {
   DRAFT
   COMPLETED
   PUBLISHED
 }
+
+// ------------------------------------------------------------
+// AllocationStatus
+// ------------------------------------------------------------
+// ACTIVE:
+//   Current allocation.
+//
+// VOID:
+//   Allocation is no longer active but is kept for history.
+//   Useful when a fundraiser is unpublished or redistributed.
+
+
+enum AllocationStatus {
+  ACTIVE
+  VOID
+}
+
+// ------------------------------------------------------------
+// ContributionType
+// ------------------------------------------------------------
+// Describes where fundraiser money came from.
 
 enum ContributionType {
   SALES
@@ -190,12 +397,33 @@ enum ContributionType {
   OTHER
 }
 
+// ------------------------------------------------------------
+// PaymentMethod
+// ------------------------------------------------------------
+// How a fundraiser contribution was received.
+
 enum PaymentMethod {
   CASH
   CHECK
   VENMO
   OTHER
 }
+
+// ------------------------------------------------------------
+// PlayerTransactionType
+// ------------------------------------------------------------
+// EXPENSE:
+//   Money spent for/on behalf of a player.
+//
+// PAYMENT:
+//   Money paid by the player/parent toward their balance.
+//
+// ADJUSTMENT:
+//   Manual correction to a player's balance.
+//
+// DISTRIBUTION:
+//   Money allocated/distributed to the player from fundraiser
+//   proceeds.
 
 enum PlayerTransactionType {
   EXPENSE

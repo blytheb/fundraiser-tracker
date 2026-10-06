@@ -1,7 +1,3 @@
-// addPlayerToFundraiser();
-// removePlayerFromFundraiser();
-// saveFundraiserParticipants();
-
 "use server";
 
 import { prisma } from "@/lib/prisma";

@@ -1,9 +1,90 @@
 "use client";
 
 import React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { MoreVertical } from "lucide-react";
+import SummaryBlock from "@/components/ui-reusable/SummaryBlock";
+import { CircleDollarSign } from "lucide-react";
+
+import {
+	Item,
+	ItemContent,
+	ItemDescription,
+	ItemMedia,
+	ItemTitle,
+} from "@/components/ui/item";
 
 export default function page() {
-	return <div>page</div>;
+	return (
+		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
+			<Card className="mb-4">
+				<CardContent className="p-5">
+					<div className="flex items-start justify-between gap-4">
+						<div className="min-w-0">
+							<p className="text-2xl font-bold tracking-tight">First Last</p>
+
+							<div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+								<span>2026 Season</span>
+
+								<span>•</span>
+
+								<span>Varsity</span>
+								<span>•</span>
+								<span>MoreTeams</span>
+							</div>
+							<Badge variant="secondary">Active</Badge>
+						</div>
+						<MoreVertical />
+
+						{/* <PlayerActions player={player} /> */}
+					</div>
+				</CardContent>
+			</Card>
+			<div className="mb-6 grid grid-cols-2 gap-2 sm:gap-4">
+				<SummaryBlock title="Money Raised" value="$2,450" />
+				<SummaryBlock title="Player Expenses" value="$2,450" />
+			</div>
+			<div className="space-y-1">
+				<Item variant="outline" size="sm">
+					<ItemMedia>
+						<CircleDollarSign className="size-8 bg-green-300 rounded-full" />
+					</ItemMedia>
+					<ItemContent className="flex flex-row justify-between items-center">
+						<div className="flex flex-col gap-1">
+							<ItemTitle>Income Money</ItemTitle>
+							<ItemDescription> 8/19/2026 </ItemDescription>
+						</div>
+						<div className="font-bold text-md">+ $1,200.00</div>
+					</ItemContent>
+				</Item>
+				<Item variant="outline" size="sm">
+					<ItemMedia>
+						<CircleDollarSign className="size-8 bg-red-400 rounded-full" />
+					</ItemMedia>
+					<ItemContent className="flex flex-row justify-between items-center">
+						<div className="flex flex-col gap-1">
+							<ItemTitle>Expense </ItemTitle>
+							<ItemDescription> 8/20/2026 </ItemDescription>
+						</div>
+						<div className="font-bold text-md">- $500.00</div>
+					</ItemContent>
+				</Item>
+				<Item variant="outline" size="sm">
+					<ItemMedia>
+						<CircleDollarSign className="size-8 bg-green-300 rounded-full" />
+					</ItemMedia>
+					<ItemContent className="flex flex-row justify-between items-center">
+						<div className="flex flex-col gap-1">
+							<ItemTitle>Income Money</ItemTitle>
+							<ItemDescription> 8/19/2026 </ItemDescription>
+						</div>
+						<div className="font-bold text-md">+ $1,200.00</div>
+					</ItemContent>
+				</Item>
+			</div>
+		</main>
+	);
 }
 
 // import Link from "next/link";

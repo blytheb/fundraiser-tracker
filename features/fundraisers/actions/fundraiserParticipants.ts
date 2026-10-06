@@ -33,6 +33,7 @@ export async function saveFundraiserParticipants(
 	playerIds: string[],
 ) {
 	return prisma.$transaction(async (tx) => {
+		//remove players who are no longer selected
 		await tx.fundraiserParticipant.deleteMany({
 			where: {
 				fundraiserId,
@@ -42,6 +43,7 @@ export async function saveFundraiserParticipants(
 			},
 		});
 
+		//add newly selected players
 		if (playerIds.length > 0) {
 			await tx.fundraiserParticipant.createMany({
 				data: playerIds.map((playerId) => ({
@@ -52,7 +54,8 @@ export async function saveFundraiserParticipants(
 			});
 		}
 
-		const participants = await tx.fundraiserParticipant.findMany({
+		// return current participants for the fundraiser
+		return tx.fundraiserParticipant.findMany({
 			where: {
 				fundraiserId,
 			},
@@ -60,10 +63,5 @@ export async function saveFundraiserParticipants(
 				player: true,
 			},
 		});
-
-		return participants.map((participant) => ({
-			...participant,
-			allocatedAmount: Number(participant.allocatedAmount),
-		}));
 	});
 }

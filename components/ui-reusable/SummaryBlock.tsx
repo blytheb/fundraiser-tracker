@@ -2,9 +2,9 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
 type SummaryBlockProps = {
-	title: string;
+	title?: string;
 	value: number;
-	label: string;
+	label?: string;
 };
 
 export default function SummaryBlock({
@@ -15,13 +15,15 @@ export default function SummaryBlock({
 	return (
 		<Card>
 			<CardContent className="p-4">
-				<p className="text-xs font-medium text-muted-foreground sm:text-sm">
-					{title}
-				</p>
+				{title && (
+					<p className="text-xs font-medium text-muted-foreground sm:text-sm">
+						{title}
+					</p>
+				)}
 
 				<p className="mt-2 text-2xl font-bold">{value}</p>
 
-				<p className="text-xs text-muted-foreground">{label}</p>
+				{label && <p className="text-xs text-muted-foreground">{label}</p>}
 			</CardContent>
 		</Card>
 	);

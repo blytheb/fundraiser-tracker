@@ -42,8 +42,8 @@ export default function page() {
 				</CardContent>
 			</Card>
 			<div className="mb-6 grid grid-cols-2 gap-2 sm:gap-4">
-				<SummaryBlock title="Money Raised" value="$2,450" />
-				<SummaryBlock title="Player Expenses" value="$2,450" />
+				<SummaryBlock title="Money Raised" value={2450} />
+				<SummaryBlock title="Player Expenses" value={2450} />
 			</div>
 			<div className="space-y-1">
 				<Item variant="outline" size="sm">

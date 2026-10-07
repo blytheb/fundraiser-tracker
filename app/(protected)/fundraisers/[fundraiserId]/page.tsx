@@ -5,7 +5,7 @@ import { getFundraiserParticipants } from "@/features/fundraisers/data/fundraise
 import {
 	getFundraiserFinancialSummary,
 	getActiveFundraiserAllocations,
-} from "@/features/fundraisers/data/fundraiserAllocation";
+} from "@/features/fundraisers/actions/fundraiserAllocation";
 import {
 	getActiveTeamsWithPlayers,
 	getActiveTeams,
@@ -61,7 +61,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 			<MoneyBreakdownSection
 				fundraiserId={fundraiser.id}
 				status={fundraiser.status}
-				total={financialSummary.totalRaised}
+				totalRaised={financialSummary.totalRaised}
 				funds={contributions}
 			/>
 

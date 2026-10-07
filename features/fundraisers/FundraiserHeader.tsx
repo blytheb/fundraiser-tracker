@@ -12,9 +12,10 @@ import PageHeader from "@/components/ui-reusable/PageHeader";
 
 import PlayerAvatar from "@/components/ui-reusable/PlayerAvatar";
 import FundraiserActions from "@/features/fundraisers/FundraiserActions";
+import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 
 import type { Team, Fundraiser } from "@prisma/client";
-import type { FundraiserParticipantWithPlayerSerialized } from "@/features/fundraisers/types";
+import { FundraiserParticipant } from "@prisma/client";
 
 type SectionProps = {
 	fundraiser: Fundraiser;
@@ -25,7 +26,7 @@ type SectionProps = {
 		participantCount: number;
 	};
 	fundraiserTeams: Team[];
-	participants: FundraiserParticipantWithPlayerSerialized[];
+	participants: FundraiserParticipantWithPlayer[];
 };
 export default function FundraiserHeader({
 	fundraiser,

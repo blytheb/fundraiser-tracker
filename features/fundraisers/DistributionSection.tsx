@@ -7,15 +7,15 @@ import { Button } from "@/components/ui/button";
 
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
-import type { FundraiserParticipantWithPlayerSerialized } from "./types";
 import { TeamWithPlayers } from "@/features/teams/types";
 import type { Team, FundraiserStatus, AllocationStatus } from "@prisma/client";
+import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 
 type SectionProps = {
 	fundraiserId: string;
 	status: FundraiserStatus;
 	selectedTeamIds: string[];
-	participants: FundraiserParticipantWithPlayerSerialized[];
+	participants: FundraiserParticipantWithPlayer[];
 	activeTeams: Team[];
 	activeRosters: TeamWithPlayers[];
 	financialSummary: {
@@ -122,7 +122,7 @@ export default function DistributionSection({
 					<div className="flex justify-end px-3 gap-4">
 						<span className="font-semibold">New Allocation</span>
 						<span className="font-semibold">
-							${newAllocaitonTotal.toFixed(2)}
+							${newAllocationTotal.toFixed(2)}
 						</span>
 					</div>
 
@@ -141,7 +141,7 @@ export default function DistributionSection({
 				</div>
 				<div className="pt-3"></div>
 
-				{isDraft && (
+				{/* {isDraft && (
 					<div className="flex justify-end">
 						<CalculateEqualDistributionButton
 							fundraiserId={fundraiserId}
@@ -151,7 +151,7 @@ export default function DistributionSection({
 							Save Distribution
 						</Button>
 					</div>
-				)}
+				)} */}
 
 				<div className="border-t pt-3">
 					<div className="flex justify-end px-3 gap-4">

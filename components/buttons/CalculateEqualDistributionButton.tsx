@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { calculateEqualDistribution } from "@/features/fundraisers/actions/fundraiserDistribution";
+import { setEqualDistribution } from "@/features/fundraisers/actions/fundraiserAllocation";
 
 type Props = {
 	fundraiserId: string;
@@ -19,7 +19,7 @@ export default function CalculateEqualDistributionButton({
 
 	function handleCalculate() {
 		startTransition(async () => {
-			await calculateEqualDistribution(fundraiserId, totalRaised);
+			await setEqualDistribution(fundraiserId);
 			router.refresh();
 		});
 	}

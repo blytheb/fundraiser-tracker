@@ -12,12 +12,6 @@ export type FundraiserFormData = {
 	status: FundraiserStatus;
 };
 
-// export type FundraiserFundFormData = {
-// 	type: FundType;
-// 	amount: number;
-// 	description?: string;
-// };
-
 export type FundraiserContributionListItem = {
 	id: string;
 	amount: number;
@@ -56,10 +50,3 @@ export type FundraiserParticipantWithPlayer =
 			player: true;
 		};
 	}>;
-
-export type FundraiserParticipantWithPlayerSerialized = Omit<
-	FundraiserParticipantWithPlayer,
-	"allocatedAmount"
-> & {
-	allocatedAmount: number;
-};

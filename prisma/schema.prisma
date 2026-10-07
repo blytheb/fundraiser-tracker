@@ -160,7 +160,8 @@ model Fundraiser {
   id            String                   @id @default(cuid())
   name          String
   description   String
-  status        FundraiserStatus         @default(DRAFT)
+  isCompleted   Boolean                   @default(false)
+  isPublished   Boolean                   @default(false)
   startDate     DateTime
 
   createdAt     DateTime                 @default(now())
@@ -348,26 +349,6 @@ enum TeamStatus {
   SEASON_ENDED
 }
 
-// ------------------------------------------------------------
-// FundraiserStatus
-// ------------------------------------------------------------
-// DRAFT:
-//   Fundraiser is being configured. Participants and financial
-//   setup can still be changed.
-//
-// PUBLISHED:
-//   Fundraiser is active. Its allocations have been generated
-//   and the fundraiser is available to users.
-//
-// COMPLETED:
-//   Fundraiser is finished and should no longer be modified
-//   through normal editing.
-
-enum FundraiserStatus {
-  DRAFT
-  COMPLETED
-  PUBLISHED
-}
 
 // ------------------------------------------------------------
 // AllocationStatus

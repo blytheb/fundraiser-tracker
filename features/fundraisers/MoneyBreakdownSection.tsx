@@ -1,11 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Separator } from "@/components/ui/separator";
-import { ChevronsDown, ChevronsUp } from "lucide-react";
 import ContributionActions from "@/features/fundraisers/ContributionActions";
 import { Button } from "@/components/ui/button";
-// import AddFundraiserCon from "@/components/forms/fundraisers/AddFundraiserFund";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -21,13 +18,13 @@ import { FundraiserStatus } from "@prisma/client";
 type SectionProps = {
 	fundraiserId: string;
 	status: FundraiserStatus;
-	total: number;
+	totalRaised: number;
 	funds: FundraiserContributionListItem[];
 };
 export default function MoneyBreakdownSection({
 	fundraiserId,
 	status,
-	total,
+	totalRaised,
 	funds,
 }: SectionProps) {
 	const isDraft = status === "DRAFT";
@@ -63,7 +60,7 @@ export default function MoneyBreakdownSection({
 						<div className="flex gap-4 justify-center items-center">
 							<span className="font-bold text-xl">
 								$
-								{total.toLocaleString("en-US", {
+								{totalRaised.toLocaleString("en-US", {
 									minimumFractionDigits: 2,
 									maximumFractionDigits: 2,
 								})}

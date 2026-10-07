@@ -9,7 +9,7 @@ import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundrai
 import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
 import type { FundraiserParticipantWithPlayerSerialized } from "./types";
 import { TeamWithPlayers } from "@/features/teams/types";
-import type { Team, FundraiserStatus } from "@prisma/client";
+import type { Team, FundraiserStatus, AllocationStatus } from "@prisma/client";
 
 type SectionProps = {
 	fundraiserId: string;
@@ -18,7 +18,18 @@ type SectionProps = {
 	participants: FundraiserParticipantWithPlayerSerialized[];
 	activeTeams: Team[];
 	activeRosters: TeamWithPlayers[];
-	totalRaised: number;
+	financialSummary: {
+		totalRaised: number;
+		currentlyAllocated: number;
+		availableToAllocate: number;
+		participantCount: number;
+	};
+	activeAllocations: {
+		id: string;
+		fundraiserParticipantId: string;
+		amount: number;
+		status: AllocationStatus;
+	}[];
 };
 
 export default function DistributionSection({
@@ -28,26 +39,19 @@ export default function DistributionSection({
 	participants,
 	activeTeams,
 	activeRosters,
-	totalRaised,
+	financialSummary,
+	activeAllocations,
 }: SectionProps) {
 	const isDraft = status === "DRAFT";
 	const [amounts, setAmounts] = useState<Record<string, string>>({});
 
-	const totalDistributed = participants.reduce((total, participant) => {
+	const newAllocaitonTotal = participants.reduce((total, participant) => {
 		return total + (Number(amounts[participant.id]) || 0);
 	}, 0);
 
-	const totalRemaining = totalRaised - totalDistributed;
+	const remainingToAllocate =
+		financialSummary.availableToAllocate - newAllocaitonTotal;
 
-	useEffect(() => {
-		const initialAmounts: Record<string, string> = {};
-
-		participants.forEach((participant) => {
-			initialAmounts[participant.id] = participant.allocatedAmount.toFixed(2);
-		});
-
-		setAmounts(initialAmounts);
-	}, [participants]);
 	return (
 		<Card>
 			<CardHeader>
@@ -111,24 +115,27 @@ export default function DistributionSection({
 				<div className="border-t pt-3">
 					<div className="flex justify-end px-3 gap-4">
 						<span className="font-semibold">Total Raised</span>
-						<span className="font-semibold">${totalRaised.toFixed(2)}</span>
+						<span className="font-semibold">
+							${financialSummary.totalRaised.toFixed(2)}
+						</span>
 					</div>
 					<div className="flex justify-end px-3 gap-4">
-						<span className="font-semibold">Total Assigned</span>
+						<span className="font-semibold">New Allocation</span>
 						<span className="font-semibold">
-							${totalDistributed.toFixed(2)}
+							${newAllocaitonTotal.toFixed(2)}
 						</span>
 					</div>
 
-					{totalRemaining > 0 && (
+					{remainingToAllocate > 0 && (
 						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${Math.abs(totalRemaining).toFixed(2)} needs to be assigned
+							${Math.abs(remainingToAllocate).toFixed(2)} needs to be assigned
 						</p>
 					)}
 
-					{totalRemaining < 0 && (
+					{remainingToAllocate < 0 && (
 						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${Math.abs(totalRemaining).toFixed(2)} over the available amount
+							${Math.abs(remainingToAllocate).toFixed(2)} over the available
+							amount
 						</p>
 					)}
 				</div>
@@ -138,13 +145,56 @@ export default function DistributionSection({
 					<div className="flex justify-end">
 						<CalculateEqualDistributionButton
 							fundraiserId={fundraiserId}
-							totalRaised={totalRaised}
+							totalRaised={financialSummary.totalRaised}
 						/>
-						<Button disabled={Math.abs(totalRemaining) > 0.001}>
+						<Button disabled={Math.abs(remainingToAllocate) > 0.001}>
 							Save Distribution
 						</Button>
 					</div>
 				)}
+
+				<div className="border-t pt-3">
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">Total Raised</span>
+						<span className="font-semibold">
+							${financialSummary.totalRaised.toFixed(2)}
+						</span>
+					</div>
+
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">Currently Allocated</span>
+						<span className="font-semibold">
+							${financialSummary.currentlyAllocated.toFixed(2)}
+						</span>
+					</div>
+
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">Available to Allocate</span>
+						<span className="font-semibold">
+							${financialSummary.availableToAllocate.toFixed(2)}
+						</span>
+					</div>
+
+					<div className="flex justify-end px-3 gap-4">
+						<span className="font-semibold">New Allocation</span>
+						<span className="font-semibold">
+							${newAllocationTotal.toFixed(2)}
+						</span>
+					</div>
+
+					{remainingToAllocate > 0 && (
+						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
+							${remainingToAllocate.toFixed(2)} still available
+						</p>
+					)}
+
+					{remainingToAllocate < 0 && (
+						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
+							${Math.abs(remainingToAllocate).toFixed(2)} over the available
+							amount
+						</p>
+					)}
+				</div>
 			</CardContent>
 		</Card>
 	);

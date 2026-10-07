@@ -2,27 +2,15 @@ import { getFundraiserById } from "@/features/fundraisers/data/fundraisers";
 import { getFundraiserTeams } from "@/features/fundraisers/data/fundraiserTeams";
 import { getFundraiserContributions } from "@/features/fundraisers/data/fundraiserContributions";
 import { getFundraiserParticipants } from "@/features/fundraisers/data/fundraiserParticipants";
+import { getFundraiserFinancialSummary } from "@/features/fundraisers/actions/fundraiserAllocation";
 import {
 	getActiveTeamsWithPlayers,
 	getActiveTeams,
 } from "@/features/teams/data/teams";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-	Avatar,
-	AvatarFallback,
-	AvatarGroup,
-	AvatarGroupCount,
-	AvatarImage,
-} from "@/components/ui/avatar";
-import FundraiserActions from "@/features/fundraisers/FundraiserActions";
-import PageHeader from "@/components/ui-reusable/PageHeader";
-import SummaryBlock from "@/components/ui-reusable/SummaryBlock";
 import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
 import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
 import DistributionSection from "@/features/fundraisers/DistributionSection";
-import DetailSection from "@/features/fundraisers/DetailSection";
 
 type PageProps = {
 	params: Promise<{
@@ -37,6 +25,8 @@ export default async function FundraiserPage({ params }: PageProps) {
 		teams,
 		participants,
 		contributions,
+		financialSummary,
+		activeAllocations,
 		activeTeams,
 		activeTeamsWithPlayers,
 	] = await Promise.all([
@@ -44,6 +34,8 @@ export default async function FundraiserPage({ params }: PageProps) {
 		getFundraiserTeams(fundraiserId), //teams associated with fundraiser
 		getFundraiserParticipants(fundraiserId), //participants associated with fundraiser
 		getFundraiserContributions(fundraiserId), //contributions associated with fundraiser
+		getFundraiserFinancialSummary(fundraiserId),
+		getActiveFundraiserAllocations(fundraiserId), //active allocations for the fundraiser
 		getActiveTeams(),
 		getActiveTeamsWithPlayers(), //all active teams with players in the system
 	]);
@@ -52,17 +44,12 @@ export default async function FundraiserPage({ params }: PageProps) {
 		return <div> Fundraiser Not Found </div>;
 	}
 
-	const totalRaised = contributions.reduce(
-		(total, contribution) => total + contribution.amount,
-		0,
-	);
-
 	return (
 		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
 			{/* Summary Card */}
 			<FundraiserHeader
 				fundraiser={fundraiser}
-				totalRaised={totalRaised}
+				financialSummary={financialSummary}
 				fundraiserTeams={teams}
 				participants={participants}
 			/>
@@ -71,7 +58,7 @@ export default async function FundraiserPage({ params }: PageProps) {
 			<MoneyBreakdownSection
 				fundraiserId={fundraiser.id}
 				status={fundraiser.status}
-				total={totalRaised}
+				total={financialSummary.totalRaised}
 				funds={contributions}
 			/>
 
@@ -83,7 +70,8 @@ export default async function FundraiserPage({ params }: PageProps) {
 				participants={participants}
 				activeTeams={activeTeams}
 				activeRosters={activeTeamsWithPlayers}
-				totalRaised={totalRaised}
+				financialSummary={financialSummary}
+				activeAllocations={activeAllocations}
 			/>
 		</main>
 	);

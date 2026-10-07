@@ -79,7 +79,6 @@ export default function DistributionSection({
 
 		try {
 			await setCustomDistribution(fundraiserId, allocations);
-			setAmounts({});
 			router.refresh();
 		} catch (error) {
 			console.error(error);

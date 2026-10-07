@@ -64,7 +64,7 @@ export async function unpublishFundraiser(fundraiserId: string) {
 			throw new Error("Fundraiser is already unpublished");
 		}
 
-		await tx.allocation.updateMany({
+		await tx.fundraiserAllocation.updateMany({
 			where: {
 				fundraiserParticipant: {
 					fundraiserId,

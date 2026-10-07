@@ -131,7 +131,7 @@ export async function createDistributionTransaction(
 	description?: string,
 ) {
 	return prisma.$transaction(async (tx) => {
-		const allocation = await tx.allocation.findUnique({
+		const allocation = await tx.fundraiserAllocation.findUnique({
 			where: { id: allocationId },
 			include: {
 				fundraiserParticipant: {

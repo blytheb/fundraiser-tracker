@@ -20,7 +20,7 @@ export async function getParticipantFinancialSummary(
 	}
 
 	// Get all active allocations for this participant
-	const allocations = await prisma.allocation.findMany({
+	const allocations = await prisma.fundraiserAllocation.findMany({
 		where: {
 			fundraiserParticipantId,
 			status: "ACTIVE",
@@ -78,7 +78,7 @@ export async function getFundraiserFinancialSummary(fundraiserId: string) {
 			where: { fundraiserId },
 			_sum: { amount: true },
 		}),
-		prisma.allocation.aggregate({
+		prisma.fundraiserAllocation.aggregate({
 			where: { fundraiserParticipant: { fundraiserId }, status: "ACTIVE" },
 			_sum: { amount: true },
 		}),
@@ -137,7 +137,7 @@ export async function setEqualDistribution(fundraiserId: string) {
 			},
 		});
 
-		const allocations = await tx.allocation.aggregate({
+		const allocations = await tx.fundraiserAllocation.aggregate({
 			where: {
 				fundraiserParticipant: {
 					fundraiserId,
@@ -176,7 +176,7 @@ export async function setEqualDistribution(fundraiserId: string) {
 			};
 		});
 
-		await tx.allocation.createMany({
+		await tx.fundraiserAllocation.createMany({
 			data: newAllocations,
 		});
 
@@ -276,7 +276,7 @@ export async function setCustomDistribution(
 			}
 
 			// Get existing active allocations
-			const existingAllocations = await tx.allocation.findMany({
+			const existingAllocations = await tx.fundraiserAllocation.findMany({
 				where: {
 					fundraiserParticipant: {
 						fundraiserId,
@@ -324,7 +324,7 @@ export async function setCustomDistribution(
 				);
 
 				if (participantAllocations.length > 0) {
-					await tx.allocation.updateMany({
+					await tx.fundraiserAllocation.updateMany({
 						where: {
 							id: {
 								in: participantAllocations.map((existing) => existing.id),
@@ -338,7 +338,7 @@ export async function setCustomDistribution(
 
 				// create new allocation only if the desired amount is greater than 0
 				if (desiredAmount > 0) {
-					await tx.allocation.create({
+					await tx.fundraiserAllocation.create({
 						data: {
 							fundraiserParticipantId: allocation.participantId,
 							amount: Math.round(desiredAmount * 100) / 100,
@@ -431,7 +431,7 @@ export async function redistributeFunds(
 		}
 
 		//void the current active allocations
-		await tx.allocation.updateMany({
+		await tx.fundraiserAllocation.updateMany({
 			where: {
 				fundraiserParticipant: {
 					fundraiserId,
@@ -452,7 +452,7 @@ export async function redistributeFunds(
 				status: "ACTIVE" as const,
 			}));
 
-		await tx.allocation.createMany({
+		await tx.fundraiserAllocation.createMany({
 			data: newAllocations,
 		});
 
@@ -461,7 +461,7 @@ export async function redistributeFunds(
 }
 
 export async function getActiveFundraiserAllocations(fundraiserId: string) {
-	const allocations = await prisma.allocation.findMany({
+	const allocations = await prisma.fundraiserAllocation.findMany({
 		where: {
 			fundraiserParticipant: {
 				fundraiserId,

@@ -14,7 +14,7 @@ export default function FundraiserRow({ fundraiser }: FundraiserRowProps) {
 		<TableRow>
 			<TableCell>{fundraiser.startDate.toLocaleDateString()}</TableCell>
 			<TableCell>
-				<Badge variant="secondary">{fundraiser.status}</Badge>
+				{/* <Badge variant="secondary">{fundraiser.status}</Badge> */}
 			</TableCell>
 			<TableCell>
 				<Link

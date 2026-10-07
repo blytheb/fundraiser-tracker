@@ -39,7 +39,7 @@ export async function getAvailableFundraisersForTeam(
 ): Promise<Fundraiser[]> {
 	return prisma.fundraiser.findMany({
 		where: {
-			status: "DRAFT",
+			isCompleted: false,
 			teams: {
 				none: {
 					teamId,

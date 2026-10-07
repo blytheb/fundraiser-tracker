@@ -40,7 +40,6 @@ export async function createFundraiserAndAddToTeam(
 				name: data.name,
 				description: "No description",
 				startDate: new Date("2010-01-01"),
-				status: "DRAFT",
 			},
 		});
 

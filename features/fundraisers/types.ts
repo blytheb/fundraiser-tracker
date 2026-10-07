@@ -1,15 +1,11 @@
-import type {
-	Prisma,
-	ContributionType,
-	PaymentMethod,
-	FundraiserStatus,
-} from "@prisma/client";
+import type { Prisma, ContributionType, PaymentMethod } from "@prisma/client";
 
 export type FundraiserFormData = {
 	name: string;
 	description: string;
 	startDate: Date;
-	status: FundraiserStatus;
+	isCompleted: boolean;
+	isPublished: boolean;
 };
 
 export type FundraiserContributionListItem = {

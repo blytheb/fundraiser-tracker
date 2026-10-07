@@ -62,7 +62,6 @@ export default function AddFundraiserToTeamDialog({
 				name: name.trim(),
 				description: "",
 				startDate: new Date(),
-				status: "DRAFT",
 			});
 
 			router.refresh();

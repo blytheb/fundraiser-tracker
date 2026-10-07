@@ -17,7 +17,7 @@ export default function FundraiserSmallCard({
 					<h1 className="text-2xl font-bold">{fundraiser.name}</h1>
 
 					<p>{fundraiser.startDate.toLocaleDateString()}</p>
-					<Badge variant="secondary">{fundraiser.status}</Badge>
+					{/* <Badge variant="secondary">{fundraiser.status}</Badge> */}
 				</div>
 			</div>
 		</div>

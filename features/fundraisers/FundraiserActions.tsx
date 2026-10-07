@@ -31,17 +31,9 @@ export default function FundraiserActions({
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const router = useRouter();
 
-	async function handleDraft() {
-		try {
-			await changeStatus(fundraiser.id, "DRAFT");
-			router.refresh();
-		} catch (error) {
-			console.error(error);
-		}
-	}
 	async function handleComplete() {
 		try {
-			await changeStatus(fundraiser.id, "COMPLETED");
+			await changeCompletedStatus(fundraiser.id);
 			router.refresh();
 		} catch (error) {
 			console.error(error);
@@ -57,11 +49,8 @@ export default function FundraiserActions({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={handleDraft}>
-							DRAFT STATUS
-						</DropdownMenuItem>
 						<DropdownMenuItem onClick={handleComplete}>
-							COMPLETED STATUS
+							Toggle Edit Mode
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={(e) => {

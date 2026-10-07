@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
 import { TeamWithPlayers } from "@/features/teams/types";
-import type { Team, FundraiserStatus, AllocationStatus } from "@prisma/client";
+import type { Team, AllocationStatus } from "@prisma/client";
 import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 
 type SectionProps = {
 	fundraiserId: string;
-	status: FundraiserStatus;
+	isCompleted: boolean;
+	isPublished: boolean;
 	selectedTeamIds: string[];
 	participants: FundraiserParticipantWithPlayer[];
 	activeTeams: Team[];
@@ -34,7 +35,8 @@ type SectionProps = {
 
 export default function DistributionSection({
 	fundraiserId,
-	status,
+	isCompleted,
+	isPublished,
 	selectedTeamIds,
 	participants,
 	activeTeams,
@@ -42,7 +44,6 @@ export default function DistributionSection({
 	financialSummary,
 	activeAllocations,
 }: SectionProps) {
-	const isDraft = status === "DRAFT";
 	const [amounts, setAmounts] = useState<Record<string, string>>({});
 
 	const newAllocationTotal = participants.reduce((total, participant) => {
@@ -60,7 +61,7 @@ export default function DistributionSection({
 						<CardTitle className="text-base">Participant Breakdown</CardTitle>
 					</div>
 					<div className="flex items-center gap-2">
-						{isDraft && (
+						{!isCompleted && (
 							<SelectFundraiserRoster
 								fundraiserId={fundraiserId}
 								selectedTeamIds={selectedTeamIds}
@@ -91,7 +92,7 @@ export default function DistributionSection({
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
 								</div>
-								{isDraft ? (
+								{!isCompleted ? (
 									<Input
 										type="number"
 										min="0"

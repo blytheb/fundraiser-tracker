@@ -59,6 +59,7 @@ export async function getParticipantFinancialSummary(
 		remainingAmount,
 	};
 }
+
 export async function getFundraiserFinancialSummary(fundraiserId: string) {
 	// Implementation for getting financial summary
 	const fundraiser = await prisma.fundraiser.findUnique({
@@ -100,6 +101,23 @@ export async function getFundraiserFinancialSummary(fundraiserId: string) {
 
 export async function setEqualDistribution(fundraiserId: string) {
 	return prisma.$transaction(async (tx) => {
+		const fundraiser = await tx.fundraiser.findUnique({
+			where: {
+				id: fundraiserId,
+			},
+			select: {
+				isCompleted: true,
+			},
+		});
+
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
+
+		if (fundraiser.isCompleted) {
+			throw new Error("Completed fundraisers cannot be edited.");
+		}
+
 		const participants = await tx.fundraiserParticipant.findMany({
 			where: {
 				fundraiserId,
@@ -176,6 +194,22 @@ export async function setCustomDistribution(
 	allocations: CustomAllocation[],
 ) {
 	return prisma.$transaction(async (tx) => {
+		const fundraiser = await tx.fundraiser.findUnique({
+			where: {
+				id: fundraiserId,
+			},
+			select: {
+				isCompleted: true,
+			},
+		});
+
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
+
+		if (fundraiser.isCompleted) {
+			throw new Error("Completed fundraisers cannot be edited.");
+		}
 		const participants = await tx.fundraiserParticipant.findMany({
 			where: {
 				fundraiserId,
@@ -240,9 +274,9 @@ export async function setCustomDistribution(
 
 		const availableCents = Math.round(availableToAllocate * 100);
 
-		if (requestedCents > availableCents) {
+		if (requestedCents !== availableCents) {
 			throw new Error(
-				`Requested allocation of ${requestedCents / 100} exceeds available funds of ${availableCents / 100}`,
+				`Requested allocation of ${requestedCents / 100} does not match available funds of ${availableCents / 100}`,
 			);
 		}
 
@@ -268,6 +302,23 @@ export async function redistributeFunds(
 	allocations: CustomAllocation[],
 ) {
 	return prisma.$transaction(async (tx) => {
+		const fundraiser = await tx.fundraiser.findUnique({
+			where: {
+				id: fundraiserId,
+			},
+			select: {
+				isCompleted: true,
+			},
+		});
+
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
+
+		if (fundraiser.isCompleted) {
+			throw new Error("Completed fundraisers cannot be edited.");
+		}
+
 		const participants = await tx.fundraiserParticipant.findMany({
 			where: {
 				fundraiserId,

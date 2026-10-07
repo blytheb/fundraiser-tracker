@@ -9,6 +9,10 @@ export async function publishFundraiser(fundraiserId: string) {
 			where: {
 				id: fundraiserId,
 			},
+			select: {
+				isCompleted: true,
+				isPublished: true,
+			},
 			include: {
 				participants: true,
 			},
@@ -18,8 +22,12 @@ export async function publishFundraiser(fundraiserId: string) {
 			throw new Error("Fundraiser not found");
 		}
 
-		if (fundraiser.status !== "DRAFT") {
-			throw new Error("Only draft fundraisers can be published");
+		if (!fundraiser.isCompleted) {
+			throw new Error("Fundraiser is not completed and cannot be published");
+		}
+
+		if (fundraiser.isPublished) {
+			throw new Error("Fundraiser is already published");
 		}
 
 		if (fundraiser.participants.length === 0) {
@@ -31,7 +39,7 @@ export async function publishFundraiser(fundraiserId: string) {
 				id: fundraiserId,
 			},
 			data: {
-				status: "PUBLISHED",
+				isPublished: true,
 			},
 		});
 
@@ -52,8 +60,8 @@ export async function unpublishFundraiser(fundraiserId: string) {
 			throw new Error("Fundraiser not found");
 		}
 
-		if (fundraiser.status !== "PUBLISHED") {
-			throw new Error("Only published fundraisers can be unpublished");
+		if (!fundraiser.isPublished) {
+			throw new Error("Fundraiser is already unpublished");
 		}
 
 		await tx.allocation.updateMany({
@@ -73,7 +81,7 @@ export async function unpublishFundraiser(fundraiserId: string) {
 				id: fundraiserId,
 			},
 			data: {
-				status: "DRAFT",
+				isPublished: false,
 			},
 		});
 
@@ -92,12 +100,31 @@ export async function completeFundraiser(fundraiserId: string) {
 		throw new Error("Fundraiser not found");
 	}
 
-	if (fundraiser.status !== "PUBLISHED") {
-		throw new Error("Only published fundraisers can be completed");
+	if (fundraiser.isCompleted) {
+		throw new Error("Fundraiser is already completed");
 	}
 
 	return prisma.fundraiser.update({
 		where: { id: fundraiserId },
-		data: { status: "COMPLETED" },
+		data: { isCompleted: true },
+	});
+}
+
+export async function draftFundraiser(fundraiserId: string) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: { id: fundraiserId },
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (!fundraiser.isCompleted) {
+		throw new Error("Fundraiser is already in draft mode");
+	}
+
+	return prisma.fundraiser.update({
+		where: { id: fundraiserId },
+		data: { isCompleted: false },
 	});
 }

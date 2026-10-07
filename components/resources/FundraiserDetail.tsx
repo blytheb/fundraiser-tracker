@@ -22,10 +22,10 @@ export default function FundraiserDetail({ fundraiser }: Props) {
 					</p>
 				</div>
 
-				<Badge
+				{/* <Badge
 					variant={fundraiser.status === "DRAFT" ? "default" : "secondary"}>
 					{fundraiser.status}
-				</Badge>
+				</Badge> */}
 			</CardHeader>
 
 			<CardContent>

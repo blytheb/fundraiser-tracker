@@ -13,6 +13,22 @@ type ContributionData = {
 };
 
 export async function addContribution(data: ContributionData) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: {
+			id: data.fundraiserId,
+		},
+		select: {
+			isCompleted: true,
+		},
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.isCompleted) {
+		throw new Error("Completed Fundraisers cannot be edited");
+	}
 	await prisma.fundraiserContribution.create({
 		data: {
 			fundraiserId: data.fundraiserId,
@@ -29,6 +45,36 @@ export async function updateContribution(
 	id: string,
 	data: Omit<ContributionData, "fundraiserId">,
 ) {
+	const contribution = await prisma.fundraiserContribution.findUnique({
+		where: {
+			id,
+		},
+		select: {
+			fundraiserId: true,
+		},
+	});
+
+	if (!contribution) {
+		throw new Error("Contribution not found");
+	}
+
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: {
+			id: contribution.fundraiserId,
+		},
+		select: {
+			isCompleted: true,
+		},
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.isCompleted) {
+		throw new Error("Completed Fundraisers cannot be edited");
+	}
+
 	await prisma.fundraiserContribution.update({
 		where: {
 			id,
@@ -44,6 +90,36 @@ export async function updateContribution(
 }
 
 export async function deleteContribution(id: string) {
+	const contribution = await prisma.fundraiserContribution.findUnique({
+		where: {
+			id,
+		},
+		select: {
+			fundraiserId: true,
+		},
+	});
+
+	if (!contribution) {
+		throw new Error("Contribution not found");
+	}
+
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: {
+			id: contribution.fundraiserId,
+		},
+		select: {
+			isCompleted: true,
+		},
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.isCompleted) {
+		throw new Error("Completed Fundraisers cannot be edited");
+	}
+
 	await prisma.fundraiserContribution.delete({
 		where: {
 			id,

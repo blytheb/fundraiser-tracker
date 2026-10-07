@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { Fundraiser, FundraiserStatus } from "@prisma/client";
+import type { Fundraiser } from "@prisma/client";
 import type { FundraiserFormData } from "../types";
 
 export async function createFundraiser(
@@ -30,10 +30,7 @@ export async function deleteFundraiser(id: string): Promise<Fundraiser> {
 	});
 }
 
-export async function changeStatus(
-	fundraiserId: string,
-	status: FundraiserStatus,
-) {
+export async function changeCompletedStatus(fundraiserId: string) {
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: {
 			id: fundraiserId,
@@ -44,24 +41,51 @@ export async function changeStatus(
 		throw new Error("Fundraiser not found");
 	}
 
-	// if (fundraiser.status === "DRAFT" && status !== "COMPLETED") {
-	// 	throw new Error("Draft fundraisers can only be completed");
-	// }
+	//draft to completed
+	if (!fundraiser.isCompleted) {
+		return await prisma.fundraiser.update({
+			where: {
+				id: fundraiserId,
+			},
+			data: {
+				isCompleted: true,
+			},
+		});
+	}
 
-	// if (fundraiser.status === "COMPLETED" && status !== "PUBLISHED") {
-	// 	throw new Error("Completed fundraisers can only be published");
-	// }
+	//completed to draft
+	return await prisma.fundraiser.update({
+		where: {
+			id: fundraiserId,
+		},
+		data: {
+			isCompleted: false,
+			isPublished: false,
+		},
+	});
+}
 
-	// if (fundraiser.status === "PUBLISHED") {
-	// 	throw new Error("Published fundraisers cannot change status");
-	// }
+export async function changePublishStatus(fundraiserId: string) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: {
+			id: fundraiserId,
+		},
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (!fundraiser.isCompleted) {
+		throw new Error("Fundraiser is not complete yet and cannot be published");
+	}
 
 	return await prisma.fundraiser.update({
 		where: {
 			id: fundraiserId,
 		},
 		data: {
-			status,
+			isPublished: !fundraiser.isPublished,
 		},
 	});
 }

@@ -47,7 +47,8 @@ export default function EditFundraiserDialog({
 				name,
 				description,
 				startDate: new Date(startDate),
-				status: "DRAFT",
+				isCompleted: fundraiser.isCompleted,
+				isPublished: fundraiser.isPublished,
 			});
 			router.refresh();
 			onOpenChange(false);

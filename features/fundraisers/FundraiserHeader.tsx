@@ -63,7 +63,7 @@ export default function FundraiserHeader({
 				<CardContent className="p-5">
 					<div className="flex items-start justify-between gap-4">
 						<div className="space-y-4">
-							<Badge variant="secondary">{fundraiser.status}</Badge>
+							{/* <Badge variant="secondary">{fundraiser.status}</Badge> */}
 							<PageHeader
 								heading={fundraiser.name}
 								subheading={fundraiser.description}

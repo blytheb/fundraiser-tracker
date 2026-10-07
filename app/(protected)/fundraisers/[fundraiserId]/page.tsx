@@ -2,7 +2,10 @@ import { getFundraiserById } from "@/features/fundraisers/data/fundraisers";
 import { getFundraiserTeams } from "@/features/fundraisers/data/fundraiserTeams";
 import { getFundraiserContributions } from "@/features/fundraisers/data/fundraiserContributions";
 import { getFundraiserParticipants } from "@/features/fundraisers/data/fundraiserParticipants";
-import { getFundraiserFinancialSummary } from "@/features/fundraisers/actions/fundraiserAllocation";
+import {
+	getFundraiserFinancialSummary,
+	getActiveFundraiserAllocations,
+} from "@/features/fundraisers/data/fundraiserAllocation";
 import {
 	getActiveTeamsWithPlayers,
 	getActiveTeams,

@@ -350,3 +350,25 @@ export async function redistributeFunds(
 		return newAllocations;
 	});
 }
+
+export async function getActiveFundraiserAllocations(fundraiserId: string) {
+	const allocations = await prisma.allocation.findMany({
+		where: {
+			fundraiserParticipant: {
+				fundraiserId,
+			},
+			status: "ACTIVE",
+		},
+		select: {
+			id: true,
+			fundraiserParticipantId: true,
+			amount: true,
+			status: true,
+		},
+	});
+
+	return allocations.map((allocation) => ({
+		...allocation,
+		amount: Number(allocation.amount),
+	}));
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -45,12 +45,12 @@ export default function DistributionSection({
 	const isDraft = status === "DRAFT";
 	const [amounts, setAmounts] = useState<Record<string, string>>({});
 
-	const newAllocaitonTotal = participants.reduce((total, participant) => {
+	const newAllocationTotal = participants.reduce((total, participant) => {
 		return total + (Number(amounts[participant.id]) || 0);
 	}, 0);
 
 	const remainingToAllocate =
-		financialSummary.availableToAllocate - newAllocaitonTotal;
+		financialSummary.availableToAllocate - newAllocationTotal;
 
 	return (
 		<Card>

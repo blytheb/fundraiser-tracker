@@ -85,6 +85,25 @@ export default function DistributionSection({
 		}
 	}
 
+	async function handleEqualDistribution() {
+		const totalCents = Math.round(financialSummary.totalRaised * 100);
+		const participantCount = participants.length;
+
+		if (participantCount === 0) return;
+
+		const centsPerParticipant = Math.floor(totalCents / participantCount);
+
+		const remainder = totalCents % participantCount;
+		const equalAmounts: Record<string, string> = {};
+
+		participants.forEach((participant, index) => {
+			const cents = centsPerParticipant + (index < remainder ? 1 : 0);
+			equalAmounts[participant.id] = (cents / 100).toFixed(2);
+		});
+
+		setAmounts(equalAmounts);
+	}
+
 	return (
 		<Card>
 			<CardHeader>
@@ -150,43 +169,53 @@ export default function DistributionSection({
 						);
 					})}
 				</div>
-				<div className="border-t pt-3">
-					<div className="flex justify-end gap-4 px-3">
-						<span className="font-semibold">Total Raised</span>
-						<span className="font-semibold">
-							${financialSummary.totalRaised.toFixed(2)}
-						</span>
+				{!isCompleted && (
+					<div className="border-t pt-3">
+						<div className="flex justify-end gap-4 px-3">
+							<span className="font-semibold">Total Raised</span>
+							<span className="font-semibold">
+								${financialSummary.totalRaised.toFixed(2)}
+							</span>
+						</div>
+
+						<div className="flex justify-end gap-4 px-3">
+							<span className="font-semibold">Allocated</span>
+							<span className="font-semibold">
+								${allocationTotal.toFixed(2)}
+							</span>
+						</div>
+
+						<div className="flex justify-end gap-4 px-3">
+							<span className="font-semibold">Remaining</span>
+							<span className="font-semibold">
+								${remainingToAllocate.toFixed(2)}
+							</span>
+						</div>
+
+						{remainingToAllocate > 0 && (
+							<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
+								${remainingToAllocate.toFixed(2)} still needs to be allocated
+							</p>
+						)}
+
+						{remainingToAllocate < 0 && (
+							<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
+								${Math.abs(remainingToAllocate).toFixed(2)} over the amount
+								raised
+							</p>
+						)}
+						<Button
+							disabled={Math.abs(remainingToAllocate) > 0.001}
+							onClick={handleEqualDistribution}>
+							Equal Split
+						</Button>
+						<Button
+							disabled={Math.abs(remainingToAllocate) > 0.001}
+							onClick={handleSaveDistribution}>
+							Save Distribution
+						</Button>
 					</div>
-
-					<div className="flex justify-end gap-4 px-3">
-						<span className="font-semibold">Allocated</span>
-						<span className="font-semibold">${allocationTotal.toFixed(2)}</span>
-					</div>
-
-					<div className="flex justify-end gap-4 px-3">
-						<span className="font-semibold">Remaining</span>
-						<span className="font-semibold">
-							${remainingToAllocate.toFixed(2)}
-						</span>
-					</div>
-
-					{remainingToAllocate > 0 && (
-						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${remainingToAllocate.toFixed(2)} still needs to be allocated
-						</p>
-					)}
-
-					{remainingToAllocate < 0 && (
-						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${Math.abs(remainingToAllocate).toFixed(2)} over the amount raised
-						</p>
-					)}
-				</div>
-				<Button
-					disabled={isCompleted || Math.abs(remainingToAllocate) > 0.001}
-					onClick={handleSaveDistribution}>
-					Save Distribution
-				</Button>
+				)}
 			</CardContent>
 		</Card>
 	);

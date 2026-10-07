@@ -216,7 +216,7 @@ model FundraiserParticipant {
 
   fundraiser      Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
   player          Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  allocations     Allocation[]      //allocations for this player in this fundraiser
+  allocations     FundraiserAllocation[]      //allocations for this player in this fundraiser
 
   @@unique([fundraiserId, playerId]) //prevent the same player from being added twice to a fundraiser
   @@index([fundraiserId])
@@ -262,7 +262,7 @@ model FundraiserContribution {
 }
 
 // ------------------------------------------------------------
-// Allocation
+// Fundraiser Allocation
 // ------------------------------------------------------------
 // Represents how fundraiser money is assigned to a participant.
 //
@@ -280,7 +280,7 @@ model FundraiserContribution {
 // Allocations can be VOID when a fundraiser is unpublished,
 // allowing the history to remain in the database.
 
-model Allocation {
+model FundraiserAllocation {
   id                       String                   @id @default(cuid())
   fundraiserParticipantId  String
 
@@ -327,7 +327,7 @@ model PlayerTransaction {
 
   player      Player                @relation(fields: [playerId], references: [id], onDelete: Cascade)
   fundraiser  Fundraiser?           @relation(fields: [fundraiserId], references: [id], onDelete: SetNull)
-  allocation  Allocation?           @relation(fields: [allocationId], references: [id], onDelete: SetNull)
+  allocation  FundraiserAllocation?           @relation(fields: [allocationId], references: [id], onDelete: SetNull)
 
   @@index([playerId])
   @@index([fundraiserId])

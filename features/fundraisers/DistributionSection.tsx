@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,13 +47,6 @@ export default function DistributionSection({
 	const router = useRouter();
 	const [amounts, setAmounts] = useState<Record<string, string>>({});
 
-	const newAllocationTotal = participants.reduce((total, participant) => {
-		return total + (Number(amounts[participant.id]) || 0);
-	}, 0);
-
-	const remainingToAllocate =
-		financialSummary.availableToAllocate - newAllocationTotal;
-
 	const allocatedByParticipant = activeAllocations.reduce((map, allocation) => {
 		const current = map.get(allocation.fundraiserParticipantId) ?? 0;
 
@@ -61,6 +54,23 @@ export default function DistributionSection({
 
 		return map;
 	}, new Map<string, number>());
+
+	useEffecct(() => {
+		const initialAmounts: Record<string, string> = {};
+
+		participants.forEach((participant) => {
+			const allocated = allocatedByParticipant.get(participant.id) ?? 0;
+			initialAmounts[participant.id] = allocated.toFixed(2);
+		});
+		setAmounts(initialAmounts);
+	}, [participants, activeAllocations]);
+
+	const allocationTotal = participants.reduce((total, participant) => {
+		return total + (Number(amounts[participant.id]) || 0);
+	}, 0);
+
+	const remainingToAllocate =
+		financialSummary.availableToAllocate - allocationTotal;
 
 	async function handleSaveDistribution() {
 		const allocations = participants.map((participant) => ({
@@ -104,28 +114,19 @@ export default function DistributionSection({
 				<div>
 					<div className="flex justify-between p-2 text-md font-semibold">
 						<span>Player Name ({participants.length})</span>
-						<span className="text-right">Allocated</span>
-						{!isCompleted && <span className="text-right">Add</span>}
+						<span className="text-right">Allocation</span>
 					</div>
 					{participants.map((participant) => {
 						return (
 							<div
 								key={participant.id}
-								className="flex items-center justify-between text-sm rounded-lg p-2 hover:bg-muted/50">
+								className="grid grid-cols-[1fr_120px] items-center rounded-lg p-2 text-sm hover:bg-muted/50">
 								<div>
 									<p className="font-medium">
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
 								</div>
-								<div>
-									<p>
-										$
-										{(allocatedByParticipant.get(participant.id) ?? 0).toFixed(
-											2,
-										)}
-									</p>
-								</div>
-								{!isCompleted && (
+								{!isCompleted ? (
 									<Input
 										type="number"
 										min="0"
@@ -139,66 +140,55 @@ export default function DistributionSection({
 										}}
 										className="w-28 text-right"
 									/>
+								) : (
+									<p className="text-right">
+										$
+										{(allocatedByParticipant.get(participant.id) ?? 0).toFixed(
+											2,
+										)}
+									</p>
 								)}
 							</div>
 						);
 					})}
 				</div>
 				<div className="border-t pt-3">
-					<div className="flex justify-end px-3 gap-4">
+					<div className="flex justify-end gap-4 px-3">
 						<span className="font-semibold">Total Raised</span>
 						<span className="font-semibold">
 							${financialSummary.totalRaised.toFixed(2)}
 						</span>
 					</div>
 
-					<div className="flex justify-end px-3 gap-4">
-						<span className="font-semibold">Currently Allocated</span>
-						<span className="font-semibold">
-							${financialSummary.currentlyAllocated.toFixed(2)}
-						</span>
+					<div className="flex justify-end gap-4 px-3">
+						<span className="font-semibold">Allocated</span>
+						<span className="font-semibold">${allocationTotal.toFixed(2)}</span>
 					</div>
 
-					<div className="flex justify-end px-3 gap-4">
-						<span className="font-semibold">Available to Allocate</span>
+					<div className="flex justify-end gap-4 px-3">
+						<span className="font-semibold">Remaining</span>
 						<span className="font-semibold">
-							${financialSummary.availableToAllocate.toFixed(2)}
-						</span>
-					</div>
-
-					<div className="flex justify-end px-3 gap-4">
-						<span className="font-semibold">Add Total</span>
-						<span className="font-semibold">
-							${newAllocationTotal.toFixed(2)}
+							${remainingToAllocate.toFixed(2)}
 						</span>
 					</div>
 
 					{remainingToAllocate > 0 && (
 						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${remainingToAllocate.toFixed(2)} still available
+							${remainingToAllocate.toFixed(2)} still needs to be allocated
 						</p>
 					)}
 
 					{remainingToAllocate < 0 && (
 						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${Math.abs(remainingToAllocate).toFixed(2)} over the available
-							amount
+							${Math.abs(remainingToAllocate).toFixed(2)} over the amount raised
 						</p>
 					)}
-					{!isCompleted && (
-						<div className="flex justify-end">
-							{/* <CalculateEqualDistributionButton
-							fundraiserId={fundraiserId}
-							totalRaised={financialSummary.totalRaised}
-						/> */}
-							<Button
-								disabled={isCompleted || Math.abs(remainingToAllocate) > 0.001}
-								onClick={handleSaveDistribution}>
-								Save Distribution
-							</Button>
-						</div>
-					)}
 				</div>
+				<Button
+					disabled={isCompleted || Math.abs(remainingToAllocate) > 0.001}
+					onClick={handleSaveDistribution}>
+					Save Distribution
+				</Button>
 			</CardContent>
 		</Card>
 	);

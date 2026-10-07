@@ -63,7 +63,7 @@ export default function FundraiserHeader({
 				<CardContent className="p-5">
 					<div className="flex items-start justify-between gap-4">
 						<div className="space-y-4">
-							{fundriaser.isCompleted ? (
+							{fundraiser.isCompleted ? (
 								<Badge variant="secondary">Completed</Badge>
 							) : (
 								<Badge variant="secondary">Draft</Badge>

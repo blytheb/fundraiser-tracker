@@ -193,108 +193,116 @@ export async function setCustomDistribution(
 	fundraiserId: string,
 	allocations: CustomAllocation[],
 ) {
-	return prisma.$transaction(async (tx) => {
-		const fundraiser = await tx.fundraiser.findUnique({
-			where: {
-				id: fundraiserId,
-			},
-			select: {
-				isCompleted: true,
-			},
-		});
+	return prisma.$transaction(
+		async (tx) => {
+			const fundraiser = await tx.fundraiser.findUnique({
+				where: {
+					id: fundraiserId,
+				},
+				select: {
+					isCompleted: true,
+				},
+			});
 
-		if (!fundraiser) {
-			throw new Error("Fundraiser not found");
-		}
-
-		if (fundraiser.isCompleted) {
-			throw new Error("Completed fundraisers cannot be edited.");
-		}
-		const participants = await tx.fundraiserParticipant.findMany({
-			where: {
-				fundraiserId,
-			},
-		});
-
-		if (participants.length === 0) {
-			throw new Error("No participants found");
-		}
-
-		//make sure every participant belongs to this fundraiser
-		const participantIds = new Set(
-			participants.map((participant) => participant.id),
-		);
-
-		for (const allocation of allocations) {
-			if (!participantIds.has(allocation.participantId)) {
-				throw new Error(
-					`Participant ${allocation.participantId} does not belong to fundraiser ${fundraiserId}`,
-				);
+			if (!fundraiser) {
+				throw new Error("Fundraiser not found");
 			}
 
-			if (allocation.amount < 0) {
-				throw new Error(
-					`Allocation amount for participant ${allocation.participantId} cannot be negative`,
-				);
+			if (fundraiser.isCompleted) {
+				throw new Error("Completed fundraisers cannot be edited.");
 			}
-		}
 
-		//get total money raised
-		const contributions = await tx.fundraiserContribution.aggregate({
-			where: {
-				fundraiserId,
-			},
-			_sum: {
-				amount: true,
-			},
-		});
-
-		//get money already allocated
-		const currentAllocations = await tx.allocation.aggregate({
-			where: {
-				fundraiserParticipant: {
+			const participants = await tx.fundraiserParticipant.findMany({
+				where: {
 					fundraiserId,
 				},
-				status: "ACTIVE",
-			},
-			_sum: {
-				amount: true,
-			},
-		});
+			});
 
-		const totalRaised = Number(contributions._sum.amount ?? 0);
-		const currentlyAllocated = Number(currentAllocations._sum.amount ?? 0);
-		const availableToAllocate = totalRaised - currentlyAllocated;
+			if (participants.length === 0) {
+				throw new Error("No participants found");
+			}
 
-		//convert everything to cents
-		const requestedCents = allocations.reduce(
-			(total, allocation) => total + Math.round(allocation.amount * 100),
-			0,
-		);
-
-		const availableCents = Math.round(availableToAllocate * 100);
-
-		if (requestedCents !== availableCents) {
-			throw new Error(
-				`Requested allocation of ${requestedCents / 100} does not match available funds of ${availableCents / 100}`,
+			// Make sure every participant belongs to this fundraiser
+			const participantIds = new Set(
+				participants.map((participant) => participant.id),
 			);
-		}
 
-		//create the new allocations
-		const newAllocations = allocations
-			.filter((allocation) => allocation.amount > 0)
-			.map((allocation) => ({
-				fundraiserParticipantId: allocation.participantId,
-				amount: Math.round(allocation.amount * 100) / 100,
-				status: "ACTIVE" as const,
-			}));
+			for (const allocation of allocations) {
+				if (!participantIds.has(allocation.participantId)) {
+					throw new Error(
+						`Participant ${allocation.participantId} does not belong to fundraiser ${fundraiserId}`,
+					);
+				}
 
-		await tx.allocation.createMany({
-			data: newAllocations,
-		});
+				if (allocation.amount < 0) {
+					throw new Error(
+						`Allocation amount for participant ${allocation.participantId} cannot be negative`,
+					);
+				}
+			}
 
-		return newAllocations;
-	});
+			// Get total money raised
+			const contributions = await tx.fundraiserContribution.aggregate({
+				where: {
+					fundraiserId,
+				},
+				_sum: {
+					amount: true,
+				},
+			});
+
+			// Get money already allocated
+			const currentAllocations = await tx.allocation.aggregate({
+				where: {
+					fundraiserParticipant: {
+						fundraiserId,
+					},
+					status: "ACTIVE",
+				},
+				_sum: {
+					amount: true,
+				},
+			});
+
+			const totalRaised = Number(contributions._sum.amount ?? 0);
+			const currentlyAllocated = Number(currentAllocations._sum.amount ?? 0);
+			const availableToAllocate = totalRaised - currentlyAllocated;
+
+			// Convert everything to cents
+			const requestedCents = allocations.reduce(
+				(total, allocation) => total + Math.round(allocation.amount * 100),
+				0,
+			);
+
+			const availableCents = Math.round(availableToAllocate * 100);
+
+			if (requestedCents !== availableCents) {
+				throw new Error(
+					`Requested allocation of ${
+						requestedCents / 100
+					} does not match available funds of ${availableCents / 100}`,
+				);
+			}
+
+			// Create the new allocations
+			const newAllocations = allocations
+				.filter((allocation) => allocation.amount > 0)
+				.map((allocation) => ({
+					fundraiserParticipantId: allocation.participantId,
+					amount: Math.round(allocation.amount * 100) / 100,
+					status: "ACTIVE" as const,
+				}));
+
+			await tx.allocation.createMany({
+				data: newAllocations,
+			});
+
+			return newAllocations;
+		},
+		{
+			timeout: 10000,
+		},
+	);
 }
 
 export async function redistributeFunds(

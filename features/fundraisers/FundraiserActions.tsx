@@ -14,7 +14,7 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import { MoreVertical } from "lucide-react";
 
 import Link from "next/link";
-import { changeStatus } from "@/features/fundraisers/actions/fundraisers";
+import { changeCompletedStatus } from "@/features/fundraisers/actions/fundraisers";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
 import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
 

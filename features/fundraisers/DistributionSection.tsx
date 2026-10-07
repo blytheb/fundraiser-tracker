@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
+import { setCustomDistribution } from "@/features/fundraisers/actions/fundraiserAllocation";
 import { TeamWithPlayers } from "@/features/teams/types";
 import type { Team, AllocationStatus } from "@prisma/client";
 import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
@@ -14,7 +16,6 @@ import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 type SectionProps = {
 	fundraiserId: string;
 	isCompleted: boolean;
-	isPublished: boolean;
 	selectedTeamIds: string[];
 	participants: FundraiserParticipantWithPlayer[];
 	activeTeams: Team[];
@@ -36,7 +37,6 @@ type SectionProps = {
 export default function DistributionSection({
 	fundraiserId,
 	isCompleted,
-	isPublished,
 	selectedTeamIds,
 	participants,
 	activeTeams,
@@ -44,6 +44,7 @@ export default function DistributionSection({
 	financialSummary,
 	activeAllocations,
 }: SectionProps) {
+	const router = useRouter();
 	const [amounts, setAmounts] = useState<Record<string, string>>({});
 
 	const newAllocationTotal = participants.reduce((total, participant) => {
@@ -52,6 +53,29 @@ export default function DistributionSection({
 
 	const remainingToAllocate =
 		financialSummary.availableToAllocate - newAllocationTotal;
+
+	const allocatedByParticipant = activeAllocations.reduce((map, allocation) => {
+		const current = map.get(allocation.fundraiserParticipantId) ?? 0;
+
+		map.set(allocation.fundraiserParticipantId, current + allocation.amount);
+
+		return map;
+	}, new Map<string, number>());
+
+	async function handleSaveDistribution() {
+		const allocations = participants.map((participant) => ({
+			participantId: participant.id,
+			amount: Number(amounts[participant.id] || 0),
+		}));
+
+		try {
+			await setCustomDistribution(fundraiserId, allocations);
+			setAmounts({});
+			router.refresh();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 	return (
 		<Card>
@@ -80,7 +104,8 @@ export default function DistributionSection({
 				<div>
 					<div className="flex justify-between p-2 text-md font-semibold">
 						<span>Player Name ({participants.length})</span>
-						<span className="text-right">Amount</span>
+						<span className="text-right">Allocated</span>
+						{!isCompleted && <span className="text-right">Add</span>}
 					</div>
 					{participants.map((participant) => {
 						return (
@@ -92,7 +117,15 @@ export default function DistributionSection({
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
 								</div>
-								{!isCompleted ? (
+								<div>
+									<p>
+										$
+										{(allocatedByParticipant.get(participant.id) ?? 0).toFixed(
+											2,
+										)}
+									</p>
+								</div>
+								{!isCompleted && (
 									<Input
 										type="number"
 										min="0"
@@ -106,54 +139,11 @@ export default function DistributionSection({
 										}}
 										className="w-28 text-right"
 									/>
-								) : (
-									<p>${participant.allocatedAmount.toFixed(2)}</p>
 								)}
 							</div>
 						);
 					})}
 				</div>
-				<div className="border-t pt-3">
-					<div className="flex justify-end px-3 gap-4">
-						<span className="font-semibold">Total Raised</span>
-						<span className="font-semibold">
-							${financialSummary.totalRaised.toFixed(2)}
-						</span>
-					</div>
-					<div className="flex justify-end px-3 gap-4">
-						<span className="font-semibold">New Allocation</span>
-						<span className="font-semibold">
-							${newAllocationTotal.toFixed(2)}
-						</span>
-					</div>
-
-					{remainingToAllocate > 0 && (
-						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${Math.abs(remainingToAllocate).toFixed(2)} needs to be assigned
-						</p>
-					)}
-
-					{remainingToAllocate < 0 && (
-						<p className="flex justify-end px-3 pt-1 text-sm text-destructive">
-							${Math.abs(remainingToAllocate).toFixed(2)} over the available
-							amount
-						</p>
-					)}
-				</div>
-				<div className="pt-3"></div>
-
-				{/* {isDraft && (
-					<div className="flex justify-end">
-						<CalculateEqualDistributionButton
-							fundraiserId={fundraiserId}
-							totalRaised={financialSummary.totalRaised}
-						/>
-						<Button disabled={Math.abs(remainingToAllocate) > 0.001}>
-							Save Distribution
-						</Button>
-					</div>
-				)} */}
-
 				<div className="border-t pt-3">
 					<div className="flex justify-end px-3 gap-4">
 						<span className="font-semibold">Total Raised</span>
@@ -177,7 +167,7 @@ export default function DistributionSection({
 					</div>
 
 					<div className="flex justify-end px-3 gap-4">
-						<span className="font-semibold">New Allocation</span>
+						<span className="font-semibold">Add Total</span>
 						<span className="font-semibold">
 							${newAllocationTotal.toFixed(2)}
 						</span>
@@ -194,6 +184,19 @@ export default function DistributionSection({
 							${Math.abs(remainingToAllocate).toFixed(2)} over the available
 							amount
 						</p>
+					)}
+					{!isCompleted && (
+						<div className="flex justify-end">
+							{/* <CalculateEqualDistributionButton
+							fundraiserId={fundraiserId}
+							totalRaised={financialSummary.totalRaised}
+						/> */}
+							<Button
+								disabled={isCompleted || Math.abs(remainingToAllocate) > 0.001}
+								onClick={handleSaveDistribution}>
+								Save Distribution
+							</Button>
+						</div>
 					)}
 				</div>
 			</CardContent>

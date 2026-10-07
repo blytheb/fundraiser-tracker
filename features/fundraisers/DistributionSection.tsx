@@ -55,7 +55,7 @@ export default function DistributionSection({
 		return map;
 	}, new Map<string, number>());
 
-	useEffecct(() => {
+	useEffect(() => {
 		const initialAmounts: Record<string, string> = {};
 
 		participants.forEach((participant) => {
@@ -69,8 +69,7 @@ export default function DistributionSection({
 		return total + (Number(amounts[participant.id]) || 0);
 	}, 0);
 
-	const remainingToAllocate =
-		financialSummary.availableToAllocate - allocationTotal;
+	const remainingToAllocate = financialSummary.totalRaised - allocationTotal;
 
 	async function handleSaveDistribution() {
 		const allocations = participants.map((participant) => ({

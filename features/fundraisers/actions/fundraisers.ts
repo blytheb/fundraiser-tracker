@@ -96,7 +96,6 @@ export async function changeCompletedStatus(fundraiserId: string) {
 		},
 		data: {
 			isCompleted: false,
-			isPublished: false,
 		},
 	});
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,7 @@ export default function DistributionSection({
 }: SectionProps) {
 	const router = useRouter();
 	const [amounts, setAmounts] = useState<Record<string, string>>({});
+	const [isPending, startTransition] = useTransition();
 
 	const allocatedByParticipant = activeAllocations.reduce((map, allocation) => {
 		const current = map.get(allocation.fundraiserParticipantId) ?? 0;
@@ -71,17 +72,19 @@ export default function DistributionSection({
 	const remainingToAllocate = financialSummary.totalRaised - allocationTotal;
 
 	async function handleSaveDistribution() {
-		const allocations = participants.map((participant) => ({
-			participantId: participant.id,
-			amount: Number(amounts[participant.id] || 0),
-		}));
+		startTransition(async () => {
+			const allocations = participants.map((participant) => ({
+				participantId: participant.id,
+				amount: Number(amounts[participant.id] || 0),
+			}));
 
-		try {
-			await setCustomDistribution(fundraiserId, allocations);
-			router.refresh();
-		} catch (error) {
-			console.error(error);
-		}
+			try {
+				await setCustomDistribution(fundraiserId, allocations);
+				router.refresh();
+			} catch (error) {
+				console.error(error);
+			}
+		});
 	}
 
 	async function handleEqualDistribution() {
@@ -203,15 +206,11 @@ export default function DistributionSection({
 								raised
 							</p>
 						)}
+						<Button onClick={handleEqualDistribution}>Equal Split</Button>
 						<Button
-							disabled={Math.abs(remainingToAllocate) > 0.001}
-							onClick={handleEqualDistribution}>
-							Equal Split
-						</Button>
-						<Button
-							disabled={Math.abs(remainingToAllocate) > 0.001}
+							disabled={isPending || Math.abs(remainingToAllocate) > 0.001}
 							onClick={handleSaveDistribution}>
-							Save Distribution
+							{isPending ? "Saving..." : "Save"}
 						</Button>
 					</div>
 				)}

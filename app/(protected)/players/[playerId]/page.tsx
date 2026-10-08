@@ -11,6 +11,16 @@ import FundraiserList from "@/features/fundraisers/FundraiserList";
 import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
 import { ItemGroup } from "@/components/ui/item";
 import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
+import {
+	Item,
+	ItemContent,
+	ItemDescription,
+	ItemMedia,
+	ItemTitle,
+} from "@/components/ui/item";
+import { CircleDollarSign } from "lucide-react";
+import { getPublishedFundraisersByPlayer } from "@/features/fundraisers/data/fundraisers";
+// import { getParticipantFinancialSummary } from "@/features/fundraisers/actions/fundraiserAllocation";
 
 type PlayerPageProps = {
 	params: Promise<{
@@ -20,11 +30,12 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
-	const [player, teams] = await Promise.all([
+	const [player, teams, fundraisers, financialSummary] = await Promise.all([
 		getPlayerById(playerId),
 		getPlayerTeams(playerId),
+		getPublishedFundraisersByPlayer(playerId),
+		// getParticipantFinancialSummary(playerId),
 	]);
-	const fundraisers = await getFundraisers();
 
 	if (!player) {
 		return <div>Player Not Found</div>;
@@ -38,7 +49,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 				<SummaryBlock title="Deposits" value={0} label="Active" />
 				<SummaryBlock title="Expenses" value={0} label="Active" />
 			</div>
-			<div className="space-y-2">
+			<div className="space-y-1">
 				{fundraisers.length === 0 ? (
 					<div className="flex flex-col w-full items-center gap-3 rounded-lg border p-3">
 						No Fundraisers Found
@@ -46,9 +57,32 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 				) : (
 					<div className="space-y-4">
 						<ItemGroup>
-							{fundraisers.map((fundraiser) => (
-								<ListItemWithIcon key={fundraiser.id} fundraiser={fundraiser} />
-							))}
+							{fundraisers.map((fundraiser) => {
+								const participant = fundraiser.participants[0];
+								const allocation =
+									participant?.allocations.reduce(
+										(total, allocation) => total + Number(allocation.amount),
+										0,
+									) ?? 0;
+								return (
+									<Item key={fundraiser.id} variant="outline" size="sm">
+										<ItemMedia>
+											<CircleDollarSign className="size-8 bg-green-300 rounded-full" />
+										</ItemMedia>
+										<ItemContent className="flex flex-row justify-between items-center">
+											<div className="flex flex-col gap-1">
+												<ItemTitle>{fundraiser.name}</ItemTitle>
+												<ItemDescription>
+													{fundraiser.startDate.toLocaleString()}
+												</ItemDescription>
+											</div>
+											<div className="font-bold text-md">
+												+ ${allocation.toFixed(2)}
+											</div>
+										</ItemContent>
+									</Item>
+								);
+							})}
 						</ItemGroup>
 					</div>
 				)}

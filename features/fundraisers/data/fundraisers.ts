@@ -78,3 +78,33 @@ export async function getFundraiserWithParticipants(
 		},
 	});
 }
+
+export async function getPublishedFundraisersByPlayer(playerId: string) {
+	return await prisma.fundraiser.findMany({
+		where: {
+			isPublished: true,
+			participants: {
+				some: {
+					playerId,
+				},
+			},
+		},
+		include: {
+			participants: {
+				where: {
+					playerId,
+				},
+				include: {
+					allocations: {
+						where: {
+							status: "ACTIVE",
+						},
+					},
+				},
+			},
+		},
+		orderBy: {
+			createdAt: "desc",
+		},
+	});
+}

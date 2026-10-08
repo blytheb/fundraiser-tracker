@@ -36,29 +36,6 @@ export default function FundraiserHeader({
 }: SectionProps) {
 	return (
 		<>
-			<div className="grid grid-cols-3 gap-2 pt-4">
-				<div>
-					<p className="text-sm text-muted-foreground">Raised</p>
-					<p className="font-semibold">
-						${financialSummary.totalRaised.toFixed(2)}
-					</p>
-				</div>
-
-				<div>
-					<p className="text-sm text-muted-foreground">Allocated</p>
-					<p className="font-semibold">
-						${financialSummary.currentlyAllocated.toFixed(2)}
-					</p>
-				</div>
-
-				<div>
-					<p className="text-sm text-muted-foreground">Available</p>
-					<p className="font-semibold">
-						${financialSummary.availableToAllocate.toFixed(2)}
-					</p>
-				</div>
-			</div>
-
 			<Card className="overflow-hidden bg-gray-200">
 				<CardContent className="p-5">
 					<div className="flex items-start justify-between gap-4">
@@ -68,7 +45,11 @@ export default function FundraiserHeader({
 							) : (
 								<Badge variant="secondary">Draft</Badge>
 							)}
-							{fundraiser.isPublished && <Badge>PUBLISHED</Badge>}
+							{fundraiser.isPublished ? (
+								<Badge>PUBLISHED</Badge>
+							) : (
+								<Badge>NOT PUBLISHED</Badge>
+							)}
 							<PageHeader
 								heading={fundraiser.name}
 								subheading={fundraiser.description}

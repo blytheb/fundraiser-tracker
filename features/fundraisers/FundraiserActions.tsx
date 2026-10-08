@@ -14,7 +14,10 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import { MoreVertical } from "lucide-react";
 
 import Link from "next/link";
-import { changeCompletedStatus } from "@/features/fundraisers/actions/fundraisers";
+import {
+	changeCompletedStatus,
+	changePublishStatus,
+} from "@/features/fundraisers/actions/fundraisers";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
 import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
 
@@ -39,6 +42,15 @@ export default function FundraiserActions({
 			console.error(error);
 		}
 	}
+
+	async function handlePublish() {
+		try {
+			await changePublishStatus(fundraiser.id);
+			router.refresh();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 	return (
 		<>
 			{/* Smaller Screens Collapsed Actions */}
@@ -51,6 +63,9 @@ export default function FundraiserActions({
 					<DropdownMenuContent align="end">
 						<DropdownMenuItem onClick={handleComplete}>
 							Toggle Edit Mode
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={handlePublish}>
+							Toggle Publish Mode
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={(e) => {

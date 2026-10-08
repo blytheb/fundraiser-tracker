@@ -112,10 +112,6 @@ export async function changePublishStatus(fundraiserId: string) {
 		throw new Error("Fundraiser not found");
 	}
 
-	if (!fundraiser.isCompleted) {
-		throw new Error("Fundraiser is not complete yet and cannot be published");
-	}
-
 	return await prisma.fundraiser.update({
 		where: {
 			id: fundraiserId,

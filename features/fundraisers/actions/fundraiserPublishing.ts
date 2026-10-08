@@ -22,10 +22,6 @@ export async function publishFundraiser(fundraiserId: string) {
 			throw new Error("Fundraiser not found");
 		}
 
-		if (!fundraiser.isCompleted) {
-			throw new Error("Fundraiser is not completed and cannot be published");
-		}
-
 		if (fundraiser.isPublished) {
 			throw new Error("Fundraiser is already published");
 		}

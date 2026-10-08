@@ -77,7 +77,9 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 												</ItemDescription>
 											</div>
 											<div className="font-bold text-md">
-												+ ${allocation.toFixed(2)}
+												{fundraiser.isCompleted
+													? `+ ${allocation.toFixed(2)}`
+													: "TBA"}
 											</div>
 										</ItemContent>
 									</Item>

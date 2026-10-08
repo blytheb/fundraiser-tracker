@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
-import CalculateEqualDistributionButton from "@/components/buttons/CalculateEqualDistributionButton";
 import { setCustomDistribution } from "@/features/fundraisers/actions/fundraiserAllocation";
 import { TeamWithPlayers } from "@/features/teams/types";
 import type { Team, AllocationStatus } from "@prisma/client";

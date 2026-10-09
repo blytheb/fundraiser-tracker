@@ -21,5 +21,6 @@ export const auth = betterAuth({
 		"http://localhost:3000",
 		process.env.BETTER_AUTH_URL!,
 		"https://fundraiser-tracker-git-feature-distribution-blythe3.vercel.app/",
+		"https://fundraiser-tracker-delta.vercel.app",
 	],
 });

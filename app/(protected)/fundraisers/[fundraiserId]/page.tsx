@@ -70,7 +70,6 @@ export default async function FundraiserPage({ params }: PageProps) {
 			<DistributionSection
 				fundraiserId={fundraiser.id}
 				isCompleted={fundraiser.isCompleted}
-				isPublished={fundraiser.isPublished}
 				selectedTeamIds={teams.map((team) => team.id)}
 				participants={participants}
 				activeTeams={activeTeams}

@@ -30,7 +30,7 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
-	const [player, teams, fundraisers, financialSummary] = await Promise.all([
+	const [player, teams, fundraisers] = await Promise.all([
 		getPlayerById(playerId),
 		getPlayerTeams(playerId),
 		getPublishedFundraisersByPlayer(playerId),

@@ -12,8 +12,6 @@ export async function publishFundraiser(fundraiserId: string) {
 			select: {
 				isCompleted: true,
 				isPublished: true,
-			},
-			include: {
 				participants: true,
 			},
 		});

@@ -7,12 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import { MoreVertical } from "lucide-react";
-
-import Link from "next/link";
 
 import EditContributionDialog from "@/components/forms/fundraisers/EditContributionDialog";
 import DeleteContributionDialog from "@/components/forms/fundraisers/DeleteContributionDialog";

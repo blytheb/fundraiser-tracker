@@ -23,7 +23,7 @@ export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
 	});
 }
 
-export async function getDraftFundraisers(): Promise<Fundraiser[]> {
+export async function getInCompleteFundraisers(): Promise<Fundraiser[]> {
 	return prisma.fundraiser.findMany({
 		where: {
 			isCompleted: false,

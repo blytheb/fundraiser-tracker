@@ -2,6 +2,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getFundraiserFinancialSummary } from "@/features/fundraisers/actions/fundraiserAllocation";
 
 export async function publishFundraiser(fundraiserId: string) {
 	return prisma.$transaction(async (tx) => {
@@ -58,18 +59,6 @@ export async function unpublishFundraiser(fundraiserId: string) {
 			throw new Error("Fundraiser is already unpublished");
 		}
 
-		await tx.fundraiserAllocation.updateMany({
-			where: {
-				fundraiserParticipant: {
-					fundraiserId,
-				},
-				status: "ACTIVE",
-			},
-			data: {
-				status: "VOID",
-			},
-		});
-
 		await tx.fundraiser.update({
 			where: {
 				id: fundraiserId,
@@ -98,13 +87,19 @@ export async function completeFundraiser(fundraiserId: string) {
 		throw new Error("Fundraiser is already completed");
 	}
 
+	const summary = await getFundraiserFinancialSummary(fundraiserId);
+
+	if (summary.availableToAllocate > 0) {
+		throw new Error("All funds must be allocated before completing");
+	}
+
 	return prisma.fundraiser.update({
 		where: { id: fundraiserId },
 		data: { isCompleted: true },
 	});
 }
 
-export async function draftFundraiser(fundraiserId: string) {
+export async function incompleteFundraiser(fundraiserId: string) {
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id: fundraiserId },
 	});

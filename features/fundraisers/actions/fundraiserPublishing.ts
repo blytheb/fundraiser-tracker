@@ -77,6 +77,18 @@ export async function unpublishFundraiser(fundraiserId: string) {
 export async function completeFundraiser(fundraiserId: string) {
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id: fundraiserId },
+		include: {
+			participants: {
+				include: {
+					player: true,
+					allocations: {
+						where: {
+							status: "ACTIVE",
+						},
+					},
+				},
+			},
+		},
 	});
 
 	if (!fundraiser) {
@@ -87,11 +99,32 @@ export async function completeFundraiser(fundraiserId: string) {
 		throw new Error("Fundraiser is already completed");
 	}
 
+	if (
+		fundraiser.participants.some(
+			(participant) => participant.allocations.length != 1,
+		)
+	) {
+		throw new Error(
+			"Each participant must have exactly one active allocation before completing",
+		);
+	}
+
 	const summary = await getFundraiserFinancialSummary(fundraiserId);
 
 	if (summary.availableToAllocate > 0) {
 		throw new Error("All funds must be allocated before completing");
 	}
+
+	await prisma.playerTransaction.createMany({
+		data: fundraiser.participants.map((participant) => ({
+			playerId: participant.playerId,
+			fundraiserId: fundraiser.id,
+			allocationId: participant.allocations[0].id,
+			amount: participant.allocations[0].amount,
+			type: "DISTRIBUTION",
+			description: `Fundraiser distribution`,
+		})),
+	});
 
 	return prisma.fundraiser.update({
 		where: { id: fundraiserId },

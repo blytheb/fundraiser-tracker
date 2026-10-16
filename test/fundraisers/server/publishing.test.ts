@@ -17,6 +17,9 @@ const { txMock, prismaMock } = vi.hoisted(() => {
 				findUnique: vi.fn(),
 				update: vi.fn(),
 			},
+			playerTransaction: {
+				createMany: vi.fn(),
+			},
 		},
 	};
 });
@@ -174,25 +177,7 @@ describe("completeFundraiser", () => {
 	it("throws an error when funds remain unallocated", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
 			isCompleted: false,
-		});
-
-		vi.mocked(getFundraiserFinancialSummary).mockResolvedValue({
-			totalRaised: 100,
-			currentlyAllocated: 75,
-			availableToAllocate: 25,
-			participantCount: 2,
-		});
-
-		await expect(completeFundraiser("fundraiser-1")).rejects.toThrow(
-			"All funds must be allocated before completing",
-		);
-
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("throws an error when funds remain unallocated", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			participants: [],
 		});
 
 		vi.mocked(getFundraiserFinancialSummary).mockResolvedValue({
@@ -219,6 +204,26 @@ describe("completeFundraiser", () => {
 
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
 			isCompleted: false,
+			participants: [
+				{
+					playerId: "player-1",
+					allocations: [
+						{
+							id: "allocation-1",
+							amount: 100,
+						},
+					],
+				},
+				{
+					playerId: "player-2",
+					allocations: [
+						{
+							id: "allocation-2",
+							amount: 0,
+						},
+					],
+				},
+			],
 		});
 
 		prismaMock.fundraiser.update.mockResolvedValue({

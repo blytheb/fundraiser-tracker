@@ -321,6 +321,7 @@ model PlayerTransaction {
   type        PlayerTransactionType
   description String?
   date        DateTime              @default(now())
+  status      TransactionStatus     @default(ACTIVE)
 
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
@@ -411,4 +412,21 @@ enum PlayerTransactionType {
   PAYMENT
   ADJUSTMENT
   DISTRIBUTION
+}
+
+
+// ------------------------------------------------------------
+// TransactionStatus
+// ------------------------------------------------------------
+// ACTIVE:
+//   Current transaction.
+//
+// VOID:
+//   Transaction is no longer active but is kept for history.
+//   Useful when a fundraiser is unpublished or redistributed.
+
+
+enum TransactionStatus {
+  ACTIVE
+  VOID
 }

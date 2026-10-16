@@ -22,6 +22,9 @@ const { prismaMock, transactionMock } = vi.hoisted(() => {
 		transactionMock,
 		prismaMock: {
 			$transaction: vi.fn(),
+			fundraiserParticipant: {
+				findUnique: vi.fn(),
+			},
 			fundraiserAllocation: {
 				findMany: vi.fn(),
 			},
@@ -36,6 +39,7 @@ vi.mock("@/lib/prisma", () => ({
 import {
 	setCustomDistribution,
 	getActiveFundraiserAllocations,
+	getParticipantFinancialSummary,
 } from "@/features/fundraisers/actions/fundraiserAllocation";
 
 describe("setCustomDistribution", () => {
@@ -410,5 +414,50 @@ describe("getActiveFundraiserAllocations", () => {
 				},
 			}),
 		);
+	});
+});
+
+describe("getParticipantFinancialSummary", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("ignores voided distribution transactions when calculating distributed and remaining amounts", async () => {
+		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue({
+			id: "participant-1",
+			player: { id: "player-1" },
+		});
+
+		prismaMock.fundraiserAllocation.findMany.mockResolvedValue([
+			{
+				id: "allocation-1",
+				amount: "100.00",
+				transactions: [{ amount: "30.00" }],
+			},
+		]);
+
+		await expect(
+			getParticipantFinancialSummary("participant-1"),
+		).resolves.toMatchObject({
+			allocationAmount: 100,
+			distributedAmount: 30,
+			remainingAmount: 70,
+		});
+
+		expect(prismaMock.fundraiserAllocation.findMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserParticipantId: "participant-1",
+				status: "ACTIVE",
+			},
+			include: {
+				transactions: {
+					where: {
+						type: "DISTRIBUTION",
+						status: "ACTIVE",
+					},
+					select: { amount: true },
+				},
+			},
+		});
 	});
 });

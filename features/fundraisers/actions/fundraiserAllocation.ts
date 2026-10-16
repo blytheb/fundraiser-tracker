@@ -29,6 +29,7 @@ export async function getParticipantFinancialSummary(
 			transactions: {
 				where: {
 					type: "DISTRIBUTION",
+					status: "ACTIVE",
 				},
 				select: {
 					amount: true,

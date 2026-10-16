@@ -273,7 +273,7 @@ describe("completeFundraiser", () => {
 
 describe("incompleteFundraiser", () => {
 	it("throws an error when the fundraiser does not exist", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue(null);
+		txMock.fundraiser.findUnique.mockResolvedValue(null);
 
 		await expect(incompleteFundraiser("missing-fundraiser")).rejects.toThrow(
 			"Fundraiser not found",
@@ -282,7 +282,7 @@ describe("incompleteFundraiser", () => {
 		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 	it("throws an error when the fundraiser is already in incomplete mode", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
+		txMock.fundraiser.findUnique.mockResolvedValue({
 			isCompleted: false,
 		});
 
@@ -302,14 +302,14 @@ describe("incompleteFundraiser", () => {
 			count: 2,
 		});
 
-		ttxMock.fundraiser.update.mockResolvedValue({
+		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
 			isCompleted: false,
 		});
 
 		const result = await incompleteFundraiser("fundraiser-1");
 
-		expect(txMock.playerTransaciton.updateMany).toHaveBeenCalledWith({
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
 			where: {
 				fundraiserId: "fundraiser-1",
 				status: "ACTIVE",

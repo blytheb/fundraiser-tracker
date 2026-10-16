@@ -417,7 +417,7 @@ describe("incompleteFundraiser", () => {
 				type: "DISTRIBUTION",
 			},
 			data: {
-				status: "VOIDED",
+				status: "VOID",
 			},
 		});
 
@@ -460,7 +460,7 @@ describe("incompleteFundraiser", () => {
 				type: "DISTRIBUTION",
 			},
 			data: {
-				status: "VOIDED",
+				status: "VOID",
 			},
 		});
 

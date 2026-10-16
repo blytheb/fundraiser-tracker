@@ -178,7 +178,7 @@ export async function incompleteFundraiser(fundraiserId: string) {
 				type: "DISTRIBUTION",
 			},
 			data: {
-				status: "VOIDED",
+				status: "VOID",
 			},
 		});
 

@@ -135,20 +135,33 @@ export async function completeFundraiser(fundraiserId: string) {
 }
 
 export async function incompleteFundraiser(fundraiserId: string) {
-	const fundraiser = await prisma.fundraiser.findUnique({
-		where: { id: fundraiserId },
-	});
+	return prisma.$transaction(async (tx) => {
+		const fundraiser = await tx.fundraiser.findUnique({
+			where: { id: fundraiserId },
+		});
 
-	if (!fundraiser) {
-		throw new Error("Fundraiser not found");
-	}
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
 
-	if (!fundraiser.isCompleted) {
-		throw new Error("Fundraiser is already in draft mode");
-	}
+		if (!fundraiser.isCompleted) {
+			throw new Error("Fundraiser is already in draft mode");
+		}
 
-	return prisma.fundraiser.update({
-		where: { id: fundraiserId },
-		data: { isCompleted: false },
+		await tx.playerTransaction.updateMany({
+			where: {
+				fundraiserId,
+				status: "ACTIVE",
+				type: "DISTRIBUTION",
+			},
+			data: {
+				status: "VOIDED",
+			},
+		});
+
+		return tx.fundraiser.update({
+			where: { id: fundraiserId },
+			data: { isCompleted: false },
+		});
 	});
 }

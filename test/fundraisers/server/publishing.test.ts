@@ -9,6 +9,7 @@ const { txMock, prismaMock } = vi.hoisted(() => {
 		},
 		playerTransaction: {
 			createMany: vi.fn(),
+			updateMany: vi.fn(),
 		},
 	};
 
@@ -292,19 +293,34 @@ describe("incompleteFundraiser", () => {
 		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 
-	it("returns a completed fundraiser to inmcomplete mode", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
+	it("returns a completed fundraiser to incomplete mode", async () => {
+		txMock.fundraiser.findUnique.mockResolvedValue({
 			isCompleted: true,
 		});
 
-		prismaMock.fundraiser.update.mockResolvedValue({
+		txMock.playerTransaction.updateMany.mockResolvedValue({
+			count: 2,
+		});
+
+		ttxMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
 			isCompleted: false,
 		});
 
 		const result = await incompleteFundraiser("fundraiser-1");
 
-		expect(prismaMock.fundraiser.update).toHaveBeenCalledWith({
+		expect(txMock.playerTransaciton.updateMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				status: "ACTIVE",
+				type: "DISTRIBUTION",
+			},
+			data: {
+				status: "VOIDED",
+			},
+		});
+
+		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
 			data: { isCompleted: false },
 		});

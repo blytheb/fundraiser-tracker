@@ -7,6 +7,9 @@ const { txMock, prismaMock } = vi.hoisted(() => {
 			findUnique: vi.fn(),
 			update: vi.fn(),
 		},
+		playerTransaction: {
+			createMany: vi.fn(),
+		},
 	};
 
 	return {
@@ -156,14 +159,14 @@ describe("unpublishFundraiser", () => {
 
 describe("completeFundraiser", () => {
 	it("throws an error when the fundraiser does not exist", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue(null);
+		txMock.fundraiser.findUnique.mockResolvedValue(null);
 
 		await expect(completeFundraiser("missing-fundraiser")).rejects.toThrow(
 			"Fundraiser not found",
 		);
 	});
 	it("throws an error when the fundraiser is already completed", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
+		txMock.fundraiser.findUnique.mockResolvedValue({
 			isCompleted: true,
 		});
 
@@ -171,11 +174,11 @@ describe("completeFundraiser", () => {
 			"Fundraiser is already completed",
 		);
 
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
+		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 
 	it("throws an error when funds remain unallocated", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
+		txMock.fundraiser.findUnique.mockResolvedValue({
 			isCompleted: false,
 			participants: [],
 		});
@@ -191,7 +194,7 @@ describe("completeFundraiser", () => {
 			"All funds must be allocated before completing",
 		);
 
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
+		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 
 	it("completes a fundraiser successfully", async () => {
@@ -202,7 +205,8 @@ describe("completeFundraiser", () => {
 			participantCount: 2,
 		});
 
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
 			isCompleted: false,
 			participants: [
 				{
@@ -226,14 +230,35 @@ describe("completeFundraiser", () => {
 			],
 		});
 
-		prismaMock.fundraiser.update.mockResolvedValue({
+		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
 			isCompleted: true,
 		});
 
 		const result = await completeFundraiser("fundraiser-1");
 
-		expect(prismaMock.fundraiser.update).toHaveBeenCalledWith({
+		expect(txMock.playerTransaction.createMany).toHaveBeenCalledWith({
+			data: [
+				{
+					playerId: "player-1",
+					fundraiserId: "fundraiser-1",
+					allocationId: "allocation-1",
+					amount: 100,
+					type: "DISTRIBUTION",
+					description: "Fundraiser distribution",
+				},
+				{
+					playerId: "player-2",
+					fundraiserId: "fundraiser-1",
+					allocationId: "allocation-2",
+					amount: 0,
+					type: "DISTRIBUTION",
+					description: "Fundraiser distribution",
+				},
+			],
+		});
+
+		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
 			data: { isCompleted: true },
 		});

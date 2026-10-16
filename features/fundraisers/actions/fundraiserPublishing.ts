@@ -2,7 +2,6 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getFundraiserFinancialSummary } from "@/features/fundraisers/actions/fundraiserAllocation";
 
 export async function publishFundraiser(fundraiserId: string) {
 	return prisma.$transaction(async (tx) => {
@@ -11,7 +10,6 @@ export async function publishFundraiser(fundraiserId: string) {
 				id: fundraiserId,
 			},
 			select: {
-				isCompleted: true,
 				isPublished: true,
 				participants: true,
 			},
@@ -81,7 +79,6 @@ export async function completeFundraiser(fundraiserId: string) {
 			include: {
 				participants: {
 					include: {
-						player: true,
 						allocations: {
 							where: {
 								status: "ACTIVE",
@@ -102,30 +99,56 @@ export async function completeFundraiser(fundraiserId: string) {
 
 		if (
 			fundraiser.participants.some(
-				(participant) => participant.allocations.length != 1,
+				(participant) => participant.allocations.length > 1,
 			)
 		) {
 			throw new Error(
-				"Each participant must have exactly one active allocation before completing",
+				"Each participant can have at most one active allocation before completing",
 			);
 		}
+		const [contributions, allocations] = await Promise.all([
+			tx.fundraiserContribution.aggregate({
+				where: { fundraiserId },
+				_sum: { amount: true },
+			}),
+			tx.fundraiserAllocation.aggregate({
+				where: {
+					fundraiserParticipant: { fundraiserId },
+					status: "ACTIVE",
+				},
+				_sum: { amount: true },
+			}),
+		]);
 
-		const summary = await getFundraiserFinancialSummary(fundraiserId);
+		const totalRaised = Number(contributions._sum.amount ?? 0);
+		const currentlyAllocated = Number(allocations._sum.amount ?? 0);
 
-		if (summary.availableToAllocate > 0) {
+		if (currentlyAllocated > totalRaised) {
+			throw new Error("Allocated funds cannot exceed funds raised");
+		}
+
+		const availableToAllocate = totalRaised - currentlyAllocated;
+
+		if (availableToAllocate > 0) {
 			throw new Error("All funds must be allocated before completing");
 		}
 
-		await tx.playerTransaction.createMany({
-			data: fundraiser.participants.map((participant) => ({
+		const distributions = fundraiser.participants
+			.filter((participant) => participant.allocations.length === 1)
+			.map((participant) => ({
 				playerId: participant.playerId,
 				fundraiserId: fundraiser.id,
 				allocationId: participant.allocations[0].id,
 				amount: participant.allocations[0].amount,
-				type: "DISTRIBUTION",
-				description: `Fundraiser distribution`,
-			})),
-		});
+				type: "DISTRIBUTION" as const,
+				description: "Fundraiser distribution",
+			}));
+
+		if (distributions.length > 0) {
+			await tx.playerTransaction.createMany({
+				data: distributions,
+			});
+		}
 
 		return tx.fundraiser.update({
 			where: { id: fundraiserId },
@@ -161,7 +184,10 @@ export async function incompleteFundraiser(fundraiserId: string) {
 
 		return tx.fundraiser.update({
 			where: { id: fundraiserId },
-			data: { isCompleted: false },
+			data: {
+				isCompleted: false,
+				isPublished: false,
+			},
 		});
 	});
 }

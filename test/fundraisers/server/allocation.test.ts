@@ -22,11 +22,19 @@ const { prismaMock, transactionMock } = vi.hoisted(() => {
 		transactionMock,
 		prismaMock: {
 			$transaction: vi.fn(),
+			fundraiser: {
+				findUnique: vi.fn(),
+			},
 			fundraiserParticipant: {
 				findUnique: vi.fn(),
+				count: vi.fn(),
+			},
+			fundraiserContribution: {
+				aggregate: vi.fn(),
 			},
 			fundraiserAllocation: {
 				findMany: vi.fn(),
+				aggregate: vi.fn(),
 			},
 		},
 	};
@@ -40,6 +48,7 @@ import {
 	setCustomDistribution,
 	getActiveFundraiserAllocations,
 	getParticipantFinancialSummary,
+	getFundraiserFinancialSummary,
 } from "@/features/fundraisers/actions/fundraiserAllocation";
 
 describe("setCustomDistribution", () => {
@@ -458,6 +467,94 @@ describe("getParticipantFinancialSummary", () => {
 					select: { amount: true },
 				},
 			},
+		});
+	});
+
+	it("throws an error when the participant does not exist", async () => {
+		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue(null);
+
+		await expect(
+			getParticipantFinancialSummary("missing-participant"),
+		).rejects.toThrow("Fundraiser participant not found");
+
+		expect(prismaMock.fundraiserAllocation.findMany).not.toHaveBeenCalled();
+	});
+});
+
+describe("getFundraiserFinancialSummary", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("throws an error when the fundraiser does not exist", async () => {
+		prismaMock.fundraiser.findUnique.mockResolvedValue(null);
+
+		await expect(
+			getFundraiserFinancialSummary("missing-fundraiser"),
+		).rejects.toThrow("Fundraiser not found");
+
+		expect(prismaMock.fundraiserContribution.aggregate).not.toHaveBeenCalled();
+
+		expect(prismaMock.fundraiserAllocation.aggregate).not.toHaveBeenCalled();
+
+		expect(prismaMock.fundraiserParticipant.count).not.toHaveBeenCalled();
+	});
+
+	it("calculates the fundraiser's financial summary", async () => {
+		prismaMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
+		});
+
+		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
+			_sum: { amount: "250.00" },
+		});
+
+		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
+			_sum: { amount: "175.00" },
+		});
+
+		prismaMock.fundraiserParticipant.count.mockResolvedValue(5);
+
+		await expect(
+			getFundraiserFinancialSummary("fundraiser-1"),
+		).resolves.toEqual({
+			totalRaised: 250,
+			currentlyAllocated: 175,
+			availableToAllocate: 75,
+			participantCount: 5,
+		});
+
+		expect(prismaMock.fundraiserAllocation.aggregate).toHaveBeenCalledWith({
+			where: {
+				fundraiserParticipant: { fundraiserId: "fundraiser-1" },
+				status: "ACTIVE",
+			},
+			_sum: { amount: true },
+		});
+	});
+
+	it("treats null contribution and allocation totals as zero", async () => {
+		prismaMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
+		});
+
+		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
+			_sum: { amount: null },
+		});
+
+		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
+			_sum: { amount: null },
+		});
+
+		prismaMock.fundraiserParticipant.count.mockResolvedValue(0);
+
+		await expect(
+			getFundraiserFinancialSummary("fundraiser-1"),
+		).resolves.toEqual({
+			totalRaised: 0,
+			currentlyAllocated: 0,
+			availableToAllocate: 0,
+			participantCount: 0,
 		});
 	});
 });

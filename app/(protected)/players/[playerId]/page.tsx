@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/item";
 import { CircleDollarSign } from "lucide-react";
 import { getPublishedFundraisersByPlayer } from "@/features/fundraisers/data/fundraisers";
-import { getParticipantFinancialSummary } from "@/features/fundraisers/actions/fundraiserAllocation";
 
 type PlayerPageProps = {
 	params: Promise<{
@@ -30,11 +29,10 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
-	const [player, teams, fundraisers, financialSummary] = await Promise.all([
+	const [player, teams, fundraisers] = await Promise.all([
 		getPlayerById(playerId),
 		getPlayerTeams(playerId),
 		getPublishedFundraisersByPlayer(playerId),
-		getParticipantFinancialSummary(playerId),
 	]);
 
 	if (!player) {
@@ -58,12 +56,11 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 					<div className="space-y-4">
 						<ItemGroup>
 							{fundraisers.map((fundraiser) => {
-								const participant = fundraiser.participants[0];
-								const allocation =
-									participant?.allocations.reduce(
-										(total, allocation) => total + Number(allocation.amount),
-										0,
-									) ?? 0;
+								const distribution = fundraiser.transactions.reduce(
+									(total, transaction) => total + Number(transaction.amount),
+									0,
+								);
+
 								return (
 									<Item key={fundraiser.id} variant="outline" size="sm">
 										<ItemMedia>
@@ -78,7 +75,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 											</div>
 											<div className="font-bold text-md">
 												{fundraiser.isCompleted
-													? `+ ${allocation.toFixed(2)}`
+													? `+ ${distribution.toFixed(2)}`
 													: "TBA"}
 											</div>
 										</ItemContent>

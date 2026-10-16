@@ -90,16 +90,14 @@ export async function getPublishedFundraisersByPlayer(playerId: string) {
 			},
 		},
 		include: {
-			participants: {
+			transactions: {
 				where: {
 					playerId,
+					status: "ACTIVE",
+					type: "DISTRIBUTION",
 				},
-				include: {
-					allocations: {
-						where: {
-							status: "ACTIVE",
-						},
-					},
+				orderBy: {
+					date: "desc",
 				},
 			},
 		},

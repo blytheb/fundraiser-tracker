@@ -163,15 +163,20 @@ describe("getFundraiserWithParticipants", () => {
 });
 
 describe("getPublishedFundraisersByPlayer", () => {
-	it("gets published fundraisers for a player with active allocations", async () => {
+	it("gets published fundraisers for a player with active distribution transactions", async () => {
 		const fundraisers = [
 			{
 				id: "fundraiser-1",
 				name: "Cookie Sale",
-				participants: [
+				isPublished: true,
+				isCompleted: true,
+				transactions: [
 					{
+						id: "transaction-1",
 						playerId: "player-1",
-						allocations: [{ id: "allocation-1", amount: 50, status: "ACTIVE" }],
+						amount: 50,
+						type: "DISTRIBUTION",
+						status: "ACTIVE",
 					},
 				],
 			},
@@ -185,22 +190,65 @@ describe("getPublishedFundraisersByPlayer", () => {
 			where: {
 				isPublished: true,
 				participants: {
-					some: { playerId: "player-1" },
-				},
-			},
-			include: {
-				participants: {
-					where: { playerId: "player-1" },
-					include: {
-						allocations: {
-							where: { status: "ACTIVE" },
-						},
+					some: {
+						playerId: "player-1",
 					},
 				},
 			},
-			orderBy: { createdAt: "desc" },
+			include: {
+				transactions: {
+					where: {
+						playerId: "player-1",
+						status: "ACTIVE",
+						type: "DISTRIBUTION",
+					},
+					orderBy: {
+						date: "desc",
+					},
+				},
+			},
+			orderBy: {
+				createdAt: "desc",
+			},
 		});
 
 		expect(result).toEqual(fundraisers);
+	});
+	it("does not include allocations in the query", async () => {
+		prismaMock.fundraiser.findMany.mockResolvedValue([]);
+
+		await getPublishedFundraisersByPlayer("player-1");
+
+		const query = prismaMock.fundraiser.findMany.mock.calls[0][0];
+
+		expect(query.include).not.toHaveProperty("participants");
+		expect(query.include).not.toHaveProperty("allocations");
+		expect(query.include).toHaveProperty("transactions");
+	});
+
+	it("filters transactions by player, active status, and distribution type", async () => {
+		prismaMock.fundraiser.findMany.mockResolvedValue([]);
+
+		await getPublishedFundraisersByPlayer("player-1");
+
+		const query = prismaMock.fundraiser.findMany.mock.calls[0][0];
+
+		expect(query.include.transactions.where).toEqual({
+			playerId: "player-1",
+			status: "ACTIVE",
+			type: "DISTRIBUTION",
+		});
+	});
+
+	it("orders distribution transactions by date descending", async () => {
+		prismaMock.fundraiser.findMany.mockResolvedValue([]);
+
+		await getPublishedFundraisersByPlayer("player-1");
+
+		const query = prismaMock.fundraiser.findMany.mock.calls[0][0];
+
+		expect(query.include.transactions.orderBy).toEqual({
+			date: "desc",
+		});
 	});
 });

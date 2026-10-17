@@ -93,12 +93,28 @@ describe("setCustomDistribution", () => {
 			isCompleted: true,
 		});
 
+		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([
+			{
+				id: "allocation-1",
+				fundraiserParticipantId: "participant-1",
+				amount: 100,
+			},
+		]);
+
 		await expect(
 			setCustomDistribution("fundraiser-1", [
 				{ participantId: "participant-1", amount: 50 },
 				{ participantId: "participant-2", amount: 50 },
 			]),
 		).rejects.toThrow(/Completed fundraisers cannot be edited/);
+
+		expect(
+			transactionMock.fundraiserAllocation.findMany,
+		).not.toHaveBeenCalled();
+
+		expect(
+			transactionMock.fundraiserAllocation.updateMany,
+		).not.toHaveBeenCalled();
 
 		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
 	});

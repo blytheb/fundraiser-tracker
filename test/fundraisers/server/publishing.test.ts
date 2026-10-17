@@ -15,6 +15,8 @@ const { txMock, prismaMock } = vi.hoisted(() => {
 		},
 		fundraiserAllocation: {
 			aggregate: vi.fn(),
+			create: vi.fn(),
+			updateMany: vi.fn(),
 		},
 	};
 
@@ -437,6 +439,42 @@ describe("completeFundraiser", () => {
 			],
 		});
 	});
+
+	it("does not mark the fundraiser completed when distribution creation fails", async () => {
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
+			isCompleted: false,
+			participants: [
+				{
+					playerId: "player-1",
+					allocations: [
+						{
+							id: "allocation-1",
+							amount: 100,
+						},
+					],
+				},
+			],
+		});
+
+		txMock.fundraiserContribution.aggregate.mockResolvedValue({
+			_sum: { amount: 100 },
+		});
+
+		txMock.fundraiserAllocation.aggregate.mockResolvedValue({
+			_sum: { amount: 100 },
+		});
+
+		txMock.playerTransaction.createMany.mockRejectedValue(
+			new Error("Duplicate active distribution"),
+		);
+
+		await expect(completeFundraiser("fundraiser-1")).rejects.toThrow(
+			"Duplicate active distribution",
+		);
+
+		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
+	});
 });
 
 describe("incompleteFundraiser", () => {
@@ -489,6 +527,8 @@ describe("incompleteFundraiser", () => {
 			},
 		});
 
+		expect(txMock.fundraiserAllocation.updateMany).not.toHaveBeenCalled();
+		expect(txMock.fundraiserAllocation.create).not.toHaveBeenCalled();
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
 			data: {

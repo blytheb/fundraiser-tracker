@@ -73,6 +73,9 @@ describe("updateFundraiser", () => {
 		};
 
 		prismaMock.fundraiser.update.mockResolvedValue(fundraiser);
+		prismaMock.fundraiser.findUnique.mockResolvedValue({
+			isCompleted: false,
+		});
 
 		const result = await updateFundraiser("fundraiser-1", data as never);
 
@@ -82,6 +85,23 @@ describe("updateFundraiser", () => {
 		});
 
 		expect(result).toEqual(fundraiser);
+	});
+	it("rejects updating a completed fundraiser", async () => {
+		const data = {
+			name: "Updated Cookie Sale",
+			description: "Updated fundraiser",
+			startDate: new Date("2026-11-01"),
+		};
+
+		prismaMock.fundraiser.findUnique.mockResolvedValue({
+			isCompleted: true,
+		});
+
+		await expect(
+			updateFundraiser("fundraiser-1", data as never),
+		).rejects.toThrow("Completed fundraisers cannot be edited.");
+
+		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 });
 
@@ -93,6 +113,9 @@ describe("deleteFundraiser", () => {
 		};
 
 		prismaMock.fundraiser.delete.mockResolvedValue(fundraiser);
+		prismaMock.fundraiser.findUnique.mockResolvedValue({
+			isCompleted: false,
+		});
 
 		const result = await deleteFundraiser("fundraiser-1");
 
@@ -101,6 +124,17 @@ describe("deleteFundraiser", () => {
 		});
 
 		expect(result).toEqual(fundraiser);
+	});
+	it("rejects deleting a completed fundraiser", async () => {
+		prismaMock.fundraiser.findUnique.mockResolvedValue({
+			isCompleted: true,
+		} as any);
+
+		await expect(deleteFundraiser("fundraiser-1")).rejects.toThrow(
+			"Completed fundraisers cannot be deleted.",
+		);
+
+		expect(prismaMock.fundraiser.delete).not.toHaveBeenCalled();
 	});
 });
 

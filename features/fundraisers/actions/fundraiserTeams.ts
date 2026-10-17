@@ -7,25 +7,45 @@ import type { FundraiserTeam, Fundraiser } from "@prisma/client";
 export async function addTeamToFundraiser(
 	fundraiserId: string,
 	teamId: string,
-): Promise<FundraiserTeam> {
+) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: { id: fundraiserId },
+		select: { isCompleted: true },
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.isCompleted) {
+		throw new Error("Completed fundraisers cannot be edited.");
+	}
+
 	return prisma.fundraiserTeam.create({
-		data: {
-			fundraiserId,
-			teamId,
-		},
+		data: { fundraiserId, teamId },
 	});
 }
 
 export async function removeTeamFromFundraiser(
 	fundraiserId: string,
 	teamId: string,
-): Promise<FundraiserTeam> {
+) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: { id: fundraiserId },
+		select: { isCompleted: true },
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.isCompleted) {
+		throw new Error("Completed fundraisers cannot be edited.");
+	}
+
 	return prisma.fundraiserTeam.delete({
 		where: {
-			fundraiserId_teamId: {
-				fundraiserId,
-				teamId,
-			},
+			fundraiserId_teamId: { fundraiserId, teamId },
 		},
 	});
 }
@@ -59,6 +79,18 @@ export async function saveFundraiserTeams(
 	teamIds: string[],
 ): Promise<void> {
 	await prisma.$transaction(async (tx) => {
+		const fundraiser = await tx.fundraiser.findUnique({
+			where: { id: fundraiserId },
+			select: { isCompleted: true },
+		});
+
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
+
+		if (fundraiser.isCompleted) {
+			throw new Error("Completed fundraisers cannot be edited.");
+		}
 		// 1. Find all players who are eligible based on
 		//    the NEW set of selected teams.
 		const eligiblePlayers = await tx.teamPlayer.findMany({

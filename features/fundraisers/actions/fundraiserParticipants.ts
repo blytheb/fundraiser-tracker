@@ -6,6 +6,19 @@ export async function addPlayerToFundraiser(
 	fundraiserId: string,
 	playerId: string,
 ) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: { id: fundraiserId },
+		select: { isCompleted: true },
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.isCompleted) {
+		throw new Error("Completed fundraisers cannot be edited.");
+	}
+
 	return prisma.fundraiserParticipant.create({
 		data: {
 			fundraiserId,
@@ -18,6 +31,19 @@ export async function removePlayerFromFundraiser(
 	fundraiserId: string,
 	playerId: string,
 ) {
+	const fundraiser = await prisma.fundraiser.findUnique({
+		where: { id: fundraiserId },
+		select: { isCompleted: true },
+	});
+
+	if (!fundraiser) {
+		throw new Error("Fundraiser not found");
+	}
+
+	if (fundraiser.isCompleted) {
+		throw new Error("Completed fundraisers cannot be edited.");
+	}
+
 	return prisma.fundraiserParticipant.delete({
 		where: {
 			fundraiserId_playerId: {
@@ -33,6 +59,18 @@ export async function saveFundraiserParticipants(
 	playerIds: string[],
 ) {
 	return prisma.$transaction(async (tx) => {
+		const fundraiser = await tx.fundraiser.findUnique({
+			where: { id: fundraiserId },
+			select: { isCompleted: true },
+		});
+
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
+
+		if (fundraiser.isCompleted) {
+			throw new Error("Completed fundraisers cannot be edited.");
+		}
 		//remove players who are no longer selected
 		await tx.fundraiserParticipant.deleteMany({
 			where: {

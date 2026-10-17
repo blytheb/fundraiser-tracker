@@ -39,11 +39,27 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 		return <div>Player Not Found</div>;
 	}
 
+	const totalDistributed = fundraisers.reduce((total, fundraiser) => {
+		if (!fundraiser.isCompleted || !fundraiser.isPublished) return total;
+
+		return (
+			total +
+			fundraiser.transactions.reduce(
+				(sum, transaction) => sum + Number(transaction.amount),
+				0,
+			)
+		);
+	}, 0);
+
 	return (
 		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
 			<PlayerHeader player={player} teams={teams} />
 			<div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
-				<SummaryBlock title="Total" value={0} label="Total" />
+				<SummaryBlock
+					title="Total"
+					value={`${totalDistributed.toFixed(2)}`}
+					label="Total"
+				/>
 				<SummaryBlock title="Deposits" value={0} label="Active" />
 				<SummaryBlock title="Expenses" value={0} label="Active" />
 			</div>

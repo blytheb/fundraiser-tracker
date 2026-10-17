@@ -431,7 +431,7 @@ describe("getParticipantFinancialSummary", () => {
 		vi.clearAllMocks();
 	});
 
-	it("ignores voided distribution transactions when calculating distributed and remaining amounts", async () => {
+	it("ignores void distribution transactions when calculating distributed and remaining amounts", async () => {
 		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue({
 			id: "participant-1",
 			player: { id: "player-1" },

@@ -168,6 +168,29 @@ describe("unpublishFundraiser", () => {
 		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
 		expect(txMock.fundraiserAllocation.aggregate).not.toHaveBeenCalled();
 	});
+	it("unpublishes a completed fundraiser without voiding distributions", async () => {
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
+			isPublished: true,
+			isCompleted: true,
+		});
+
+		txMock.fundraiser.update.mockResolvedValue({
+			id: "fundraiser-1",
+			isPublished: false,
+			isCompleted: true,
+		});
+
+		const result = await unpublishFundraiser("fundraiser-1");
+
+		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1" },
+			data: { isPublished: false },
+		});
+
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
+		expect(result).toEqual({ success: true });
+	});
 });
 
 describe("completeFundraiser", () => {
@@ -367,6 +390,51 @@ describe("completeFundraiser", () => {
 		expect(result).toEqual({
 			id: "fundraiser-1",
 			isCompleted: true,
+		});
+	});
+	it("creates a new distribution transaction when completing again after a previous distribution was voided", async () => {
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
+			isCompleted: false,
+			participants: [
+				{
+					playerId: "player-1",
+					allocations: [
+						{
+							id: "allocation-1",
+							amount: 100,
+						},
+					],
+				},
+			],
+		});
+
+		txMock.fundraiserContribution.aggregate.mockResolvedValue({
+			_sum: { amount: 100 },
+		});
+
+		txMock.fundraiserAllocation.aggregate.mockResolvedValue({
+			_sum: { amount: 100 },
+		});
+
+		txMock.fundraiser.update.mockResolvedValue({
+			id: "fundraiser-1",
+			isCompleted: true,
+		});
+
+		await completeFundraiser("fundraiser-1");
+
+		expect(txMock.playerTransaction.createMany).toHaveBeenCalledWith({
+			data: [
+				{
+					playerId: "player-1",
+					fundraiserId: "fundraiser-1",
+					allocationId: "allocation-1",
+					amount: 100,
+					type: "DISTRIBUTION",
+					description: "Fundraiser distribution",
+				},
+			],
 		});
 	});
 });

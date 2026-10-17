@@ -1,16 +1,12 @@
 import React from "react";
 import PlayerHeader from "@/features/players/PlayerHeader";
 import SummaryBlock from "@/components/ui-reusable/SummaryBlock";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { getPlayerById } from "@/features/players/data/players";
+import {
+	getPlayerById,
+	getPlayerTransactions,
+} from "@/features/players/data/players";
 import { getPlayerTeams } from "@/features/players/data/playerTeams";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FundraiserList from "@/features/fundraisers/FundraiserList";
-import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
 import { ItemGroup } from "@/components/ui/item";
-import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
 import {
 	Item,
 	ItemContent,
@@ -29,10 +25,11 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
-	const [player, teams, fundraisers] = await Promise.all([
+	const [player, teams, fundraisers, transactions] = await Promise.all([
 		getPlayerById(playerId),
 		getPlayerTeams(playerId),
 		getPublishedFundraisersByPlayer(playerId),
+		getPlayerTransactions(playerId),
 	]);
 
 	if (!player) {
@@ -51,17 +48,32 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 		);
 	}, 0);
 
+	const totalDeposits = transactions
+		.filter((transaction) => transaction.type === "PAYMENT")
+		.reduce((total, transaction) => total + Number(transaction.amount), 0);
+
+	const totalExpenses = transactions
+		.filter((transaction) => transaction.type === "EXPENSE")
+		.reduce((total, transaction) => total + Number(transaction.amount), 0);
 	return (
 		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
 			<PlayerHeader player={player} teams={teams} />
 			<div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
 				<SummaryBlock
-					title="Total"
-					value={`${totalDistributed.toFixed(2)}`}
-					label="Total"
+					title="Fundraiser Total"
+					value={`$${totalDistributed.toFixed(2)}`}
+					label="Total Earned from completed and published fundraisers"
 				/>
-				<SummaryBlock title="Deposits" value={0} label="Active" />
-				<SummaryBlock title="Expenses" value={0} label="Active" />
+				<SummaryBlock
+					title="Deposits"
+					value={`$${totalDeposits.toFixed(2)}`}
+					label="Payments made to add to player account"
+				/>
+				<SummaryBlock
+					title="Expenses"
+					value={`$${totalExpenses.toFixed(2)}`}
+					label="Costs charged to the player's account"
+				/>
 			</div>
 			<div className="space-y-1">
 				{fundraisers.length === 0 ? (
@@ -91,7 +103,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 											</div>
 											<div className="font-bold text-md">
 												{fundraiser.isCompleted
-													? `+ ${distribution.toFixed(2)}`
+													? `+ $${distribution.toFixed(2)}`
 													: "TBA"}
 											</div>
 										</ItemContent>

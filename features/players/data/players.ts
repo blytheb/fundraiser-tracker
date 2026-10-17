@@ -90,3 +90,18 @@ export async function getPlayerWithFundraisers(
 		},
 	});
 }
+
+export async function getPlayerTransactions(playerId: string) {
+	return prisma.playerTransaction.findMany({
+		where: {
+			playerId,
+			status: "ACTIVE",
+			type: {
+				in: ["PAYMENT", "EXPENSE"],
+			},
+		},
+		orderBy: {
+			date: "desc",
+		},
+	});
+}

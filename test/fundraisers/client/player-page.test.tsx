@@ -14,6 +14,7 @@ const { getPlayerByIdMock, getPlayerTeamsMock, getPublishedFundraisersMock } =
 
 vi.mock("@/features/players/data/players", () => ({
 	getPlayerById: getPlayerByIdMock,
+	getPlayerTransactions: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock("@/features/players/data/playerTeams", () => ({
@@ -50,12 +51,14 @@ beforeEach(() => {
 			name: "Travel Fundraiser",
 			startDate: new Date("2026-01-01T12:00:00Z"),
 			isCompleted: false,
+			isPublished: false,
 			transactions: [
 				{
 					id: "transaction-1",
 					amount: "100.00",
 					type: "DISTRIBUTION",
 					status: "ACTIVE",
+					date: new Date("2026-01-01T12:00:00Z"),
 				},
 			],
 		},
@@ -86,18 +89,22 @@ describe("PlayerPage", () => {
 				name: "Travel Fundraiser",
 				startDate: new Date("2026-01-01T12:00:00Z"),
 				isCompleted: true,
+				isPublished: false,
+
 				transactions: [
 					{
 						id: "transaction-1",
 						amount: "75.00",
 						type: "DISTRIBUTION",
 						status: "ACTIVE",
+						date: new Date("2026-01-01T12:00:00Z"),
 					},
 					{
 						id: "transaction-2",
 						amount: "25.00",
 						type: "DISTRIBUTION",
 						status: "ACTIVE",
+						date: new Date("2026-01-01T12:00:00Z"),
 					},
 				],
 			},

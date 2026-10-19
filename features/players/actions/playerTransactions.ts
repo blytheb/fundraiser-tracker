@@ -4,6 +4,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type { PlayerTransactionType } from "@prisma/client";
 
 type PlayerTransactionData = {
 	playerId: string;

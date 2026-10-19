@@ -96,9 +96,9 @@ export async function getPlayerTransactions(playerId: string) {
 		where: {
 			playerId,
 			status: "ACTIVE",
-			type: {
-				in: ["PAYMENT", "EXPENSE"],
-			},
+			// type: {
+			// 	in: ["PAYMENT", "EXPENSE"],
+			// },
 		},
 		orderBy: {
 			date: "desc",

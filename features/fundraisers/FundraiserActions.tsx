@@ -16,7 +16,7 @@ import {
 	unpublishFundraiser,
 	completeFundraiser,
 	incompleteFundraiser,
-} from "@/features/fundraisers/actions/fundraiserPublishing.ts";
+} from "@/features/fundraisers/actions/fundraiserPublishing";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
 import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
 

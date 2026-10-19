@@ -55,23 +55,55 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 	const totalExpenses = transactions
 		.filter((transaction) => transaction.type === "EXPENSE")
 		.reduce((total, transaction) => total + Number(transaction.amount), 0);
+	const history = [
+		...fundraisers.map((fundraiser) => ({
+			kind: "FUNDRAISER" as const,
+			id: fundraiser.id,
+			name: fundraiser.name,
+			date: fundraiser.startDate,
+			isCompleted: fundraiser.isCompleted,
+			amount: fundraiser.isCompleted
+				? fundraiser.transactions.reduce(
+						(sum, transaction) => sum + Number(transaction.amount),
+						0,
+					)
+				: null,
+		})),
+
+		...transactions
+			.filter((transaction) => transaction.type !== "DISTRIBUTION")
+			.map((transaction) => ({
+				kind: "TRANSACTION" as const,
+				id: transaction.id,
+				name:
+					transaction.type === "PAYMENT"
+						? "Deposit"
+						: transaction.type === "EXPENSE"
+							? "Expense"
+							: "Adjustment",
+				description: transaction.description,
+				date: transaction.date,
+				amount: Number(transaction.amount),
+				type: transaction.type,
+			})),
+	].sort((a, b) => b.date.getTime() - a.date.getTime());
 	return (
 		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
 			<PlayerHeader player={player} teams={teams} />
 			<div className="mb-6 grid grid-cols-3 gap-2 sm:gap-4">
 				<SummaryBlock
 					title="Fundraiser Total"
-					value={`$${totalDistributed.toFixed(2)}`}
+					value={totalDistributed}
 					label="Total Earned from completed and published fundraisers"
 				/>
 				<SummaryBlock
 					title="Deposits"
-					value={`$${totalDeposits.toFixed(2)}`}
+					value={totalDeposits}
 					label="Payments made to add to player account"
 				/>
 				<SummaryBlock
 					title="Expenses"
-					value={`$${totalExpenses.toFixed(2)}`}
+					value={totalExpenses}
 					label="Costs charged to the player's account"
 				/>
 			</div>
@@ -82,35 +114,59 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 					</div>
 				) : (
 					<div className="space-y-4">
-						<ItemGroup>
-							{fundraisers.map((fundraiser) => {
-								const distribution = fundraiser.transactions.reduce(
-									(total, transaction) => total + Number(transaction.amount),
-									0,
-								);
+						<h2 className="text-lg font-semibold">Transaction History</h2>
 
-								return (
-									<Item key={fundraiser.id} variant="outline" size="sm">
+						{history.length === 0 ? (
+							<div className="flex w-full flex-col items-center gap-3 rounded-lg border p-3">
+								No Transactions Found
+							</div>
+						) : (
+							<ItemGroup>
+								{history.map((entry) => (
+									<Item
+										key={`${entry.kind}-${entry.id}`}
+										variant="outline"
+										size="sm">
 										<ItemMedia>
-											<CircleDollarSign className="size-8 bg-green-300 rounded-full" />
+											<CircleDollarSign className="size-8 rounded-full bg-green-300" />
 										</ItemMedia>
-										<ItemContent className="flex flex-row justify-between items-center">
+
+										<ItemContent className="flex flex-row items-center justify-between">
 											<div className="flex flex-col gap-1">
-												<ItemTitle>{fundraiser.name}</ItemTitle>
+												<ItemTitle>{entry.name}</ItemTitle>
+
 												<ItemDescription>
-													{fundraiser.startDate.toLocaleString()}
+													{entry.kind === "FUNDRAISER"
+														? entry.isCompleted
+															? "Completed"
+															: "In progress"
+														: entry.description ||
+															entry.date.toLocaleDateString()}
 												</ItemDescription>
+
+												{entry.kind === "TRANSACTION" && entry.description && (
+													<ItemDescription>
+														{entry.date.toLocaleDateString()}
+													</ItemDescription>
+												)}
 											</div>
-											<div className="font-bold text-md">
-												{fundraiser.isCompleted
-													? `+ $${distribution.toFixed(2)}`
-													: "TBA"}
+
+											<div className="text-md font-bold">
+												{entry.kind === "FUNDRAISER"
+													? entry.isCompleted
+														? `+ $${entry.amount!.toFixed(2)}`
+														: "TBA"
+													: entry.type === "EXPENSE"
+														? `- $${entry.amount.toFixed(2)}`
+														: entry.type === "PAYMENT"
+															? `+ $${entry.amount.toFixed(2)}`
+															: `$${entry.amount.toFixed(2)}`}
 											</div>
 										</ItemContent>
 									</Item>
-								);
-							})}
-						</ItemGroup>
+								))}
+							</ItemGroup>
+						)}
 					</div>
 				)}
 			</div>

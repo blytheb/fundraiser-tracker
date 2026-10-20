@@ -8,7 +8,11 @@ export const metadata: Metadata = {
 	description: "Manage teams, players, fundraisers, and player accounts.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+	children,
+}: Readonly<{
+	children: React.ReactNode;
+}>) {
 	return (
 		<html lang="en" className="h-full antialiased">
 			<body className="h-full flex flex-col">

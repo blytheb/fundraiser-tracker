@@ -16,6 +16,9 @@ export default async function ProtectedLayout({
 		redirect("/");
 	}
 
+	if (session?.user) {
+		console.log(session.user.role);
+	}
 	return (
 		<div className="flex h-screen flex-col">
 			<Navbar />

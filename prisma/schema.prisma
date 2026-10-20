@@ -24,12 +24,18 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
+  role          UserRole  @default(PARENT)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
 
   @@map("user")
+}
+
+enum UserRole {
+  ADMIN
+  PARENT
 }
 
 model Session {

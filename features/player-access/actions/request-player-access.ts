@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/authorization";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 export async function requestPlayerAccess(playerId: string) {
 	const user = await requireUser();
@@ -49,12 +50,23 @@ export async function requestPlayerAccess(playerId: string) {
 		throw new Error("You already have pending request for this player");
 	}
 
-	await prisma.playerAccessRequest.create({
-		data: {
-			userId: user.id,
-			playerId,
-		},
-	});
+	try {
+		await prisma.playerAccessRequest.create({
+			data: {
+				userId: user.id,
+				playerId,
+			},
+		});
+	} catch (error) {
+		if (
+			error instanceof Prisma.PrismaClientKnownRequestError &&
+			error.code === "P2002"
+		) {
+			throw new Error("You already have a pending request for this player.");
+		}
+
+		throw error;
+	}
 
 	revalidatePath("/dashboard");
 

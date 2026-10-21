@@ -4,6 +4,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin, requireUser } from "@/lib/authorization";
 import type { PlayerTransactionType } from "@prisma/client";
 
 type PlayerTransactionData = {
@@ -16,6 +17,7 @@ type PlayerTransactionData = {
 };
 
 export async function addPlayerPayment(data: PlayerTransactionData) {
+	await requireAdmin();
 	return prisma.playerTransaction.create({
 		data: {
 			playerId: data.playerId,
@@ -30,6 +32,7 @@ export async function addPlayerPayment(data: PlayerTransactionData) {
 }
 
 export async function addPlayerExpense(data: PlayerTransactionData) {
+	await requireAdmin();
 	return prisma.playerTransaction.create({
 		data: {
 			playerId: data.playerId,
@@ -44,6 +47,7 @@ export async function addPlayerExpense(data: PlayerTransactionData) {
 }
 
 export async function addPlayerAdjustment(data: PlayerTransactionData) {
+	await requireAdmin();
 	return prisma.playerTransaction.create({
 		data: {
 			playerId: data.playerId,
@@ -58,6 +62,7 @@ export async function addPlayerAdjustment(data: PlayerTransactionData) {
 }
 
 export async function addPlayerDistribution(data: PlayerTransactionData) {
+	await requireAdmin();
 	return prisma.playerTransaction.create({
 		data: {
 			playerId: data.playerId,
@@ -72,6 +77,22 @@ export async function addPlayerDistribution(data: PlayerTransactionData) {
 }
 
 export async function getPlayerFinancialSummary(playerId: string) {
+	const user = await requireUser();
+
+	if (user.role === "PARENT") {
+		const link = await prisma.parentPlayerLink.findUnique({
+			where: {
+				userId_playerId: {
+					userId: user.id,
+					playerId,
+				},
+			},
+			select: { id: true },
+		});
+		if (!link) {
+			throw new Error("You do not have access to this player's finances");
+		}
+	}
 	const player = await prisma.player.findUnique({
 		where: { id: playerId },
 		select: {
@@ -83,7 +104,7 @@ export async function getPlayerFinancialSummary(playerId: string) {
 		throw new Error("Player not found");
 	}
 	const transactions = await prisma.playerTransaction.findMany({
-		where: { playerId },
+		where: { playerId, status: "ACTIVE" },
 		select: {
 			amount: true,
 			type: true,
@@ -131,6 +152,7 @@ export async function createDistributionTransaction(
 	amount: number,
 	description?: string,
 ) {
+	await requireAdmin();
 	return prisma.$transaction(async (tx) => {
 		const allocation = await tx.fundraiserAllocation.findUnique({
 			where: { id: allocationId },

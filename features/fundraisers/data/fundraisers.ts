@@ -4,6 +4,7 @@ import type {
 	FundraiserWithTeams,
 	FundraiserWithParticipants,
 } from "@/features/fundraisers/types";
+import { requireUser } from "@/lib/authorization";
 
 //get All fundraisers
 export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
@@ -80,6 +81,23 @@ export async function getFundraiserWithParticipants(
 }
 
 export async function getPublishedFundraisersByPlayer(playerId: string) {
+	const user = await requireUser();
+
+	if (user.role === "PARENT") {
+		const link = await prisma.parentPlayerLink.findUnique({
+			where: {
+				userId_playerId: {
+					userId: user.id,
+					playerId,
+				},
+			},
+			select: { id: true },
+		});
+
+		if (!link) {
+			throw new Error("You do not have access to this player.");
+		}
+	}
 	return await prisma.fundraiser.findMany({
 		where: {
 			isPublished: true,

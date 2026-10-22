@@ -18,7 +18,7 @@ type PlayerTransactionData = {
 
 export async function addPlayerPayment(data: PlayerTransactionData) {
 	await requireAdmin();
-	return prisma.playerTransaction.create({
+	const transaction = await prisma.playerTransaction.create({
 		data: {
 			playerId: data.playerId,
 			fundraiserId: data.fundraiserId,
@@ -29,11 +29,15 @@ export async function addPlayerPayment(data: PlayerTransactionData) {
 			date: new Date(data.date),
 		},
 	});
+	return {
+		...transaction,
+		amount: Number(transaction.amount),
+	};
 }
 
 export async function addPlayerExpense(data: PlayerTransactionData) {
 	await requireAdmin();
-	return prisma.playerTransaction.create({
+	const transaction = await prisma.playerTransaction.create({
 		data: {
 			playerId: data.playerId,
 			fundraiserId: data.fundraiserId,
@@ -44,6 +48,11 @@ export async function addPlayerExpense(data: PlayerTransactionData) {
 			date: new Date(data.date),
 		},
 	});
+
+	return {
+		...transaction,
+		amount: Number(transaction.amount),
+	};
 }
 
 export async function addPlayerAdjustment(data: PlayerTransactionData) {

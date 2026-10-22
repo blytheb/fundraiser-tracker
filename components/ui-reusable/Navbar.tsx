@@ -70,7 +70,7 @@ export default function Navbar({ role }: NavbarProps) {
 					</div>
 
 					<div className="flex justify-center items-center gap-4">
-						<h1>Welcome</h1>
+						<h1>role: {role}</h1>
 						<LogoutButton />
 					</div>
 				</NavigationMenuList>

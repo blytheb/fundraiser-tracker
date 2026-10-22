@@ -147,12 +147,17 @@ export async function getPlayerTransactions(playerId: string) {
 		where: {
 			playerId,
 			status: "ACTIVE",
-			// type: {
-			// 	in: ["PAYMENT", "EXPENSE"],
-			// },
 		},
 		orderBy: {
 			date: "desc",
+		},
+		include: {
+			fundraiser: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
 		},
 	});
 }

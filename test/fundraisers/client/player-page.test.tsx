@@ -116,7 +116,7 @@ describe("PlayerPage", () => {
 
 		render(page);
 
-		expect(screen.getByText("+ 100.00")).toBeInTheDocument();
+		expect(screen.getByText("+ $100.00")).toBeInTheDocument();
 		expect(screen.queryByText("TBA")).not.toBeInTheDocument();
 	});
 
@@ -145,9 +145,9 @@ describe("PlayerPage", () => {
 		render(page);
 
 		expect(screen.getByText("Completed Fundraiser")).toBeInTheDocument();
-		expect(screen.getByText("+ 150.00")).toBeInTheDocument();
+		expect(screen.getByText("+ $150.00")).toBeInTheDocument();
 		expect(screen.getByText("Upcoming Fundraiser")).toBeInTheDocument();
 		expect(screen.getByText("TBA")).toBeInTheDocument();
-		expect(screen.queryByText("+ 200.00")).not.toBeInTheDocument();
+		expect(screen.queryByText("+ $200.00")).not.toBeInTheDocument();
 	});
 });

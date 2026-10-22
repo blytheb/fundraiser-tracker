@@ -6,7 +6,17 @@ const { prismaMock } = vi.hoisted(() => ({
 			findMany: vi.fn(),
 			findUnique: vi.fn(),
 		},
+		parentPlayerLink: {
+			findUnique: vi.fn(),
+		},
 	},
+}));
+const { requireUserMock } = vi.hoisted(() => ({
+	requireUserMock: vi.fn(),
+}));
+
+vi.mock("@/lib/authorization", () => ({
+	requireUser: requireUserMock,
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -24,6 +34,14 @@ import {
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	requireUserMock.mockResolvedValue({
+		id: "parent-1",
+		role: "PARENT",
+	});
+	prismaMock.parentPlayerLink.findUnique.mockResolvedValue({
+		userId: "parent-1",
+		playerId: "player-1",
+	} as never);
 });
 
 describe("getFundraisers", () => {

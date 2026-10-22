@@ -30,7 +30,7 @@ export async function reviewPlayerAccess(
 		}
 
 		if (request.status !== "PENDING") {
-			throw new Error("This request has alreadu been reviewed.");
+			throw new Error("This request has already been reviewed.");
 		}
 
 		if (decision === "APPROVED") {
@@ -50,14 +50,21 @@ export async function reviewPlayerAccess(
 			});
 		}
 
-		await tx.playerAccessRequest.update({
-			where: { id: request.id },
+		const result = await tx.playerAccessRequest.updateMany({
+			where: {
+				id: request.id,
+				status: "PENDING",
+			},
 			data: {
 				status: decision,
 				reviewedById: admin.id,
 				reviewedAt: new Date(),
 			},
 		});
+
+		if (result.count !== 1) {
+			throw new Error("This request has already been reviewed.");
+		}
 	});
 
 	revalidatePath("/dashboard");

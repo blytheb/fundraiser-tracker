@@ -41,9 +41,8 @@ vi.mock("@/lib/prisma", () => ({
 
 import {
 	publishFundraiser,
-	unpublishFundraiser,
 	completeFundraiser,
-	incompleteFundraiser,
+	reopenFundraiser,
 } from "@/features/fundraisers/actions/fundraiserPublishing";
 
 beforeEach(() => {
@@ -137,53 +136,29 @@ describe("publishFundraiser", () => {
 	});
 });
 
-describe("unpublishFundraiser", () => {
+describe("reopenFundraiser", () => {
 	it("throws an error when the fundraiser does not exist", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue(null);
 
-		await expect(unpublishFundraiser("missing-fundraiser")).rejects.toThrow(
+		await expect(reopenFundraiser("missing-fundraiser")).rejects.toThrow(
 			"Fundraiser not found",
 		);
 
 		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
 	});
-	it("throws an error when the fundraiser is already unpublished", async () => {
+	it("throws an error when the fundraiser is already in draft mode", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			isPublished: false,
+			isCompleted: false,
 		});
 
-		await expect(unpublishFundraiser("fundraiser-1")).rejects.toThrow(
-			"Fundraiser is already unpublished",
+		await expect(reopenFundraiser("fundraiser-1")).rejects.toThrow(
+			"Fundraiser is already in draft mode",
 		);
 
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 
-	it("unpublishes a fundraiser successfully", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			isPublished: true,
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			isPublished: false,
-		});
-
-		const result = await unpublishFundraiser("fundraiser-1");
-
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: { isPublished: false },
-		});
-
-		expect(result).toEqual({ success: true });
-		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
-		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
-		expect(txMock.fundraiserAllocation.aggregate).not.toHaveBeenCalled();
-	});
-	it("unpublishes a completed fundraiser without voiding distributions", async () => {
+	it("reopens a published fundraiser successfully", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
 			isPublished: true,
@@ -193,18 +168,109 @@ describe("unpublishFundraiser", () => {
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
 			isPublished: false,
-			isCompleted: true,
+			isCompleted: false,
 		});
 
-		const result = await unpublishFundraiser("fundraiser-1");
+		const result = await reopenFundraiser("fundraiser-1");
+
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				status: "ACTIVE",
+				type: "DISTRIBUTION",
+			},
+			data: { status: "VOID" },
+		});
 
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
-			data: { isPublished: false },
+			data: { isCompleted: false, isPublished: false },
 		});
 
-		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 		expect(result).toEqual({ success: true });
+	});
+	it("returns a published fundraiser to draft mode", async () => {
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			isCompleted: true,
+		});
+
+		txMock.playerTransaction.updateMany.mockResolvedValue({
+			count: 2,
+		});
+
+		txMock.fundraiser.update.mockResolvedValue({
+			id: "fundraiser-1",
+			isCompleted: false,
+			isPublished: false,
+		});
+
+		const result = await reopenFundraiser("fundraiser-1");
+
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				status: "ACTIVE",
+				type: "DISTRIBUTION",
+			},
+			data: {
+				status: "VOID",
+			},
+		});
+
+		expect(txMock.fundraiserAllocation.updateMany).not.toHaveBeenCalled();
+		expect(txMock.fundraiserAllocation.create).not.toHaveBeenCalled();
+		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1" },
+			data: {
+				isCompleted: false,
+				isPublished: false,
+			},
+		});
+
+		expect(result).toEqual({
+			success: true,
+		});
+	});
+
+	it("returns a published fundraiser to draft mode when no transactions exist", async () => {
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			isCompleted: true,
+		});
+
+		txMock.playerTransaction.updateMany.mockResolvedValue({
+			count: 0,
+		});
+
+		txMock.fundraiser.update.mockResolvedValue({
+			id: "fundraiser-1",
+			isCompleted: false,
+			isPublished: false,
+		});
+
+		const result = await reopenFundraiser("fundraiser-1");
+
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				status: "ACTIVE",
+				type: "DISTRIBUTION",
+			},
+			data: {
+				status: "VOID",
+			},
+		});
+
+		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1" },
+			data: {
+				isCompleted: false,
+				isPublished: false,
+			},
+		});
+
+		expect(result).toEqual({
+			success: true,
+		});
 	});
 });
 
@@ -487,116 +553,5 @@ describe("completeFundraiser", () => {
 		);
 
 		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-});
-
-describe("incompleteFundraiser", () => {
-	it("throws an error when the fundraiser does not exist", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue(null);
-
-		await expect(incompleteFundraiser("missing-fundraiser")).rejects.toThrow(
-			"Fundraiser not found",
-		);
-
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-	it("throws an error when the fundraiser is already in incomplete mode", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
-		});
-
-		await expect(incompleteFundraiser("fundraiser-1")).rejects.toThrow(
-			"Fundraiser is already in draft mode",
-		);
-
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("returns a completed fundraiser to incomplete mode", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
-		});
-
-		txMock.playerTransaction.updateMany.mockResolvedValue({
-			count: 2,
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			isCompleted: false,
-			isPublished: false,
-		});
-
-		const result = await incompleteFundraiser("fundraiser-1");
-
-		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
-			where: {
-				fundraiserId: "fundraiser-1",
-				status: "ACTIVE",
-				type: "DISTRIBUTION",
-			},
-			data: {
-				status: "VOID",
-			},
-		});
-
-		expect(txMock.fundraiserAllocation.updateMany).not.toHaveBeenCalled();
-		expect(txMock.fundraiserAllocation.create).not.toHaveBeenCalled();
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: {
-				isCompleted: false,
-				isPublished: false,
-			},
-		});
-
-		expect(result).toEqual({
-			id: "fundraiser-1",
-			isCompleted: false,
-			isPublished: false,
-		});
-	});
-
-	it("returns a completed fundraiser to incomplete mode when no transactions exist", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
-		});
-
-		txMock.playerTransaction.updateMany.mockResolvedValue({
-			count: 0,
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			isCompleted: false,
-			isPublished: false,
-		});
-
-		const result = await incompleteFundraiser("fundraiser-1");
-
-		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
-			where: {
-				fundraiserId: "fundraiser-1",
-				status: "ACTIVE",
-				type: "DISTRIBUTION",
-			},
-			data: {
-				status: "VOID",
-			},
-		});
-
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: {
-				isCompleted: false,
-				isPublished: false,
-			},
-		});
-
-		expect(result).toEqual({
-			id: "fundraiser-1",
-			isCompleted: false,
-			isPublished: false,
-		});
 	});
 });

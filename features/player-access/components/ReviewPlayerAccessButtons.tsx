@@ -8,7 +8,7 @@ type Props = {
 	requestId: string;
 };
 
-export default function ReviewPlayerAccessvuttons({ requestId }: Props) {
+export default function ReviewPlayerAccessButtons({ requestId }: Props) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);

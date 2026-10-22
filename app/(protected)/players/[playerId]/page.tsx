@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/item";
 import { CircleDollarSign } from "lucide-react";
 import { getPublishedFundraisersByPlayer } from "@/features/fundraisers/data/fundraisers";
+import { notFound } from "next/navigation";
 
 type PlayerPageProps = {
 	params: Promise<{
@@ -25,8 +26,18 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
-	const [player, teams, fundraisers, transactions] = await Promise.all([
-		getPlayerById(playerId),
+	let player;
+
+	try {
+		player = await getPlayerById(playerId);
+	} catch {
+		notFound();
+	}
+
+	if (!player) {
+		notFound();
+	}
+	const [teams, fundraisers, transactions] = await Promise.all([
 		getPlayerTeams(playerId),
 		getPublishedFundraisersByPlayer(playerId),
 		getPlayerTransactions(playerId),

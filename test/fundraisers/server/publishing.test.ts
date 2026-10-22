@@ -103,7 +103,7 @@ describe("publishFundraiser", () => {
 
 	it("publishes a fundraiser with participants", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			isCompleted: true,
 			isPublished: false,
 			participants: [{ id: "participant-1" }],
 		});
@@ -121,6 +121,19 @@ describe("publishFundraiser", () => {
 		});
 
 		expect(result).toEqual({ success: true });
+	});
+	it("throws an error when the fundraiser is incomplete", async () => {
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			isCompleted: false,
+			isPublished: false,
+			participants: [{ id: "participant-1" }],
+		});
+
+		await expect(publishFundraiser("fundraiser-1")).rejects.toThrow(
+			"A fundraiser must be completed before it can be published",
+		);
+
+		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 });
 

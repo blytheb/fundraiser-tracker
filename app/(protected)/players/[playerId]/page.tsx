@@ -13,7 +13,6 @@ import {
 	getPlayerTransactions,
 } from "@/features/players/data/players";
 import { getPlayerTeams } from "@/features/players/data/playerTeams";
-import { getPublishedFundraisersByPlayer } from "@/features/fundraisers/data/fundraisers";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import PlayerTransactionForm from "@/features/players/components/PlayerTransactionForm";
@@ -54,9 +53,8 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 
 	if (!player) notFound();
 
-	const [teams, fundraisers, transactions] = await Promise.all([
+	const [teams, transactions] = await Promise.all([
 		getPlayerTeams(playerId),
-		getPublishedFundraisersByPlayer(playerId),
 		getPlayerTransactions(playerId),
 	]);
 

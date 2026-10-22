@@ -113,10 +113,25 @@ export async function getPlayerFinancialSummary(playerId: string) {
 		throw new Error("Player not found");
 	}
 	const transactions = await prisma.playerTransaction.findMany({
-		where: { playerId, status: "ACTIVE" },
-		select: {
-			amount: true,
-			type: true,
+		where: {
+			playerId,
+			status: "ACTIVE",
+			OR: [
+				{
+					type: {
+						not: "DISTRIBUTION",
+					},
+				},
+				{
+					type: "DISTRIBUTION",
+					fundraiser: {
+						is: {
+							isCompleted: true,
+							isPublished: true,
+						},
+					},
+				},
+			],
 		},
 	});
 

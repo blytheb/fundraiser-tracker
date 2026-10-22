@@ -5,12 +5,10 @@ import { render, screen, cleanup } from "@testing-library/react";
 
 import PlayerPage from "@/app/(protected)/players/[playerId]/page";
 
-const { getPlayerByIdMock, getPlayerTeamsMock, getPublishedFundraisersMock } =
-	vi.hoisted(() => ({
-		getPlayerByIdMock: vi.fn(),
-		getPlayerTeamsMock: vi.fn(),
-		getPublishedFundraisersMock: vi.fn(),
-	}));
+const { getPlayerByIdMock, getPlayerTeamsMock } = vi.hoisted(() => ({
+	getPlayerByIdMock: vi.fn(),
+	getPlayerTeamsMock: vi.fn(),
+}));
 
 vi.mock("@/features/players/data/players", () => ({
 	getPlayerById: getPlayerByIdMock,
@@ -21,11 +19,31 @@ vi.mock("@/features/players/data/playerTeams", () => ({
 	getPlayerTeams: getPlayerTeamsMock,
 }));
 
-vi.mock("@/features/fundraisers/data/fundraisers", () => ({
-	getFundraisers: vi.fn(),
-	getPublishedFundraisersByPlayer: getPublishedFundraisersMock,
+vi.mock("next/headers", () => ({
+	headers: vi.fn().mockResolvedValue(new Headers()),
 }));
 
+vi.mock("@/lib/auth", () => ({
+	auth: {
+		api: {
+			getSession: vi.fn().mockResolvedValue({
+				user: {
+					id: "admin-1",
+					role: "ADMIN",
+				},
+			}),
+		},
+	},
+}));
+
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({
+		refresh: vi.fn(),
+		push: vi.fn(),
+		replace: vi.fn(),
+		back: vi.fn(),
+	}),
+}));
 vi.mock("@/features/players/PlayerHeader", () => ({
 	default: () => <div>Player Header</div>,
 }));
@@ -44,25 +62,6 @@ beforeEach(() => {
 	});
 
 	getPlayerTeamsMock.mockResolvedValue([]);
-
-	getPublishedFundraisersMock.mockResolvedValue([
-		{
-			id: "fundraiser-1",
-			name: "Travel Fundraiser",
-			startDate: new Date("2026-01-01T12:00:00Z"),
-			isCompleted: false,
-			isPublished: false,
-			transactions: [
-				{
-					id: "transaction-1",
-					amount: "100.00",
-					type: "DISTRIBUTION",
-					status: "ACTIVE",
-					date: new Date("2026-01-01T12:00:00Z"),
-				},
-			],
-		},
-	]);
 });
 
 afterEach(() => {
@@ -70,84 +69,27 @@ afterEach(() => {
 });
 
 describe("PlayerPage", () => {
-	it("shows TBA for a published fundraiser that is not completed", async () => {
+	it("renders the player page when there are no transactions", async () => {
 		const page = await PlayerPage({
 			params: Promise.resolve({ playerId: "player-1" }),
 		});
 
 		render(page);
 
-		expect(screen.getByText("Travel Fundraiser")).toBeInTheDocument();
-		expect(screen.getByText("TBA")).toBeInTheDocument();
-		expect(screen.queryByText("+ 100.00")).not.toBeInTheDocument();
-	});
-
-	it("shows the distribution transaction total for a completed fundraiser", async () => {
-		getPublishedFundraisersMock.mockResolvedValue([
-			{
-				id: "fundraiser-1",
-				name: "Travel Fundraiser",
-				startDate: new Date("2026-01-01T12:00:00Z"),
-				isCompleted: true,
-				isPublished: false,
-
-				transactions: [
-					{
-						id: "transaction-1",
-						amount: "75.00",
-						type: "DISTRIBUTION",
-						status: "ACTIVE",
-						date: new Date("2026-01-01T12:00:00Z"),
-					},
-					{
-						id: "transaction-2",
-						amount: "25.00",
-						type: "DISTRIBUTION",
-						status: "ACTIVE",
-						date: new Date("2026-01-01T12:00:00Z"),
-					},
-				],
-			},
-		]);
-
-		const page = await PlayerPage({
-			params: Promise.resolve({ playerId: "player-1" }),
-		});
-
-		render(page);
-
-		expect(screen.getByText("+ $100.00")).toBeInTheDocument();
+		expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+		expect(screen.getByText("No transactions yet")).toBeInTheDocument();
 		expect(screen.queryByText("TBA")).not.toBeInTheDocument();
 	});
 
-	it("displays completed and incomplete fundraisers independently", async () => {
-		getPublishedFundraisersMock.mockResolvedValue([
-			{
-				id: "fundraiser-1",
-				name: "Completed Fundraiser",
-				startDate: new Date("2026-01-01T12:00:00Z"),
-				isCompleted: true,
-				transactions: [{ id: "transaction-1", amount: "150.00" }],
-			},
-			{
-				id: "fundraiser-2",
-				name: "Upcoming Fundraiser",
-				startDate: new Date("2026-02-01T12:00:00Z"),
-				isCompleted: false,
-				transactions: [{ id: "transaction-2", amount: "200.00" }],
-			},
-		]);
-
+	it("does not display fundraiser placeholders or amounts from fundraiser data alone", async () => {
 		const page = await PlayerPage({
 			params: Promise.resolve({ playerId: "player-1" }),
 		});
 
 		render(page);
 
-		expect(screen.getByText("Completed Fundraiser")).toBeInTheDocument();
-		expect(screen.getByText("+ $150.00")).toBeInTheDocument();
-		expect(screen.getByText("Upcoming Fundraiser")).toBeInTheDocument();
-		expect(screen.getByText("TBA")).toBeInTheDocument();
-		expect(screen.queryByText("+ $200.00")).not.toBeInTheDocument();
+		expect(screen.queryByText("Travel Fundraiser")).not.toBeInTheDocument();
+		expect(screen.queryByText("TBA")).not.toBeInTheDocument();
+		expect(screen.getByText("No transactions yet")).toBeInTheDocument();
 	});
 });

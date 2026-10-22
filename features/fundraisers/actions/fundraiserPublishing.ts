@@ -10,6 +10,7 @@ export async function publishFundraiser(fundraiserId: string) {
 				id: fundraiserId,
 			},
 			select: {
+				isCompleted: true,
 				isPublished: true,
 				participants: true,
 			},
@@ -21,6 +22,11 @@ export async function publishFundraiser(fundraiserId: string) {
 
 		if (fundraiser.isPublished) {
 			throw new Error("Fundraiser is already published");
+		}
+		if (!fundraiser.isCompleted) {
+			throw new Error(
+				"A fundraiser must be completed before it can be published",
+			);
 		}
 
 		if (fundraiser.participants.length === 0) {

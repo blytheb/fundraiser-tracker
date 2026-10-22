@@ -143,10 +143,27 @@ export async function getPlayerTransactions(playerId: string) {
 			throw new Error("You do not have access to this player's finances");
 		}
 	}
+
 	return prisma.playerTransaction.findMany({
 		where: {
 			playerId,
 			status: "ACTIVE",
+			OR: [
+				{
+					type: {
+						not: "DISTRIBUTION",
+					},
+				},
+				{
+					type: "DISTRIBUTION",
+					fundraiser: {
+						is: {
+							isCompleted: true,
+							isPublished: true,
+						},
+					},
+				},
+			],
 		},
 		orderBy: {
 			date: "desc",

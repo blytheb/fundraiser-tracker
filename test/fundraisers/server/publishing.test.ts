@@ -555,3 +555,39 @@ describe("completeFundraiser", () => {
 		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 });
+
+it("reopens a completed but unpublished fundraiser", async () => {
+	txMock.fundraiser.findUnique.mockResolvedValue({
+		id: "fundraiser-1",
+		isCompleted: true,
+		isPublished: false,
+	});
+
+	txMock.playerTransaction.updateMany.mockResolvedValue({
+		count: 2,
+	});
+
+	txMock.fundraiser.update.mockResolvedValue({
+		id: "fundraiser-1",
+		isCompleted: false,
+		isPublished: false,
+	});
+
+	const result = await reopenFundraiser("fundraiser-1");
+
+	expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+		where: {
+			fundraiserId: "fundraiser-1",
+			status: "ACTIVE",
+			type: "DISTRIBUTION",
+		},
+		data: { status: "VOID" },
+	});
+
+	expect(txMock.fundraiser.update).toHaveBeenCalledWith({
+		where: { id: "fundraiser-1" },
+		data: { isCompleted: false, isPublished: false },
+	});
+
+	expect(result).toEqual({ success: true });
+});

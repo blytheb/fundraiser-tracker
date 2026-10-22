@@ -12,6 +12,11 @@ export default async function MyPlayersPage() {
 					View the players connected to your parent account.
 				</p>
 			</header>
+			<Link
+				href="/request-player-access"
+				className="mt-4 inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+				Request player access
+			</Link>
 
 			{links.length === 0 ? (
 				<div className="mt-8 rounded-xl border p-6">
@@ -21,7 +26,7 @@ export default async function MyPlayersPage() {
 						appear here.
 					</p>
 					<Link
-						href="/request-player-access-test"
+						href="/request-player-access"
 						className="mt-4 inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
 						Request player access
 					</Link>

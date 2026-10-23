@@ -1,3 +1,7 @@
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
 import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
 
 import PageHeader from "@/components/ui-reusable/PageHeader";
@@ -12,17 +16,29 @@ type PageProps = {
 };
 
 export default async function AllFundraisersPage({ searchParams }: PageProps) {
-	const { search } = await searchParams;
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
 
+	if (!session?.user) {
+		redirect("/");
+	}
+
+	if (session.user.role !== "ADMIN") {
+		redirect("/my-players");
+	}
+
+	const { search } = await searchParams;
 	const fundraisers = await getFundraisers(search);
+
 	return (
-		<div className="space-y-4 px-4">
+		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:py-10">
 			<PageHeader heading="Fundraiser" />
 			<div className="flex gap-4">
 				<SearchBar placeholder="Search Fundraisers" />
 				<AddFundraiserDialog />
 			</div>
 			<FundraiserList fundraisers={fundraisers} />
-		</div>
+		</main>
 	);
 }

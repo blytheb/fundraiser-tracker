@@ -1,9 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import type { Team, Player } from "@prisma/client";
 import type { TeamWithPlayers } from "../types";
+import { requireAdmin } from "@/lib/authorization";
 
-export async function getTeams(): Promise<Team[]> {
+export async function getTeams(search?: string): Promise<Team[]> {
+	await requireAdmin();
+
 	return prisma.team.findMany({
+		where: search
+			? {
+					name: {
+						contains: search,
+						mode: "insensitive",
+					},
+				}
+			: undefined,
+
 		orderBy: {
 			name: "asc",
 		},

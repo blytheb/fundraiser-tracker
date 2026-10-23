@@ -3,36 +3,43 @@
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type SearchBarProps = {
 	placeholder?: string;
+	paramName?: string;
 };
 
 export default function SearchBar({
 	placeholder = "Search...",
+	paramName = "search",
 }: SearchBarProps) {
 	const router = useRouter();
 	const pathname = usePathname();
+	const searchParams = useSearchParams();
 
+	const queryValue = searchParams.get(paramName) ?? "";
 	const [value, setValue] = useState("");
 
 	useEffect(() => {
-		const timeout = setTimeout(() => {
-			const params = new URLSearchParams();
+		if (value === queryValue) return;
 
-			if (value) {
-				params.set("search", value);
+		const timeout = setTimeout(() => {
+			const params = new URLSearchParams(searchParams.toString());
+
+			if (value.trim()) {
+				params.set(paramName, value.trim());
+			} else {
+				params.delete(paramName);
 			}
 
 			const query = params.toString();
-
 			router.replace(query ? `${pathname}?${query}` : pathname);
 		}, 300);
 
 		return () => clearTimeout(timeout);
-	}, [value, pathname, router]);
+	}, [value, queryValue, paramName, pathname, router, searchParams]);
 
 	function clearSearch() {
 		setValue("");
@@ -50,6 +57,7 @@ export default function SearchBar({
 				onChange={(event) => setValue(event.target.value)}
 				placeholder={placeholder}
 				className="pl-9 pr-9"
+				aria-label={placeholder}
 			/>
 
 			{value && (

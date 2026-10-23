@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { createTeam } from "@/features/teams/actions/teams";
 
 import { CirclePlus } from "lucide-react";
+import { Plus } from "lucide-react";
+
 import {
 	Dialog,
 	DialogContent,
@@ -40,15 +42,13 @@ export default function AddTeamDialog() {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger>
-				<Card className="flex h-[250px] min-h-full w-full cursor-pointer items-center justify-center overflow-hidden">
-					<CardContent className="flex flex-col items-center gap-2">
-						<CirclePlus className="h-10 w-10" />
-
-						<CardTitle>Add a Team</CardTitle>
-					</CardContent>
-				</Card>
-			</DialogTrigger>
+			<DialogTrigger
+				render={
+					<Button>
+						<Plus />
+						Create New Team
+					</Button>
+				}></DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Create a New Team</DialogTitle>

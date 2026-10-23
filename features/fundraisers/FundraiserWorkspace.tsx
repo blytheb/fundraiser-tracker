@@ -191,7 +191,7 @@ export default function FundraiserWorkspace({
 				</CardContent>
 			</Card>
 
-			{/* Financial summary */}
+			{/* Finanncial summary */}
 			<section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 				<Card>
 					<CardContent className="p-5">

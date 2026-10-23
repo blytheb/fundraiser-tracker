@@ -40,20 +40,16 @@ export default function FundraiserHeader({
 				<CardContent className="p-5">
 					<div className="flex items-start justify-between gap-4">
 						<div className="space-y-4">
-							{/* In progress = !isComplete & !isPublished
-							published but incomplete = !isComplete & isPublished
-							completed but unpublished= isComplete & !isPublished
-							completed and published = isComplete & isPublished */}
-							{fundraiser.isCompleted ? (
-								<Badge variant="secondary">Completed</Badge>
-							) : (
+							{!fundraiser.isCompleted && !fundraiser.isPublished && (
 								<Badge variant="secondary">Draft</Badge>
 							)}
-							{fundraiser.isPublished ? (
-								<Badge>PUBLISHED</Badge>
-							) : (
-								<Badge>NOT PUBLISHED</Badge>
+							{fundraiser.isCompleted && !fundraiser.isPublished && (
+								<Badge variant="secondary">Completed</Badge>
 							)}
+							{fundraiser.isCompleted && fundraiser.isPublished && (
+								<Badge variant="secondary">Published</Badge>
+							)}
+
 							<PageHeader
 								heading={fundraiser.name}
 								subheading={fundraiser.description}

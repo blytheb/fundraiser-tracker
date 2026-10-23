@@ -13,9 +13,8 @@ import { MoreVertical } from "lucide-react";
 
 import {
 	publishFundraiser,
-	unpublishFundraiser,
 	completeFundraiser,
-	incompleteFundraiser,
+	reopenFundraiser,
 } from "@/features/fundraisers/actions/fundraiserPublishing";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
 import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
@@ -35,13 +34,8 @@ export default function FundraiserActions({
 
 	async function handleComplete() {
 		try {
-			if (fundraiser.isCompleted) {
-				await incompleteFundraiser(fundraiser.id);
-				router.refresh();
-			} else {
-				await completeFundraiser(fundraiser.id);
-				router.refresh();
-			}
+			await completeFundraiser(fundraiser.id);
+			router.refresh();
 		} catch (error) {
 			console.error(error);
 		}
@@ -49,13 +43,17 @@ export default function FundraiserActions({
 
 	async function handlePublish() {
 		try {
-			if (fundraiser.isPublished) {
-				await unpublishFundraiser(fundraiser.id);
-				router.refresh();
-			} else {
-				await publishFundraiser(fundraiser.id);
-				router.refresh();
-			}
+			await publishFundraiser(fundraiser.id);
+			router.refresh();
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	async function handleReopen() {
+		try {
+			await reopenFundraiser(fundraiser.id);
+			router.refresh();
 		} catch (error) {
 			console.error(error);
 		}
@@ -70,23 +68,22 @@ export default function FundraiserActions({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
-						{fundraiser.isCompleted ? (
+						{!fundraiser.isCompleted ? (
 							<DropdownMenuItem onClick={handleComplete}>
-								Make InComplete
+								Complete Fundraiser
 							</DropdownMenuItem>
 						) : (
-							<DropdownMenuItem onClick={handleComplete}>
-								Make Complete
-							</DropdownMenuItem>
-						)}
-						{fundraiser.isPublished ? (
-							<DropdownMenuItem onClick={handlePublish}>
-								Make Private
-							</DropdownMenuItem>
-						) : (
-							<DropdownMenuItem onClick={handlePublish}>
-								Make Public
-							</DropdownMenuItem>
+							<>
+								{!fundraiser.isPublished && (
+									<DropdownMenuItem onClick={handlePublish}>
+										Publish Fundraiser
+									</DropdownMenuItem>
+								)}
+
+								<DropdownMenuItem onClick={handleReopen}>
+									Reopen to Draft
+								</DropdownMenuItem>
+							</>
 						)}
 
 						<DropdownMenuItem

@@ -11,9 +11,7 @@ import {
 	getActiveTeams,
 } from "@/features/teams/data/teams";
 
-import FundraiserHeader from "@/features/fundraisers/FundraiserHeader";
-import MoneyBreakdownSection from "@/features/fundraisers/MoneyBreakdownSection";
-import DistributionSection from "@/features/fundraisers/DistributionSection";
+import FundraiserWorkspace from "@/features/fundraisers/FundraiserWorkspace";
 
 type PageProps = {
 	params: Promise<{
@@ -48,35 +46,15 @@ export default async function FundraiserPage({ params }: PageProps) {
 	}
 
 	return (
-		<main className="mx-auto w-full max-w-2xl space-y-4 p-4 sm:px-6">
-			{/* Summary Card */}
-			<FundraiserHeader
-				fundraiser={fundraiser}
-				financialSummary={financialSummary}
-				fundraiserTeams={teams}
-				participants={participants}
-			/>
-
-			{/* Money Breakdown */}
-			<MoneyBreakdownSection
-				fundraiserId={fundraiser.id}
-				isCompleted={fundraiser.isCompleted}
-				isPublished={fundraiser.isPublished}
-				totalRaised={financialSummary.totalRaised}
-				funds={contributions}
-			/>
-
-			{/* Participant Distribution */}
-			<DistributionSection
-				fundraiserId={fundraiser.id}
-				isCompleted={fundraiser.isCompleted}
-				selectedTeamIds={teams.map((team) => team.id)}
-				participants={participants}
-				activeTeams={activeTeams}
-				activeRosters={activeTeamsWithPlayers}
-				financialSummary={financialSummary}
-				activeAllocations={activeAllocations}
-			/>
-		</main>
+		<FundraiserWorkspace
+			fundraiser={fundraiser}
+			teams={teams}
+			participants={participants}
+			contributions={contributions}
+			financialSummary={financialSummary}
+			activeAllocations={activeAllocations}
+			activeTeams={activeTeams}
+			activeTeamsWithPlayers={activeTeamsWithPlayers}
+		/>
 	);
 }

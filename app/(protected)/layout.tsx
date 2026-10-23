@@ -1,4 +1,4 @@
-import Navbar from "@/components/ui-reusable/Navbar";
+import Navbar from "@/components/reusable/Navbar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";

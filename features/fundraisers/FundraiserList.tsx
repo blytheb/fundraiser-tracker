@@ -1,6 +1,6 @@
 import React from "react";
 import { ItemGroup } from "@/components/ui/item";
-import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
+import FundraiserListItem from "@/components/reusable/FundraiserListItem";
 
 import type { Fundraiser } from "@prisma/client";
 
@@ -18,7 +18,7 @@ export default function FundraiserList({ fundraisers }: ListProps) {
 				<div className="space-y-4">
 					<ItemGroup>
 						{fundraisers.map((fundraiser) => (
-							<ListItemWithIcon key={fundraiser.id} fundraiser={fundraiser} />
+							<FundraiserListItem key={fundraiser.id} fundraiser={fundraiser} />
 						))}
 					</ItemGroup>
 				</div>

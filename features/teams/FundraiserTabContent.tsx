@@ -1,9 +1,4 @@
-import React from "react";
-import Link from "next/link";
-
 import AddFundraiserToTeamDialog from "@/components/forms/teams/AddFundraiserToTeamDialog";
-import ListItemWithIcon from "@/components/ui-reusable/ListItemWithIcon";
-import TeamFundraiserActions from "@/features/teams/TeamFundraiserActions";
 import TeamFundraiserList from "@/features/teams/TeamFundraiserList";
 
 import type { Fundraiser } from "@prisma/client";
@@ -20,13 +15,13 @@ export default function FundraiserTabContent({
 	availableFundraisers,
 }: TabProps) {
 	return (
-		<>
-			<div className="mb-3 flex items-center justify-between">
-				<div>
+		<section className="space-y-4">
+			<div className="flex items-center justify-between gap-3">
+				<div className="min-w-0">
 					<h2 className="font-semibold">Fundraisers</h2>
-
 					<p className="text-sm text-muted-foreground">
-						{fundraisers.length} fundraisers
+						{fundraisers.length}{" "}
+						{fundraisers.length === 1 ? "fundraiser" : "fundraisers"}
 					</p>
 				</div>
 
@@ -37,6 +32,6 @@ export default function FundraiserTabContent({
 			</div>
 
 			<TeamFundraiserList fundraisers={fundraisers} teamId={teamId} />
-		</>
+		</section>
 	);
 }

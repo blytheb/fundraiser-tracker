@@ -19,7 +19,7 @@ import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 import ContributionActions from "@/features/fundraisers/ContributionActions";
 import AddContribution from "@/components/forms/fundraisers/AddContribution";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
-import PlayerAvatar from "@/components/ui-reusable/PlayerAvatar";
+import PlayerAvatar from "@/components/reusable/PlayerAvatar";
 
 import { setCustomDistribution } from "@/features/fundraisers/actions/fundraiserAllocation";
 import type {

@@ -1,5 +1,5 @@
 import React from "react";
-import ListItemWithAvatar from "@/components/ui-reusable/ListItemWithAvatar";
+import PlayerListItem from "@/components/reusable/PlayerListItem";
 import PlayerActions from "@/features/players/PlayerActions";
 
 import { ItemGroup } from "@/components/ui/item";
@@ -21,11 +21,7 @@ export default function PlayerList({ players }: ListProps) {
 				<div className="space-y-4">
 					<ItemGroup>
 						{players.map((player) => (
-							<ListItemWithAvatar
-								key={player.id}
-								player={player}
-								action={<PlayerActions player={player} />}
-							/>
+							<PlayerListItem key={player.id} player={player} />
 						))}
 					</ItemGroup>
 				</div>

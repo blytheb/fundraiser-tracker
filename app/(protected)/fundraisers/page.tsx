@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 
 import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
 
-import PageHeader from "@/components/ui-reusable/PageHeader";
-import SearchBar from "@/components/ui-reusable/SearchBar";
+import PageHeader from "@/components/reusable/PageHeader";
+import SearchBar from "@/components/reusable/SearchBar";
 import AddFundraiserDialog from "@/components/forms/fundraisers/AddFundraiserDialog";
 import FundraiserList from "@/features/fundraisers/FundraiserList";
 

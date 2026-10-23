@@ -2,8 +2,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import PageHeader from "@/components/ui-reusable/PageHeader";
-import SearchBar from "@/components/ui-reusable/SearchBar";
+import PageHeader from "@/components/reusable/PageHeader";
+import SearchBar from "@/components/reusable/SearchBar";
 import AddPlayerDialog from "@/components/forms/players/AddPlayerDialog";
 import PlayerList from "@/features/players/PlayerList";
 import { getPlayers } from "@/features/players/data/players";

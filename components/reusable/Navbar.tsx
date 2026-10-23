@@ -1,13 +1,11 @@
 import React from "react";
 import {
 	NavigationMenu,
-	NavigationMenuContent,
 	NavigationMenuItem,
 	NavigationMenuLink,
 	NavigationMenuList,
-	NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import LogoutButton from "@/components/ui-reusable/logout-button";
+import LogoutButton from "@/components/auth/logout-button";
 
 import Link from "next/link";
 

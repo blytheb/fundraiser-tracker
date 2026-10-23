@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import PageHeader from "@/components/ui-reusable/PageHeader";
+import PageHeader from "@/components/reusable/PageHeader";
 
-import PlayerAvatar from "@/components/ui-reusable/PlayerAvatar";
+import PlayerAvatar from "@/components/reusable/PlayerAvatar";
 import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 

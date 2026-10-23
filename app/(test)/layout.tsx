@@ -1,4 +1,4 @@
-import Navbar from "@/components/ui-reusable/Navbar";
+import Navbar from "@/components/reusable/Navbar";
 
 export default async function TestLayout({
 	children,

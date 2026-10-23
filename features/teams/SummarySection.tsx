@@ -1,5 +1,4 @@
-import React from "react";
-import SummaryBlock from "@/components/ui-reusable/SummaryBlock";
+import SummaryBlock from "@/components/reusable/SummaryBlock";
 
 type SectionProps = {
 	playerCount: number;
@@ -11,10 +10,14 @@ export default function SummarySection({
 	fundraiserCount,
 }: SectionProps) {
 	return (
-		<div className="mb-6 grid grid-cols-2 gap-2 sm:gap-4">
-			<SummaryBlock title="Players" value={playerCount} label="Total" />
-			<SummaryBlock title="Fundraiser" value={fundraiserCount} label="Active" />
-			{/* <SummaryBlock title="Trips" value={1} label="Upcoming" /> */}
-		</div>
+		<section aria-label="Team overview" className="grid grid-cols-2 gap-3">
+			<SummaryBlock title="Players" value={playerCount} label="On roster" />
+
+			<SummaryBlock
+				title="Fundraisers"
+				value={fundraiserCount}
+				label="Assigned to team"
+			/>
+		</section>
 	);
 }

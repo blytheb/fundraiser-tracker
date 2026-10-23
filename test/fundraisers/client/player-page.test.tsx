@@ -48,7 +48,7 @@ vi.mock("@/features/players/PlayerHeader", () => ({
 	default: () => <div>Player Header</div>,
 }));
 
-vi.mock("@/components/ui-reusable/SummaryBlock", () => ({
+vi.mock("@/components/reusable/SummaryBlock", () => ({
 	default: () => <div>Summary Block</div>,
 }));
 

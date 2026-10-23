@@ -1,4 +1,4 @@
-import React from "react";
+import { notFound } from "next/navigation";
 
 import TeamHeader from "@/features/teams/TeamHeader";
 import SummarySection from "@/features/teams/SummarySection";
@@ -22,6 +22,7 @@ type TeamPageProps = {
 
 export default async function TeamPage({ params }: TeamPageProps) {
 	const { teamId } = await params;
+
 	const [team, players, fundraisers, availablePlayers, availableFundraisers] =
 		await Promise.all([
 			getTeamById(teamId),
@@ -32,19 +33,18 @@ export default async function TeamPage({ params }: TeamPageProps) {
 		]);
 
 	if (!team) {
-		return <div>Team Not Found</div>;
+		notFound();
 	}
 
 	return (
-		<main className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
-			{/* Header */}
+		<main className="mx-auto w-full max-w-5xl space-y-5 px-4 py-5 sm:px-6 sm:py-6">
 			<TeamHeader team={team} playerCount={players.length} />
-			{/* Summary */}
+
 			<SummarySection
 				playerCount={players.length}
 				fundraiserCount={fundraisers.length}
 			/>
-			{/* Tabs */}
+
 			<TabSection
 				teamId={team.id}
 				players={players}

@@ -2,10 +2,10 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import PageHeader from "@/components/ui-reusable/PageHeader";
+import PageHeader from "@/components/reusable/PageHeader";
 import TeamList from "@/features/teams/TeamList";
 import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
-import SearchBar from "@/components/ui-reusable/SearchBar";
+import SearchBar from "@/components/reusable/SearchBar";
 
 import { getTeams } from "@/features/teams/data/teams";
 

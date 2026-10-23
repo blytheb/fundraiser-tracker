@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import PublicNavbar from "@/components/ui-reusable/PublicNavbar";
+import PublicNavbar from "@/components/reusable/PublicNavbar";
 
 export const metadata: Metadata = {
 	title: "Fundraiser Tracker",

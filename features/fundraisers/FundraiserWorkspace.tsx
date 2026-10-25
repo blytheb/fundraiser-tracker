@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Fundraiser, Team, AllocationStatus } from "@prisma/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,6 @@ import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 import ContributionActions from "@/features/fundraisers/ContributionActions";
 import AddContribution from "@/components/forms/fundraisers/AddContribution";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
-import PlayerAvatar from "@/components/reusable/PlayerAvatar";
 
 import { setCustomDistribution } from "@/features/fundraisers/actions/fundraiserAllocation";
 import type {
@@ -170,10 +170,19 @@ export default function FundraiserWorkspace({
 
 							<div className="flex flex-wrap items-center gap-2">
 								{participants.slice(0, 6).map((participant) => (
-									<PlayerAvatar
-										key={participant.id}
-										player={participant.player}
-									/>
+									<Avatar key={participant.id} className="size-10">
+										<AvatarImage
+											src={
+												participant.player.imageUrl ??
+												`https://robohash.org/${participant.player.id}?set=set2`
+											}
+											alt={`${participant.player.firstName} ${participant.player.lastName}`}
+										/>
+										<AvatarFallback>
+											{participant.player.firstName[0].toUpperCase()}
+											{participant.player.lastName[0].toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
 								))}
 								{participants.length > 6 && (
 									<span className="text-sm text-muted-foreground">
@@ -347,7 +356,19 @@ export default function FundraiserWorkspace({
 							key={participant.id}
 							className="grid grid-cols-[1fr_120px] items-center gap-3 rounded-lg p-2 hover:bg-muted/50">
 							<div className="flex min-w-0 items-center gap-3">
-								<PlayerAvatar player={participant.player} />
+								<Avatar className="size-10">
+									<AvatarImage
+										src={
+											participant.player.imageUrl ??
+											`https://robohash.org/${participant.player.id}?set=set2`
+										}
+										alt={`${participant.player.firstName} ${participant.player.lastName}`}
+									/>
+									<AvatarFallback>
+										{participant.player.firstName[0].toUpperCase()}
+										{participant.player.lastName[0].toUpperCase()}
+									</AvatarFallback>
+								</Avatar>
 								<p className="truncate font-medium">
 									{participant.player.firstName} {participant.player.lastName}
 								</p>

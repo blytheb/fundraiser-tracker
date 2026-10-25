@@ -1,5 +1,5 @@
 import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
-import PlayerListItem from "@/components/reusable/PlayerListItem";
+import PlayerListItem from "@/features/players/PlayerListItem";
 import { ItemGroup } from "@/components/ui/item";
 import type { Player } from "@prisma/client";
 

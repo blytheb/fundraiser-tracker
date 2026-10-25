@@ -1,5 +1,5 @@
 import React from "react";
-import PlayerListItem from "@/components/reusable/PlayerListItem";
+import PlayerListItem from "@/features/players//PlayerListItem";
 import PlayerActions from "@/features/players/PlayerActions";
 
 import { ItemGroup } from "@/components/ui/item";

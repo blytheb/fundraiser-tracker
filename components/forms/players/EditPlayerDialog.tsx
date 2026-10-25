@@ -14,10 +14,9 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 import type { Player } from "@prisma/client";
+import PlayerForm from "@/components/forms/players/PlayerForm";
 
 type EditPlayerDialogProps = {
 	player: Player;
@@ -62,24 +61,12 @@ export default function EditPlayerDialog({
 					<DialogTitle>Edit this Player</DialogTitle>
 				</DialogHeader>
 
-				<div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="firstName">Player First Name</Label>
-						<Input
-							id="firstName"
-							value={firstName}
-							onChange={(e) => setFirstName(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="lastName">Player Last Name</Label>
-						<Input
-							id="lastName"
-							value={lastName}
-							onChange={(e) => setLastName(e.target.value)}
-						/>
-					</div>
-				</div>
+				<PlayerForm
+					firstName={firstName}
+					lastName={lastName}
+					onFirstNameChange={setFirstName}
+					onLastNameChange={setLastName}
+				/>
 
 				<DialogFooter>
 					<Button onClick={handleEdit}>Save Changes</Button>

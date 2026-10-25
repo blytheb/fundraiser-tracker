@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/authorization";
-import ReviewPlayerAccessButtons from "@/features/player-access/components/ReviewPlayerAccessButtons";
+import ReviewPlayerAccessButtons from "@/components/forms/player-access/ReviewPlayerAccessButtons";
 import { getPendingPlayerAccessRequests } from "@/features/player-access/data/get-pending-player-access-requests";
 
 export default async function AdminPage() {

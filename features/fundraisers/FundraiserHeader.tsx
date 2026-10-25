@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import PageHeader from "@/components/reusable/PageHeader";
 
-import PlayerAvatar from "@/components/reusable/PlayerAvatar";
 import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 
@@ -66,28 +65,63 @@ export default function FundraiserHeader({
 					</div>
 					{participants.length > 3 ? (
 						<AvatarGroup>
-							<PlayerAvatar
-								key={participants[0].id}
-								player={participants[0].player}
-							/>
-							<PlayerAvatar
-								key={participants[1].id}
-								player={participants[1].player}
-							/>
-							<PlayerAvatar
-								key={participants[2].id}
-								player={participants[2].player}
-							/>
-
-							<AvatarGroupCount>+{participants.length - 3}</AvatarGroupCount>
+							<Avatar className="size-10">
+								<AvatarImage
+									src={
+										participants[0].player.imageUrl ??
+										`https://robohash.org/${participants[0].player.id}?set=set2`
+									}
+									alt={`${participants[0].player.firstName} ${participants[0].player.lastName}`}
+								/>
+								<AvatarFallback>
+									{participants[0].player.firstName[0].toUpperCase()}
+									{participants[0].player.lastName[0].toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
+							<Avatar className="size-10">
+								<AvatarImage
+									src={
+										participants[1].player.imageUrl ??
+										`https://robohash.org/${participants[1].player.id}?set=set2`
+									}
+									alt={`${participants[1].player.firstName} ${participants[1].player.lastName}`}
+								/>
+								<AvatarFallback>
+									{participants[1].player.firstName[1].toUpperCase()}
+									{participants[1].player.lastName[1].toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
+							<Avatar className="size-10">
+								<AvatarImage
+									src={
+										participants[2].player.imageUrl ??
+										`https://robohash.org/${participants[2].player.id}?set=set2`
+									}
+									alt={`${participants[2].player.firstName} ${participants[2].player.lastName}`}
+								/>
+								<AvatarFallback>
+									{participants[2].player.firstName[2].toUpperCase()}
+									{participants[2].player.lastName[2].toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
+							x<AvatarGroupCount>+{participants.length - 3}</AvatarGroupCount>
 						</AvatarGroup>
 					) : (
 						<div className="flex">
 							{participants.map((participant) => (
-								<PlayerAvatar
-									key={participant.player.id}
-									player={participant.player}
-								/>
+								<Avatar className="size-10" key={participant.player.id}>
+									<AvatarImage
+										src={
+											participant.player.imageUrl ??
+											`https://robohash.org/${participant.player.id}?set=set2`
+										}
+										alt={`${participant.player.firstName} ${participant.player.lastName}`}
+									/>
+									<AvatarFallback>
+										{participant.player.firstName[0].toUpperCase()}
+										{participant.player.lastName[0].toUpperCase()}
+									</AvatarFallback>
+								</Avatar>
 							))}
 						</div>
 					)}

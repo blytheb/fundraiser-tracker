@@ -1,6 +1,6 @@
 import React from "react";
 import { ItemGroup } from "@/components/ui/item";
-import FundraiserListItem from "@/components/reusable/FundraiserListItem";
+import FundraiserListItem from "@/features/fundraisers/FundraiserListItem";
 
 import type { Fundraiser } from "@prisma/client";
 

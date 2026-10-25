@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/authorization";
-import { PlayerAccessRequestForm } from "@/features/player-access/components/PlayerAccessRequestForm";
+import { PlayerAccessRequestForm } from "@/components/forms/player-access/PlayerAccessRequestForm";
 
 export default async function RequestPlayerAccessPage() {
 	const user = await requireUser();

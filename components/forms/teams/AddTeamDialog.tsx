@@ -3,8 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { createTeam } from "@/features/teams/actions/teams";
-
-import { CirclePlus } from "lucide-react";
+import TeamForm from "@/components/forms/teams/TeamForm";
 import { Plus } from "lucide-react";
 
 import {
@@ -15,11 +14,8 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 export default function AddTeamDialog() {
 	const router = useRouter();
@@ -53,18 +49,9 @@ export default function AddTeamDialog() {
 				<DialogHeader>
 					<DialogTitle>Create a New Team</DialogTitle>
 				</DialogHeader>
-				<div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="name">Team Name</Label>
-						<Input
-							id="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-						/>
-					</div>
-				</div>
+				<TeamForm name={name} onNameChange={setName} />
 				<DialogFooter>
-					<Button type="button" onClick={handleCreate}>
+					<Button type="button" onClick={handleCreate} disabled={!name.trim()}>
 						Create Team
 					</Button>
 				</DialogFooter>

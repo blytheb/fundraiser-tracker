@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateTeam } from "@/features/teams/actions/teams";
-
+import TeamForm from "@/components/forms/teams/TeamForm";
 import {
 	Dialog,
 	DialogContent,
@@ -54,20 +54,12 @@ export default function EditTeamDialog({
 					<DialogTitle>Edit this team</DialogTitle>
 				</DialogHeader>
 
-				<div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="name">Team Name</Label>
-
-						<Input
-							id="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-						/>
-					</div>
-				</div>
+				<TeamForm name={name} onNameChange={setName} />
 
 				<DialogFooter>
-					<Button onClick={handleEdit}>Save Changes</Button>
+					<Button type="button" onClick={handleEdit} disabled={!name.trim()}>
+						Save Changes
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

@@ -13,7 +13,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-
+import ContributionForm from "@/components/forms/fundraisers/ContributionForm";
 import {
 	Select,
 	SelectContent,
@@ -42,7 +42,7 @@ export default function EditContributionDialog({
 }: DialogProps) {
 	const router = useRouter();
 
-	const [amount, setAmount] = useState<number>(contribution.amount);
+	const [amount, setAmount] = useState(String(contribution.amount));
 	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
 		contribution.paymentMethod,
 	);
@@ -61,7 +61,7 @@ export default function EditContributionDialog({
 	async function handleEdit() {
 		try {
 			await updateContribution(contribution.id, {
-				amount,
+				amount: Number(amount),
 				paymentMethod,
 				source,
 				date,
@@ -81,82 +81,18 @@ export default function EditContributionDialog({
 					<DialogTitle>Edit this Fundraiser</DialogTitle>
 				</DialogHeader>
 
-				<div className="space-y-4 py-4">
-					{/* Amount */}
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Amount</label>
-
-						<Input
-							type="number"
-							step="1.00"
-							min="0"
-							placeholder="0.00"
-							value={amount}
-							onChange={(event) => setAmount(Number(event.target.value))}
-						/>
-					</div>
-
-					{/* Contribution Type */}
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Contribution Type</label>
-
-						<Select
-							value={source}
-							onValueChange={(value) => setSource(value as ContributionType)}>
-							<SelectTrigger>
-								<SelectValue />
-							</SelectTrigger>
-
-							<SelectContent>
-								<SelectItem value="SALES">Sales</SelectItem>
-
-								<SelectItem value="EVENT_PROFIT">Event Profit</SelectItem>
-
-								<SelectItem value="TIPS">Tips</SelectItem>
-
-								<SelectItem value="OTHER">Other</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-
-					{/* Payment method */}
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Payment Method</label>
-
-						<Select
-							value={paymentMethod}
-							onValueChange={(value) =>
-								setPaymentMethod(value as PaymentMethod)
-							}>
-							<SelectTrigger>
-								<SelectValue />
-							</SelectTrigger>
-
-							<SelectContent>
-								<SelectItem value="CASH">Cash</SelectItem>
-
-								<SelectItem value="CHECK">Check</SelectItem>
-
-								<SelectItem value="VENMO">Venmo</SelectItem>
-								<SelectItem value="OTHER">Other</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-
-					{/* Description */}
-					<div className="space-y-2">
-						<label className="text-sm font-medium">
-							Description{" "}
-							<span className="text-muted-foreground">(optional)</span>
-						</label>
-
-						<Textarea
-							placeholder="e.g. Tournament event profit"
-							value={description}
-							onChange={(event) => setDescription(event.target.value)}
-						/>
-					</div>
-				</div>
+				<ContributionForm
+					amount={amount}
+					source={source}
+					paymentMethod={paymentMethod}
+					date={date}
+					description={description}
+					onAmountChange={setAmount}
+					onSourceChange={setSource}
+					onPaymentMethodChange={setPaymentMethod}
+					onDateChange={setDate}
+					onDescriptionChange={setDescription}
+				/>
 
 				<DialogFooter>
 					<Button onClick={handleEdit}>Save Changes</Button>

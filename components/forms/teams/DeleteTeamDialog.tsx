@@ -1,18 +1,8 @@
 "use client";
 
-import {
-	Dialog,
-	DialogDescription,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-
 import { useRouter } from "next/navigation";
 import { deleteTeam } from "@/features/teams/actions/teams";
-
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import type { Team } from "@prisma/client";
 
 type DeleteTeamDialogProps = {
@@ -39,20 +29,13 @@ export default function DeleteTeamDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Delete {team.name}</DialogTitle>
-				</DialogHeader>
-
-				<DialogDescription>
-					Are you sure you want to delete this team?
-				</DialogDescription>
-
-				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, delete this team</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<ConfirmDeleteDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title={`Delete ${team.name}`}
+			description="Are you sure you want to delete this team?"
+			confirmLabel="Yes, delete this team"
+			onConfirm={handleDelete}
+		/>
 	);
 }

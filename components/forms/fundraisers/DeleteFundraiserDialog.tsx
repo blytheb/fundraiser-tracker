@@ -2,18 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { deleteFundraiser } from "@/features/fundraisers/actions/fundraisers";
-
-import {
-	Dialog,
-	DialogDescription,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-
-import { Button } from "@/components/ui/button";
-
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import type { Fundraiser } from "@prisma/client";
 
 type DeleteFundraiserDialogProps = {
@@ -40,20 +29,13 @@ export default function DeleteFundraiserDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Delete {fundraiser.name}</DialogTitle>
-				</DialogHeader>
-
-				<DialogDescription>
-					Are you sure you want to delete this fundraiser?
-				</DialogDescription>
-
-				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, delete this fundraiser</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<ConfirmDeleteDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title={`Delete ${fundraiser.name}`}
+			description="Are you sure you want to delete this fundraiser?"
+			confirmLabel="Yes, delete this fundraiser"
+			onConfirm={handleDelete}
+		/>
 	);
 }

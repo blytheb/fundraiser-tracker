@@ -1,19 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
 import { useRouter } from "next/navigation";
-import {
-	Dialog,
-	DialogDescription,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-
-import { Button } from "@/components/ui/button";
 import { deletePlayer } from "@/features/players/actions/players";
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import type { Player } from "@prisma/client";
 
 type DeletePlayerDialogProps = {
@@ -40,22 +29,13 @@ export default function DeletePlayerDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>
-						Delete {player.firstName} {player.lastName}
-					</DialogTitle>
-				</DialogHeader>
-
-				<DialogDescription>
-					Are you sure you want to delete this player?
-				</DialogDescription>
-
-				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, delete this player</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<ConfirmDeleteDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title={`Delete ${player.firstName} ${player.lastName}`}
+			description="Are you sure you want to delete this player?"
+			confirmLabel="Yes, delete this player"
+			onConfirm={handleDelete}
+		/>
 	);
 }

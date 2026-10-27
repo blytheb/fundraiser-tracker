@@ -28,7 +28,7 @@ export default function PageHeader({
 				<div className="flex w-full items-center sm:w-auto sm:shrink-0">
 					{action}
 				</div>
-			)}{" "}
+			)}
 		</header>
 	);
 }

@@ -44,7 +44,7 @@ export function RegisterForm() {
 			return;
 		}
 
-		router.push("/teams");
+		router.push("/request-player-access");
 		router.refresh();
 	}
 

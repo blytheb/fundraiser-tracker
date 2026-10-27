@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getMyAccessRequests } from "@/features/player-access/data/get-my-access-requests";
+import { AccessRequestStatus } from "@/features/player-access/AccessRequestStatus";
 
 export default async function MyAccessRequestsPage() {
 	const requests = await getMyAccessRequests();
@@ -37,13 +38,24 @@ export default async function MyAccessRequestsPage() {
 									</p>
 								</div>
 
-								<span className="text-sm font-medium">
-									{request.status === "PENDING"
-										? "Pending review"
-										: request.status === "APPROVED"
-											? "Approved"
-											: "Rejected"}
-								</span>
+								<div className="flex flex-col items-start gap-2 sm:items-end">
+									<AccessRequestStatus status={request.status} />
+
+									{request.status === "APPROVED" && (
+										<Link
+											href="/my-players"
+											className="text-sm font-medium underline underline-offset-4">
+											View my players
+										</Link>
+									)}
+									{request.status === "REJECTED" && (
+										<Link
+											href="/request-player-access"
+											className="text-sm font-medium underline underline-offset-4">
+											Request access again
+										</Link>
+									)}
+								</div>
 							</div>
 						</article>
 					))}

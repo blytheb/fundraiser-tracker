@@ -47,7 +47,7 @@ export async function requestPlayerAccess(playerId: string) {
 	});
 
 	if (existingRequest) {
-		throw new Error("You already have pending request for this player");
+		throw new Error("You already have a pending request for this player");
 	}
 
 	try {

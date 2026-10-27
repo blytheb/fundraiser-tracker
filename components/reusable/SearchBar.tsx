@@ -20,7 +20,7 @@ export default function SearchBar({
 	const searchParams = useSearchParams();
 
 	const queryValue = searchParams.get(paramName) ?? "";
-	const [value, setValue] = useState("");
+	const [value, setValue] = useState(queryValue);
 
 	useEffect(() => {
 		if (value === queryValue) return;

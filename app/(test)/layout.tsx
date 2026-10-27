@@ -7,7 +7,7 @@ export default async function TestLayout({
 }) {
 	return (
 		<div className="flex flex-col min-h-screen">
-			<Navbar role={null} />
+			<Navbar role={null} name="hidden_layout" email="hidden_layout" />
 			<main>{children}</main>
 		</div>
 	);

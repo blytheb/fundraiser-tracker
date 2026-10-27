@@ -15,7 +15,7 @@ import { MoreVertical } from "lucide-react";
 import Link from "next/link";
 
 import EditPlayerDialog from "@/components/forms/players/EditPlayerDialog";
-import DeletePlayerDialog from "@/components/forms/players/DeletePlayerDialog";
+import DeletePlayerDialog from "@/components/dialogs/DeletePlayerDialog";
 
 import type { Player } from "@prisma/client";
 

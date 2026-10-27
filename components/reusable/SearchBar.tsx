@@ -20,6 +20,7 @@ export default function SearchBar({
 	const searchParams = useSearchParams();
 
 	const queryValue = searchParams.get(paramName) ?? "";
+	const inputLabel = placeholder.replace(/\.\.\.$/, "");
 	const [value, setValue] = useState(queryValue);
 
 	useEffect(() => {
@@ -53,22 +54,25 @@ export default function SearchBar({
 			/>
 
 			<Input
+				id="search-input"
+				data-testid="search-input"
 				value={value}
 				onChange={(event) => setValue(event.target.value)}
 				placeholder={placeholder}
 				className="pl-9 pr-9"
-				aria-label={placeholder}
+				aria-label={inputLabel}
 			/>
 
-			{value && (
+			{value.length > 0 && (
 				<Button
 					type="button"
 					variant="ghost"
 					size="icon"
 					onClick={clearSearch}
 					className="absolute right-1 top-1/2 size-7 -translate-y-1/2"
-					aria-label="Clear search">
-					<X className="size-4" />
+					aria-label={`Clear ${placeholder.toLowerCase()}`}
+					data-testid="clear-search-button">
+					<X className="size-4" aria-hidden="true" />
 				</Button>
 			)}
 		</div>

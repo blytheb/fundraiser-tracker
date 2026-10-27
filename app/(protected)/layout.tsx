@@ -15,13 +15,13 @@ export default async function ProtectedLayout({
 	if (!session?.user) {
 		redirect("/");
 	}
-
-	if (session?.user) {
-		console.log(session.user.role);
-	}
 	return (
 		<div className="flex h-screen flex-col">
-			<Navbar role={session.user.role} />
+			<Navbar
+				role={session.user.role}
+				name={session.user.name}
+				email={session.user.email}
+			/>
 
 			<main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
 		</div>

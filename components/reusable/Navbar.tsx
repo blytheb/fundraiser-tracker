@@ -1,4 +1,3 @@
-import React from "react";
 import {
 	NavigationMenu,
 	NavigationMenuItem,
@@ -11,9 +10,11 @@ import Link from "next/link";
 
 type NavbarProps = {
 	role: string | null | undefined;
+	name: string;
+	email: string;
 };
 
-export default function Navbar({ role }: NavbarProps) {
+export default function Navbar({ role, name, email }: NavbarProps) {
 	return (
 		<nav className="border-b mb-4">
 			<NavigationMenu className="mx-auto h-14 max-w-7xl px-4">
@@ -68,7 +69,10 @@ export default function Navbar({ role }: NavbarProps) {
 					</div>
 
 					<div className="flex justify-center items-center gap-4">
-						<h1>role: {role}</h1>
+						<div className="hidden text-right sm:block">
+							<p className="text-sm font-medium">{name || "User"}</p>
+							<p className="text-xs text-muted-foreground">{email}</p>
+						</div>
 						<LogoutButton />
 					</div>
 				</NavigationMenuList>

@@ -18,6 +18,7 @@ import {
 	addPlayerToTeam,
 	createPlayerAndAddToTeam,
 } from "@/features/teams/actions/teamPlayers";
+import PlayerForm from "@/components/forms/players/PlayerForm";
 
 import type { Player } from "@prisma/client";
 
@@ -143,16 +144,11 @@ export default function AddPlayerToTeamDialog({
 					</div>
 				) : (
 					<div className="space-y-4">
-						<Input
-							placeholder="First name"
-							value={firstName}
-							onChange={(e) => setFirstName(e.target.value)}
-						/>
-
-						<Input
-							placeholder="Last name"
-							value={lastName}
-							onChange={(e) => setLastName(e.target.value)}
+						<PlayerForm
+							firstName={firstName}
+							lastName={lastName}
+							onFirstNameChange={setFirstName}
+							onLastNameChange={setLastName}
 						/>
 
 						<div className="flex gap-2">

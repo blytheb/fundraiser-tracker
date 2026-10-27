@@ -2,14 +2,11 @@
 
 import React from "react";
 
-// import { getActiveTeams } from "@/lib/data/teams";
 import { useRouter } from "next/navigation";
 import { createFundraiser } from "@/features/fundraisers/actions/fundraisers";
 import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 import {
 	Dialog,

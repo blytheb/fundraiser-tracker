@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import {
 	Dialog,
 	DialogContent,
@@ -136,10 +136,15 @@ export default function AddFundraiserToTeamDialog({
 					</div>
 				) : (
 					<div className="space-y-4">
-						<Input
-							placeholder="First name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
+						<FundraiserForm
+							name={name}
+							description=""
+							startDate={new Date().toLocaleDateString("en-CA", {
+								timeZone: "Pacific/Honolulu",
+							})}
+							onNameChange={setName}
+							onDescriptionChange={() => {}}
+							onStartDateChange={() => {}}
 						/>
 
 						<div className="flex gap-2">

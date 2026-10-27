@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 import { updatePlayer } from "@/features/players/actions/players";
@@ -32,10 +32,6 @@ export default function EditPlayerDialog({
 	const router = useRouter();
 	const [firstName, setFirstName] = useState(player.firstName);
 	const [lastName, setLastName] = useState(player.lastName);
-
-	// useEffect(() => {
-	// 	setName(team.name);
-	// }, [team]);
 
 	async function handleEdit() {
 		try {

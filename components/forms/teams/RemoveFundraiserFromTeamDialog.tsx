@@ -1,14 +1,6 @@
 "use client";
 
-import {
-	Dialog,
-	DialogDescription,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 
 import { useRouter } from "next/navigation";
 import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/fundraiserTeams";
@@ -39,24 +31,14 @@ export default function RemoveFundraiserFromTeamDialog({
 			console.error("Failed to remove player from team:", error);
 		}
 	}
-
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Remove {fundraiser.name}</DialogTitle>
-				</DialogHeader>
-
-				<DialogDescription>
-					Are you sure you want to remove this fundraiser from this team?
-				</DialogDescription>
-
-				<DialogFooter>
-					<Button onClick={handleDelete}>
-						Yes, remove this {fundraiser.name}
-					</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<ConfirmDeleteDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title={`Remove ${fundraiser.name}`}
+			description="Are you sure you want to remove this fundraiser from this team?"
+			confirmLabel={`Yes, remove this ${fundraiser.name}`}
+			onConfirm={handleDelete}
+		/>
 	);
 }

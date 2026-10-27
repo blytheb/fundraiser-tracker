@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 import type { PaymentMethod, ContributionType } from "@prisma/client";
@@ -14,18 +14,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import ContributionForm from "@/components/forms/fundraisers/ContributionForm";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 import type { FundraiserContributionListItem } from "@/features/fundraisers/types";
 
@@ -53,10 +43,6 @@ export default function EditContributionDialog({
 	const [description, setDescription] = useState(
 		contribution.description ?? "",
 	);
-
-	// useEffect(() => {
-	// 	setName(fundraiser.name);
-	// }, [fundraiser]);
 
 	async function handleEdit() {
 		try {

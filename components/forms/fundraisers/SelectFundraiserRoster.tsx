@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -45,15 +45,6 @@ export default function SelectFundraiserRoster({
 
 	const [selectedParticipantIdsState, setSelectedParticipantIdsState] =
 		useState<string[]>(selectedParticipantIds);
-
-	// // Reset the dialog state whenever it opens
-	useEffect(() => {
-		if (open) {
-			setStep("teams");
-			setSelectedTeamIdsState(selectedTeamIds);
-			setSelectedParticipantIdsState(selectedParticipantIds);
-		}
-	}, [open, selectedTeamIds, selectedParticipantIds]);
 
 	// Only show rosters for currently selected teams
 	const selectedRosters = availableRosters.filter((team) =>
@@ -127,9 +118,18 @@ export default function SelectFundraiserRoster({
 			console.error("Error saving fundraiser:", error);
 		}
 	}
+	function handleOpenChange(value: boolean) {
+		if (value) {
+			setStep("teams");
+			setSelectedTeamIdsState([...selectedTeamIds]);
+			setSelectedParticipantIdsState([...selectedParticipantIds]);
+		}
+
+		setOpen(value);
+	}
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogTrigger render={<Button size="sm">Manage Participants</Button>} />
 
 			<DialogContent>
@@ -145,14 +145,12 @@ export default function SelectFundraiserRoster({
 						<div className="space-y-4 py-4">
 							{availableTeams.map((team) => (
 								<div key={team.id} className="flex items-center gap-2">
-									<input
-										type="checkbox"
+									<Checkbox
 										id={`team-${team.id}`}
 										checked={selectedTeamIdsState.includes(team.id)}
-										onChange={() => toggleTeam(team.id)}
+										onCheckedChange={() => toggleTeam(team.id)}
 									/>
-
-									<label htmlFor={`team-${team.id}`}>{team.name}</label>
+									<Label htmlFor={`team-${team.id}`}>{team.name}</Label>
 								</div>
 							))}
 						</div>
@@ -196,18 +194,19 @@ export default function SelectFundraiserRoster({
 													<div
 														key={player.id}
 														className="flex items-center gap-2">
-														<input
-															type="checkbox"
+														<Checkbox
 															id={`player-${player.id}`}
 															checked={selectedParticipantIdsState.includes(
 																player.id,
 															)}
-															onChange={() => toggleParticipant(player.id)}
+															onCheckedChange={() =>
+																toggleParticipant(player.id)
+															}
 														/>
 
-														<label htmlFor={`player-${player.id}`}>
+														<Label htmlFor={`player-${player.id}`}>
 															{player.firstName} {player.lastName}
-														</label>
+														</Label>
 													</div>
 												);
 											})}

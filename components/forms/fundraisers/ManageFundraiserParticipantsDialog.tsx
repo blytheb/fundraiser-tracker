@@ -1,6 +1,5 @@
 "use client";
-
-import React from "react";
+import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -13,7 +12,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,6 +36,7 @@ export default function ManageFundraiserParticipantsDialog({
 	const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>(
 		selectedPlayers.map((player) => player.id),
 	);
+
 	async function handleSave() {
 		try {
 			await saveFundraiserParticipants(fundraiserId, selectedPlayerIds);
@@ -54,8 +53,16 @@ export default function ManageFundraiserParticipantsDialog({
 		);
 	}
 
+	function handleOpenChange(value: boolean) {
+		if (value) {
+			setSelectedPlayerIds(selectedPlayers.map((player) => player.id));
+		}
+
+		setOpen(value);
+	}
+
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogTrigger
 				render={
 					<Button>

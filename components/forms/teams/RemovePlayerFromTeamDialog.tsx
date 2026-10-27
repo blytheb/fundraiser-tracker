@@ -1,15 +1,6 @@
 "use client";
 
-import {
-	Dialog,
-	DialogDescription,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import { useRouter } from "next/navigation";
 import { removePlayerFromTeam } from "@/features/teams/actions/teamPlayers";
 
@@ -41,22 +32,13 @@ export default function RemovePlayerFromTeamDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Remove {player.firstName}</DialogTitle>
-				</DialogHeader>
-
-				<DialogDescription>
-					Are you sure you want to remove this player from this team?
-				</DialogDescription>
-
-				<DialogFooter>
-					<Button onClick={handleDelete}>
-						Yes, remove this {player.firstName} {player.lastName}
-					</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<ConfirmDeleteDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title={`Remove ${player.firstName}`}
+			description="Are you sure you want to remove this player from this team?"
+			confirmLabel={`Yes, remove this ${player.firstName} ${player.lastName}`}
+			onConfirm={handleDelete}
+		/>
 	);
 }

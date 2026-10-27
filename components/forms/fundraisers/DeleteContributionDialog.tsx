@@ -2,17 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { deleteContribution } from "@/features/fundraisers/actions/fundraiserContributions";
-
-import {
-	Dialog,
-	DialogDescription,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-
-import { Button } from "@/components/ui/button";
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 
 import type { FundraiserContributionListItem } from "@/features/fundraisers/types";
 
@@ -40,20 +30,13 @@ export default function DeleteContributionDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Delete Contribution</DialogTitle>
-				</DialogHeader>
-
-				<DialogDescription>
-					Are you sure you want to delete this contribution?
-				</DialogDescription>
-
-				<DialogFooter>
-					<Button onClick={handleDelete}>Yes, delete this contribution</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<ConfirmDeleteDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title="Delete Contribution"
+			description="Are you sure you want to delete this contribution?"
+			confirmLabel="Yes, delete this contribution"
+			onConfirm={handleDelete}
+		/>
 	);
 }

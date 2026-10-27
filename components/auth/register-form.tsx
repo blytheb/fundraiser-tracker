@@ -51,7 +51,7 @@ export function RegisterForm() {
 	return (
 		<Card className="w-full max-w-md">
 			<CardHeader>
-				<CardTitle>Create anaccount</CardTitle>
+				<CardTitle>Create an account</CardTitle>
 
 				<CardDescription>
 					Create your Fundraiser Tracker account.
@@ -61,7 +61,7 @@ export function RegisterForm() {
 			<CardContent>
 				<form onSubmit={handleSubmit} className="space-y-5">
 					<div className="space-y-2">
-						<Label htmlFor="email">Name</Label>
+						<Label htmlFor="name">Name</Label>
 
 						<Input
 							id="name"

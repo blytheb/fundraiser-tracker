@@ -32,12 +32,10 @@ export default async function AllFundraisersPage({ searchParams }: PageProps) {
 	const fundraisers = await getFundraisers(search);
 
 	return (
-		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:py-10">
-			<PageHeader heading="Fundraiser" />
-			<div className="flex gap-4">
-				<SearchBar placeholder="Search Fundraisers" />
-				<AddFundraiserDialog />
-			</div>
+		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
+			<PageHeader heading="Fundraiser" action={<AddFundraiserDialog />} />
+
+			<SearchBar placeholder="Search Fundraisers" />
 			<FundraiserList fundraisers={fundraisers} />
 		</main>
 	);

@@ -29,14 +29,14 @@ export default async function AllTeamsPage({ searchParams }: PageProps) {
 	const teams = await getTeams(search);
 
 	return (
-		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:py-10">
-			<PageHeader heading="Teams" subheading="All Menehune Teams" />
-			<div className="flex items-center gap-3">
-				<div className="min-w-0 flex-1">
-					<SearchBar paramName="search" placeholder="Search teams..." />
-				</div>
-				<AddTeamDialog />
-			</div>
+		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
+			<PageHeader
+				heading="Teams"
+				subheading="All Menehune Teams"
+				action={<AddTeamDialog />}
+			/>
+
+			<SearchBar paramName="search" placeholder="Search teams..." />
 
 			<TeamList teams={teams} />
 		</main>

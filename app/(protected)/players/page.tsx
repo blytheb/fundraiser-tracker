@@ -31,15 +31,10 @@ export default async function AllPlayersPage({ searchParams }: PageProps) {
 	const players = await getPlayers(search);
 
 	return (
-		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:py-10">
-			<PageHeader heading="Players" />
+		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
+			<PageHeader heading="Players" action={<AddPlayerDialog />} />
 
-			<div className="flex items-center gap-3">
-				<div className="min-w-0 flex-1">
-					<SearchBar placeholder="Search players..." />
-				</div>
-				<AddPlayerDialog />
-			</div>
+			<SearchBar placeholder="Search players..." />
 
 			<PlayerList players={players} />
 		</main>

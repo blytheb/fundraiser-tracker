@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteFundraiser } from "@/features/fundraisers/actions/fundraisers";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
@@ -16,26 +17,43 @@ export default function DeleteFundraiserDialog({
 	open,
 	onOpenChange,
 }: DeleteFundraiserDialogProps) {
+	const [error, setError] = useState("");
+	const [isPending, setIsPending] = useState(false);
 	const router = useRouter();
 
 	async function handleDelete() {
+		setError("");
+		setIsPending(true);
+
 		try {
 			await deleteFundraiser(fundraiser.id);
 			router.refresh();
 			onOpenChange(false);
 		} catch (error) {
 			console.error("Failed to delete fundraiser:", error);
+			setError("Unable to delete this fundraiser. Please try again.");
+		} finally {
+			setIsPending(false);
 		}
 	}
 
+	function handleOpenChange(nextOpen: boolean) {
+		if (!nextOpen) {
+			setError("");
+		}
+
+		onOpenChange(nextOpen);
+	}
 	return (
 		<ConfirmDeleteDialog
 			open={open}
-			onOpenChange={onOpenChange}
+			onOpenChange={handleOpenChange}
 			title={`Delete ${fundraiser.name}`}
 			description="Are you sure you want to delete this fundraiser?"
 			confirmLabel="Yes, delete this fundraiser"
 			onConfirm={handleDelete}
+			error={error}
+			isPending={isPending}
 		/>
 	);
 }

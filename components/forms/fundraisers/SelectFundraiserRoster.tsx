@@ -177,7 +177,7 @@ export default function SelectFundraiserRoster({
 							</DialogDescription>
 						</DialogHeader>
 
-						<div className="max-h-[400px] space-y-6 overflow-y-auto py-4">
+						<div className="max-h-100 space-y-6 overflow-y-auto py-4">
 							{selectedRosters.length === 0 ? (
 								<p className="text-sm text-muted-foreground">
 									No teams selected. Go back and select at least one team.

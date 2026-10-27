@@ -10,7 +10,7 @@ import {
 import { MoreVertical } from "lucide-react";
 
 import EditContributionDialog from "@/components/forms/fundraisers/EditContributionDialog";
-import DeleteContributionDialog from "@/components/forms/fundraisers/DeleteContributionDialog";
+import DeleteContributionDialog from "@/components/dialogs/DeleteContributionDialog";
 
 import type { FundraiserContributionListItem } from "./types";
 

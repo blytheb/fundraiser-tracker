@@ -17,7 +17,7 @@ import {
 	reopenFundraiser,
 } from "@/features/fundraisers/actions/fundraiserPublishing";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
-import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
+import DeleteFundraiserDialog from "@/components/dialogs/DeleteFundraiserDialog";
 
 import type { Fundraiser } from "@prisma/client";
 

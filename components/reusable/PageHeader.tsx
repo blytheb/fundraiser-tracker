@@ -13,7 +13,6 @@ export default function PageHeader({
 }: PageHeaderProps) {
 	return (
 		<header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-			{" "}
 			<div className="min-w-0">
 				<h1 className="text-2xl font-bold leading-tight tracking-tight sm:text-3xl">
 					{heading}
@@ -25,7 +24,11 @@ export default function PageHeader({
 					</p>
 				)}
 			</div>
-			{action && <div className="flex shrink-0 items-center">{action}</div>}
+			{action && (
+				<div className="flex w-full items-center sm:w-auto sm:shrink-0">
+					{action}
+				</div>
+			)}{" "}
 		</header>
 	);
 }

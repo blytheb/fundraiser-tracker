@@ -5,10 +5,9 @@ import SummarySection from "@/features/teams/SummarySection";
 import TabSection from "@/features/teams/TabSection";
 
 import { getTeamById } from "@/features/teams/data/teams";
-import {
-	getTeamPlayers,
-	getAvailablePlayersForTeam,
-} from "@/features/teams/data/teamPlayers";
+import { getAvailablePlayersForTeam } from "@/features/teams/data/get-available-players-for-team";
+import { getTeamPlayers } from "@/features/teams/data/get-team-players";
+
 import {
 	getTeamFundraisers,
 	getAvailableFundraisersForTeam,

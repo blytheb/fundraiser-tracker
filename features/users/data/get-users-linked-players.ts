@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireParentAccess } from "@/lib/authorization";
+import { requireParentAccess } from "@/lib/permissions";
 
 export async function getMyLinkedPlayers() {
 	const user = await requireParentAccess();

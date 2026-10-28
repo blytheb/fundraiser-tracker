@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/authorization";
+import { requireUser } from "@/lib/permissions";
 
 export async function getMyAccessRequests() {
 	const user = await requireUser();

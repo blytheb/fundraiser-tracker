@@ -4,7 +4,7 @@ import type {
 	FundraiserWithTeams,
 	FundraiserWithParticipants,
 } from "@/features/fundraisers/types";
-import { requireUser } from "@/lib/authorization";
+import { requireUser } from "@/lib/permissions";
 
 //get All fundraisers
 export async function getFundraisers(search?: string): Promise<Fundraiser[]> {

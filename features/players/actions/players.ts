@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/authorization";
+import { requireAdmin } from "@/lib/permissions";
 import type { Player } from "@prisma/client";
 import type { PlayerFormData } from "../types";
 

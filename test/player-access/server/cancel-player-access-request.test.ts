@@ -19,7 +19,7 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-vi.mock("@/lib/authorization", () => ({
+vi.mock("@/lib/permissions", () => ({
 	requireUser: authorizationMock.requireUser,
 }));
 

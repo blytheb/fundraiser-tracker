@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/authorization";
+import { requireUser } from "@/lib/permissions";
 import { PlayerAccessRequestForm } from "@/components/forms/player-access/PlayerAccessRequestForm";
 import Link from "next/link";
 import { getMyAccessRequests } from "@/features/player-access/data/get-my-access-requests";

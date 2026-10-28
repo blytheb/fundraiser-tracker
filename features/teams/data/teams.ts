@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Team } from "@prisma/client";
 import type { TeamWithPlayers } from "../types";
-import { requireAdmin } from "@/lib/authorization";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function getTeams(search?: string): Promise<Team[]> {
 	await requireAdmin();

@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/authorization";
+import { requireAdmin } from "@/lib/permissions";
 import ReviewPlayerAccessButtons from "@/components/forms/player-access/ReviewPlayerAccessButtons";
 import { getPendingPlayerAccessRequests } from "@/features/player-access/data/get-pending-player-access-requests";
 

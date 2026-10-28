@@ -15,7 +15,7 @@ const { requireUserMock } = vi.hoisted(() => ({
 	requireUserMock: vi.fn(),
 }));
 
-vi.mock("@/lib/authorization", () => ({
+vi.mock("@/lib/permissions", () => ({
 	requireUser: requireUserMock,
 }));
 

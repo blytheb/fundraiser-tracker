@@ -25,7 +25,7 @@ vi.mock("@/components/forms/fundraisers/EditContributionDialog", () => ({
 		) : null,
 }));
 
-vi.mock("@/components/forms/fundraisers/DeleteContributionDialog", () => ({
+vi.mock("@/components/dialogs/DeleteContributionDialog", () => ({
 	default: ({
 		contribution,
 		open,
@@ -42,6 +42,14 @@ vi.mock("@/components/forms/fundraisers/DeleteContributionDialog", () => ({
 				<button onClick={() => onOpenChange(false)}>Close Delete</button>
 			</div>
 		) : null,
+}));
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({
+		refresh: vi.fn(),
+		push: vi.fn(),
+		replace: vi.fn(),
+		back: vi.fn(),
+	}),
 }));
 const contribution = {
 	id: "contribution-1",

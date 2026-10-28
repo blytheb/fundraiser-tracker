@@ -21,6 +21,7 @@ export default async function ProtectedLayout({
 				role={session.user.role}
 				name={session.user.name}
 				email={session.user.email}
+				hasParentAccess={session.user.hasParentAccess ?? false}
 			/>
 
 			<main className="min-h-0 flex-1 overflow-y-auto">{children}</main>

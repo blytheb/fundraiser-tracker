@@ -1,12 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/authorization";
+import { requireParentAccess } from "@/lib/authorization";
 
 export async function getMyLinkedPlayers() {
-	const user = await requireUser();
-
-	if (user.role !== "PARENT") {
-		throw new Error("Only parents can access their linked players.");
-	}
+	const user = await requireParentAccess();
 
 	return prisma.parentPlayerLink.findMany({
 		where: {

@@ -23,3 +23,13 @@ export async function requireAdmin() {
 
 	return user;
 }
+
+export async function requireParentAccess() {
+	const user = await requireUser();
+
+	if (user.role !== "PARENT" && !user.hasParentAccess) {
+		redirect("/dashboard");
+	}
+
+	return user;
+}

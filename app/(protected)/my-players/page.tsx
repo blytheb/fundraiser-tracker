@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getMyLinkedPlayers } from "@/features/users/queries/get-users-linked-players";
+import { getMyLinkedPlayers } from "@/features/users/data/get-users-linked-players";
 
 export default async function MyPlayersPage() {
 	const links = await getMyLinkedPlayers();

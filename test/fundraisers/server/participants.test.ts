@@ -20,11 +20,9 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-import {
-	addPlayerToFundraiser,
-	removePlayerFromFundraiser,
-	saveFundraiserParticipants,
-} from "@/features/fundraisers/actions/fundraiserParticipants";
+import { addPlayerToFundraiser } from "@/features/fundraisers/actions/add-player-to-fundraiser";
+import { removePlayerFromFundraiser } from "@/features/fundraisers/actions/remove-player-from-fundraiser";
+import { saveFundraiserParticipants } from "@/features/fundraisers/actions/save-fundraiser-participants";
 
 beforeEach(() => {
 	vi.clearAllMocks();

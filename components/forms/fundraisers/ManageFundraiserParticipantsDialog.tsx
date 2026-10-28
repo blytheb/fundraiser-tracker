@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { saveFundraiserParticipants } from "@/features/fundraisers/actions/fundraiserParticipants";
+import { saveFundraiserParticipants } from "@/features/fundraisers/actions/save-fundraiser-participants";
 
 import type { Player } from "@prisma/client";
 

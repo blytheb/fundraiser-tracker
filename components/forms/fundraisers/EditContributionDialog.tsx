@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 import type { PaymentMethod, ContributionType } from "@prisma/client";
-import { updateContribution } from "@/features/fundraisers/actions/fundraiserContributions";
+import { updateContribution } from "@/features/fundraisers/actions/contributions";
 
 import {
 	Dialog,

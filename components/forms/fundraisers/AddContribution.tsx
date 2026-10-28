@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import ContributionForm from "@/components/forms/fundraisers/ContributionForm";
 import type { ContributionType, PaymentMethod } from "@prisma/client";
-import { addContribution } from "@/features/fundraisers/actions/fundraiserContributions";
+import { addContribution } from "@/features/fundraisers/actions/contributions";
 
 type AddFundraiserFundProps = {
 	fundraiserId: string;

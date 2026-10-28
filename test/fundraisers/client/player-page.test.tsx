@@ -15,7 +15,7 @@ vi.mock("@/features/players/data/players", () => ({
 	getPlayerTransactions: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock("@/features/players/data/playerTeams", () => ({
+vi.mock("@/features/players/data/get-player-teams", () => ({
 	getPlayerTeams: getPlayerTeamsMock,
 }));
 

@@ -21,7 +21,7 @@ import ContributionActions from "@/features/fundraisers/ContributionActions";
 import AddContribution from "@/components/forms/fundraisers/AddContribution";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 
-import { setCustomDistribution } from "@/features/fundraisers/actions/fundraiserAllocation";
+import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
 import type {
 	FundraiserParticipantWithPlayer,
 	FundraiserContributionListItem,

@@ -14,10 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-	addTeamToFundraiser,
-	createFundraiserAndAddToTeam,
-} from "@/features/fundraisers/actions/fundraiserTeams";
+import { addTeamToFundraiser } from "@/features/fundraisers/actions/add-team-to-fundraiser";
+import { createFundraiserAndAddToTeam } from "@/features/fundraisers/actions/create-fundraiser-and-add-to-team";
 
 import type { Fundraiser } from "@prisma/client";
 

@@ -39,11 +39,9 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-import {
-	publishFundraiser,
-	completeFundraiser,
-	reopenFundraiser,
-} from "@/features/fundraisers/actions/fundraiserPublishing";
+import { publishFundraiser } from "@/features/fundraisers/actions/publish-fundraiser";
+import { completeFundraiser } from "@/features/fundraisers/actions/complete-fundraiser";
+import { reopenFundraiser } from "@/features/fundraisers/actions/reopen-fundraiser";
 
 beforeEach(() => {
 	vi.clearAllMocks();

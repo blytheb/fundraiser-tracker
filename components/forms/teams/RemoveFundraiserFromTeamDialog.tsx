@@ -3,7 +3,7 @@ import { useState } from "react";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 
 import { useRouter } from "next/navigation";
-import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/fundraiserTeams";
+import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/remove-team-from-fundraiser";
 
 import type { Fundraiser } from "@prisma/client";
 

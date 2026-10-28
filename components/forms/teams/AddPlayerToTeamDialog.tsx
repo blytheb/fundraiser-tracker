@@ -14,10 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-	addPlayerToTeam,
-	createPlayerAndAddToTeam,
-} from "@/features/teams/actions/teamPlayers";
+import { addPlayerToTeam } from "@/features/teams/actions/add-player-to-team";
+import { createPlayerAndAddToTeam } from "@/features/teams/actions/create-player-and-add-to-team";
 import PlayerForm from "@/components/forms/players/PlayerForm";
 
 import type { Player } from "@prisma/client";

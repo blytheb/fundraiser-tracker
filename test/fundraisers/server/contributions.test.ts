@@ -22,7 +22,7 @@ import {
 	addContribution,
 	updateContribution,
 	deleteContribution,
-} from "@/features/fundraisers/actions/fundraiserContributions";
+} from "@/features/fundraisers/actions/contributions";
 beforeEach(() => {
 	vi.clearAllMocks();
 });

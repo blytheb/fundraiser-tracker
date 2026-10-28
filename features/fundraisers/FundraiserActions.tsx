@@ -11,11 +11,9 @@ import {
 
 import { MoreVertical } from "lucide-react";
 
-import {
-	publishFundraiser,
-	completeFundraiser,
-	reopenFundraiser,
-} from "@/features/fundraisers/actions/fundraiserPublishing";
+import { publishFundraiser } from "@/features/fundraisers/actions/publish-fundraiser";
+import { reopenFundraiser } from "@/features/fundraisers/actions/reopen-fundraiser";
+import { completeFundraiser } from "@/features/fundraisers/actions/complete-fundraiser";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
 import DeleteFundraiserDialog from "@/components/dialogs/DeleteFundraiserDialog";
 

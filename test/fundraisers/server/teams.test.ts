@@ -26,12 +26,10 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-import {
-	addTeamToFundraiser,
-	removeTeamFromFundraiser,
-	createFundraiserAndAddToTeam,
-	saveFundraiserTeams,
-} from "@/features/fundraisers/actions/fundraiserTeams";
+import { addTeamToFundraiser } from "@/features/fundraisers/actions/add-team-to-fundraiser";
+import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/remove-team-from-fundraiser";
+import { createFundraiserAndAddToTeam } from "@/features/fundraisers/actions/create-fundraiser-and-add-to-team";
+import { saveFundraiserTeams } from "@/features/fundraisers/actions/save-fundraiser-teams";
 
 beforeEach(() => {
 	vi.clearAllMocks();

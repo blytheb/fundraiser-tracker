@@ -12,7 +12,7 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-import { getFundraiserContributions } from "@/features/fundraisers/data/fundraiserContributions";
+import { getFundraiserContributions } from "@/features/fundraisers/data/get-fundraiser-contributions";
 
 beforeEach(() => {
 	vi.clearAllMocks();

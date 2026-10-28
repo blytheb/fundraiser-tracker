@@ -15,8 +15,8 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { saveFundraiserTeams } from "@/features/fundraisers/actions/fundraiserTeams";
-import { saveFundraiserParticipants } from "@/features/fundraisers/actions/fundraiserParticipants";
+import { saveFundraiserTeams } from "@/features/fundraisers/actions/save-fundraiser-teams";
+import { saveFundraiserParticipants } from "@/features/fundraisers/actions/save-fundraiser-participants";
 import { TeamWithPlayers } from "@/features/teams/types";
 import type { Team } from "@prisma/client";
 

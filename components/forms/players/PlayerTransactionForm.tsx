@@ -2,10 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-	addPlayerExpense,
-	addPlayerPayment,
-} from "@/features/players/actions/playerTransactions";
+import { addPlayerPayment } from "@/features/players/actions/add-player-payment";
+import { addPlayerExpense } from "@/features/players/actions/add-player-expense";
 import PlayerTransactionFields from "@/components/forms/players/PlayerTransactionFields";
 
 type PlayerTransactionFormProps = {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { deleteContribution } from "@/features/fundraisers/actions/fundraiserContributions";
+import { deleteContribution } from "@/features/fundraisers/actions/contributions";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 
 import type { FundraiserContributionListItem } from "@/features/fundraisers/types";

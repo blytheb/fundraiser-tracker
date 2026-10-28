@@ -12,7 +12,7 @@ import {
 	getPlayerById,
 	getPlayerTransactions,
 } from "@/features/players/data/players";
-import { getPlayerTeams } from "@/features/players/data/playerTeams";
+import { getPlayerTeams } from "@/features/players/data/get-player-teams";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import PlayerTransactionForm from "@/components/forms/players/PlayerTransactionForm";

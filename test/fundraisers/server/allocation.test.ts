@@ -44,12 +44,10 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-import {
-	setCustomDistribution,
-	getActiveFundraiserAllocations,
-	getParticipantFinancialSummary,
-	getFundraiserFinancialSummary,
-} from "@/features/fundraisers/actions/fundraiserAllocation";
+import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
+import { getActiveFundraiserAllocations } from "@/features/fundraisers/actions/get-active-fundraiser-allocations";
+import { getParticipantFinancialSummary } from "@/features/fundraisers/actions/get-participant-financial-summary";
+import { getFundraiserFinancialSummary } from "@/features/fundraisers/actions/get-fundraiser-financial-summary";
 
 describe("setCustomDistribution", () => {
 	beforeEach(() => {

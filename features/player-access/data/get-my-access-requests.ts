@@ -17,6 +17,7 @@ export async function getMyAccessRequests() {
 		},
 		select: {
 			id: true,
+			playerId: true,
 			status: true,
 			createdAt: true,
 			player: {

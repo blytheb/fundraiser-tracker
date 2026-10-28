@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/authorization";
 import { PlayerAccessRequestForm } from "@/components/forms/player-access/PlayerAccessRequestForm";
 import Link from "next/link";
+import { getMyAccessRequests } from "@/features/player-access/data/get-my-access-requests";
 
 export default async function RequestPlayerAccessPage() {
 	const user = await requireUser();
@@ -23,6 +24,15 @@ export default async function RequestPlayerAccessPage() {
 		},
 		orderBy: { lastName: "asc" },
 	});
+	const requests = await getMyAccessRequests();
+	const existingLinks = await prisma.parentPlayerLink.findMany({
+		where: {
+			userId: user.id,
+		},
+		select: {
+			playerId: true,
+		},
+	});
 
 	return (
 		<main className="mx-auto max-w-xl p-6">
@@ -33,7 +43,14 @@ export default async function RequestPlayerAccessPage() {
 					: "Select a player to request access to their fundraiser information. An administrator must approve your request."}
 			</p>
 
-			<PlayerAccessRequestForm players={players} />
+			<PlayerAccessRequestForm
+				players={players}
+				requests={requests.map((request) => ({
+					playerId: request.playerId,
+					status: request.status,
+				}))}
+				linkedPlayerIds={existingLinks.map((link) => link.playerId)}
+			/>
 			<div className="mt-4">
 				<Link
 					href="/my-access-requests"

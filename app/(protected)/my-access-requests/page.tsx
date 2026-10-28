@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getMyAccessRequests } from "@/features/player-access/data/get-my-access-requests";
 import { AccessRequestStatus } from "@/features/player-access/AccessRequestStatus";
+import { CancelPlayerAccessRequestButton } from "@/components/forms/player-access/CancelPlayerAccessRequestButton";
 
 export default async function MyAccessRequestsPage() {
 	const requests = await getMyAccessRequests();
@@ -40,7 +41,9 @@ export default async function MyAccessRequestsPage() {
 
 								<div className="flex flex-col items-start gap-2 sm:items-end">
 									<AccessRequestStatus status={request.status} />
-
+									{request.status === "PENDING" && (
+										<CancelPlayerAccessRequestButton requestId={request.id} />
+									)}
 									{request.status === "APPROVED" && (
 										<Link
 											href="/my-players"

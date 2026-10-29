@@ -11,7 +11,7 @@ export default function ParentNavLinks() {
 			<NavigationMenuItem>
 				<NavigationMenuLink
 					className={navLinkClassName}
-					render={<Link href="/my-players" />}>
+					render={<Link href="/parent/my-players" />}>
 					My Players
 				</NavigationMenuLink>
 			</NavigationMenuItem>
@@ -19,15 +19,7 @@ export default function ParentNavLinks() {
 			<NavigationMenuItem>
 				<NavigationMenuLink
 					className={navLinkClassName}
-					render={<Link href="/my-access-requests" />}>
-					My Access Requests
-				</NavigationMenuLink>
-			</NavigationMenuItem>
-
-			<NavigationMenuItem>
-				<NavigationMenuLink
-					className={navLinkClassName}
-					render={<Link href="/request-player-access" />}>
+					render={<Link href="/parent/request-player-access" />}>
 					Request Player Access
 				</NavigationMenuLink>
 			</NavigationMenuItem>

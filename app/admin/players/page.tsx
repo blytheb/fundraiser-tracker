@@ -2,12 +2,11 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
-
 import PageHeader from "@/components/reusable/PageHeader";
 import SearchBar from "@/components/reusable/SearchBar";
-import AddFundraiserDialog from "@/components/forms/fundraisers/AddFundraiserDialog";
-import FundraiserList from "@/features/fundraisers/FundraiserList";
+import AddPlayerDialog from "@/components/forms/players/AddPlayerDialog";
+import PlayerList from "@/features/players/PlayerList";
+import { getPlayers } from "@/features/players/data/players";
 
 type PageProps = {
 	searchParams: Promise<{
@@ -15,7 +14,7 @@ type PageProps = {
 	}>;
 };
 
-export default async function AllFundraisersPage({ searchParams }: PageProps) {
+export default async function AllPlayersPage({ searchParams }: PageProps) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
@@ -25,18 +24,19 @@ export default async function AllFundraisersPage({ searchParams }: PageProps) {
 	}
 
 	if (session.user.role !== "ADMIN") {
-		redirect("/my-players");
+		redirect("/parent/my-players");
 	}
 
 	const { search } = await searchParams;
-	const fundraisers = await getFundraisers(search);
+	const players = await getPlayers(search);
 
 	return (
 		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
-			<PageHeader heading="Fundraiser" action={<AddFundraiserDialog />} />
+			<PageHeader heading="Players" action={<AddPlayerDialog />} />
 
-			<SearchBar placeholder="Search Fundraisers" />
-			<FundraiserList fundraisers={fundraisers} />
+			<SearchBar placeholder="Search players..." />
+
+			<PlayerList players={players} />
 		</main>
 	);
 }

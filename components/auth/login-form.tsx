@@ -46,7 +46,7 @@ export function LoginForm() {
 		if (currentSession?.user.role === "ADMIN") {
 			router.push("/dashboard");
 		} else {
-			router.push("/my-players");
+			router.push("/parent/my-players");
 		}
 
 		router.refresh();

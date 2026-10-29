@@ -3,18 +3,17 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import PageHeader from "@/components/reusable/PageHeader";
+import TeamList from "@/features/teams/TeamList";
+import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
 import SearchBar from "@/components/reusable/SearchBar";
-import AddPlayerDialog from "@/components/forms/players/AddPlayerDialog";
-import PlayerList from "@/features/players/PlayerList";
-import { getPlayers } from "@/features/players/data/players";
+
+import { getTeams } from "@/features/teams/data/teams";
 
 type PageProps = {
-	searchParams: Promise<{
-		search?: string;
-	}>;
+	searchParams: Promise<{ search?: string }>;
 };
 
-export default async function AllPlayersPage({ searchParams }: PageProps) {
+export default async function AllTeamsPage({ searchParams }: PageProps) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
@@ -24,19 +23,22 @@ export default async function AllPlayersPage({ searchParams }: PageProps) {
 	}
 
 	if (session.user.role !== "ADMIN") {
-		redirect("/my-players");
+		redirect("/parent/my-players");
 	}
-
 	const { search } = await searchParams;
-	const players = await getPlayers(search);
+	const teams = await getTeams(search);
 
 	return (
 		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
-			<PageHeader heading="Players" action={<AddPlayerDialog />} />
+			<PageHeader
+				heading="Teams"
+				subheading="All Menehune Teams"
+				action={<AddTeamDialog />}
+			/>
 
-			<SearchBar placeholder="Search players..." />
+			<SearchBar paramName="search" placeholder="Search teams..." />
 
-			<PlayerList players={players} />
+			<TeamList teams={teams} />
 		</main>
 	);
 }

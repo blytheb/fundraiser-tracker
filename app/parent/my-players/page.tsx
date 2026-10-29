@@ -1,11 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getMyLinkedPlayers } from "@/features/users/data/get-users-linked-players";
 
 export default async function MyPlayersPage() {
 	const links = await getMyLinkedPlayers();
 
 	return (
-		<main className="mx-auto max-w-5xl p-6">
+		<div className="mx-auto max-w-3xl p-6">
 			<header>
 				<h1 className="text-2xl font-bold">My Players</h1>
 				<p className="mt-2 text-sm text-muted-foreground">
@@ -21,7 +22,7 @@ export default async function MyPlayersPage() {
 						appear here.
 					</p>
 					<Link
-						href="/request-player-access"
+						href="/parent/request-player-access"
 						className="mt-4 inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
 						Request player access
 					</Link>
@@ -29,10 +30,13 @@ export default async function MyPlayersPage() {
 			) : (
 				<div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{links.map(({ player }) => (
-						<article key={player.id} className="rounded-xl border p-5">
+						<Link
+							key={player.id}
+							href={`/parent/my-players/${player.id}`}
+							className="rounded-xl border p-5">
 							<div className="flex items-center gap-3">
 								{player.imageUrl ? (
-									<img
+									<Image
 										src={player.imageUrl}
 										alt=""
 										className="h-14 w-14 rounded-full object-cover"
@@ -51,15 +55,15 @@ export default async function MyPlayersPage() {
 								</div>
 							</div>
 
-							<Link
+							{/* <Link
 								href={`/players/${player.id}`}
 								className="mt-5 inline-block text-sm font-medium underline underline-offset-4">
 								View player profile
-							</Link>
-						</article>
+							</Link> */}
+						</Link>
 					))}
 				</div>
 			)}
-		</main>
+		</div>
 	);
 }

@@ -71,10 +71,15 @@ export function PlayerAccessRequestForm({
 
 	return (
 		<div className="mt-6 space-y-4">
-			{players.length === 0 ? (
-				<p className="rounded-md border p-4 text-sm text-muted-foreground">
+			{players.length === 0 && (
+				<p className="rounded-md border p-4 text-md text-muted-foreground">
 					There are currently no active players available to request. Please
 					contact an administrator for assistance.
+				</p>
+			)}
+			{!hasAvailablePlayer && players.length > 0 ? (
+				<p className="text-md text-muted-foreground">
+					You already have access to or pending requests for all active players.
 				</p>
 			) : (
 				<>
@@ -111,12 +116,7 @@ export function PlayerAccessRequestForm({
 							})}
 						</select>
 					</label>
-					{!hasAvailablePlayer && players.length > 0 && (
-						<p className="text-sm text-muted-foreground">
-							You already have access to or pending requests for all active
-							players.
-						</p>
-					)}
+
 					<button
 						type="button"
 						onClick={handleSubmit}

@@ -44,7 +44,7 @@ export function RegisterForm() {
 			return;
 		}
 
-		router.push("/request-player-access");
+		router.push("/parent/request-player-access");
 		router.refresh();
 	}
 

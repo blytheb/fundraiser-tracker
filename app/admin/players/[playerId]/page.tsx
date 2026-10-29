@@ -203,12 +203,12 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 
 			{/* Financial overview */}
 			<section className="space-y-4">
-				<div>
+				{/* <div>
 					<h2 className="text-lg font-semibold">Financial Overview</h2>
 					<p className="text-sm text-muted-foreground">
 						All-time financial activity across seasons
 					</p>
-				</div>
+				</div> */}
 
 				<div className="rounded-xl border bg-card p-5 sm:p-7">
 					<div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -37,8 +37,8 @@ export async function cancelPlayerAccessRequest(requestId: string) {
 		},
 	});
 
-	revalidatePath("/request-player-access");
-	revalidatePath("/my-access-requests");
+	revalidatePath("/parent/request-player-access");
+	revalidatePath("/parent/my-access-requests");
 	revalidatePath("/admin/player-access-requests");
 
 	return { success: true };

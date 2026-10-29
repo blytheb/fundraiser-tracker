@@ -1,10 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 import type { Player } from "@prisma/client";
 import type { PlayerFormData } from "../types";
 
 export async function createPlayer(data: PlayerFormData): Promise<Player> {
+	await requireAdmin();
+
 	return prisma.player.create({
 		data: {
 			...data,
@@ -17,6 +20,7 @@ export async function updatePlayer(
 	id: string,
 	data: PlayerFormData,
 ): Promise<Player> {
+	await requireAdmin();
 	return prisma.player.update({
 		where: {
 			id,
@@ -31,6 +35,7 @@ export async function updatePlayer(
 }
 
 export async function deletePlayer(id: string): Promise<Player> {
+	await requireAdmin();
 	return prisma.player.delete({
 		where: {
 			id,

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createPlayer } from "@/features/players/actions/players";
-
 import {
 	Dialog,
 	DialogContent,
@@ -14,9 +13,8 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
+import PlayerForm from "@/components/forms/players/PlayerForm";
 
 export default function AddPlayerDialog() {
 	const router = useRouter();
@@ -53,26 +51,17 @@ export default function AddPlayerDialog() {
 				<DialogHeader>
 					<DialogTitle>Create a New Player</DialogTitle>
 				</DialogHeader>
-				<div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="firstName">Player First Name</Label>
-						<Input
-							id="firstName"
-							value={firstName}
-							onChange={(e) => setFirstName(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="lastName">Player Last Name</Label>
-						<Input
-							id="lastName"
-							value={lastName}
-							onChange={(e) => setLastName(e.target.value)}
-						/>
-					</div>
-				</div>
+				<PlayerForm
+					firstName={firstName}
+					lastName={lastName}
+					onFirstNameChange={setFirstName}
+					onLastNameChange={setLastName}
+				/>
 				<DialogFooter>
-					<Button type="button" onClick={handleCreate}>
+					<Button
+						type="button"
+						onClick={handleCreate}
+						disabled={!firstName.trim() || !lastName.trim()}>
 						Create Player
 					</Button>
 				</DialogFooter>

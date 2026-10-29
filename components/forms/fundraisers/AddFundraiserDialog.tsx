@@ -2,14 +2,11 @@
 
 import React from "react";
 
-// import { getActiveTeams } from "@/lib/data/teams";
 import { useRouter } from "next/navigation";
 import { createFundraiser } from "@/features/fundraisers/actions/fundraisers";
-
+import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 import {
 	Dialog,
@@ -42,6 +39,8 @@ export default function AddFundraiserDialog() {
 			router.refresh();
 			setOpen(false);
 			setName("");
+			setDescription("");
+			setStartDate("");
 		} catch (error) {
 			console.error("Failed to create fundraiser:", error);
 		}
@@ -64,36 +63,20 @@ export default function AddFundraiserDialog() {
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="name">Fundraiser Name</Label>
-						<Input
-							id="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="description">Fundraiser Description</Label>
-						<Input
-							id="description"
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="startDate">Date of Fundraiser</Label>
-						<Input
-							id="startDate"
-							type="Date"
-							value={startDate}
-							onChange={(e) => setStartDate(e.target.value)}
-							required
-						/>
-					</div>
-				</div>
+				<FundraiserForm
+					name={name}
+					description={description}
+					startDate={startDate}
+					onNameChange={setName}
+					onDescriptionChange={setDescription}
+					onStartDateChange={setStartDate}
+				/>
+
 				<DialogFooter>
-					<Button type="button" onClick={handleCreate}>
+					<Button
+						type="button"
+						onClick={handleCreate}
+						disabled={!name.trim() || !startDate}>
 						Create Fundraiser
 					</Button>
 				</DialogFooter>

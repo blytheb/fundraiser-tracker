@@ -1,4 +1,4 @@
-import Navbar from "@/components/ui-reusable/Navbar";
+import AdminNavbar from "@/components/reusable/AdminNavbar";
 
 export default async function TestLayout({
 	children,
@@ -7,7 +7,12 @@ export default async function TestLayout({
 }) {
 	return (
 		<div className="flex flex-col min-h-screen">
-			<Navbar />
+			<AdminNavbar
+				role={null}
+				name="hidden_layout"
+				email="hidden_layout"
+				hasParentAccess={false}
+			/>
 			<main>{children}</main>
 		</div>
 	);

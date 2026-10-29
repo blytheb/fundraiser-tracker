@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
-import { saveFundraiserTeams } from "@/features/fundraisers/actions/fundraiserTeams";
+import { saveFundraiserTeams } from "@/features/fundraisers/actions/save-fundraiser-teams";
 
 import type { Team } from "@prisma/client";
 
@@ -55,8 +56,16 @@ export default function ManageFundraiserTeamsDialog({
 		);
 	}
 
+	function handleOpenChange(value: boolean) {
+		if (value) {
+			setSelectedTeamIds(selectedTeams.map((team) => team.id));
+		}
+
+		setOpen(value);
+	}
+
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogTrigger
 				render={
 					<Button>
@@ -69,14 +78,13 @@ export default function ManageFundraiserTeamsDialog({
 					<DialogTitle>Team Selection</DialogTitle>
 				</DialogHeader>
 				{activeTeams.map((team) => (
-					<div key={team.id}>
-						<Input
-							type="checkbox"
+					<div key={team.id} className="flex items-center gap-3">
+						<Checkbox
+							id={team.id}
 							checked={selectedTeamIds.includes(team.id)}
-							onChange={() => handleToggle(team.id)}
+							onCheckedChange={() => handleToggle(team.id)}
 						/>
-
-						{team.name}
+						<Label htmlFor={team.id}>{team.name}</Label>
 					</div>
 				))}
 

@@ -1,7 +1,6 @@
 import type { Team } from "@prisma/client";
 
 import TeamActions from "@/features/teams/TeamActions";
-
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -11,28 +10,29 @@ type TeamHeaderProps = {
 };
 
 export default function TeamHeader({ team, playerCount }: TeamHeaderProps) {
+	const isActive = team.status === "IN_SEASON";
+
 	return (
-		<Card className="mb-4">
-			<CardContent className="p-5">
-				<div className="flex items-start justify-between gap-4">
-					<div className="min-w-0">
-						<p className="text-2xl font-bold tracking-tight">{team.name}</p>
+		<Card>
+			<CardContent className="flex items-center justify-between gap-4 p-4 sm:p-5">
+				<div className="min-w-0 space-y-2">
+					<h1 className="truncate text-2xl font-bold tracking-tight sm:text-3xl">
+						{team.name}
+					</h1>
 
-						<div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-							<span>2026 Season</span>
+					<div className="flex flex-wrap items-center gap-2">
+						<Badge variant={isActive ? "default" : "secondary"}>
+							{isActive ? "Active" : "Inactive"}
+						</Badge>
 
-							<span>•</span>
-
-							<span>Varsity</span>
-							<span>•</span>
-
-							<span>Active</span>
-							<Badge variant="secondary">{playerCount} Players</Badge>
-						</div>
+						<span className="text-sm text-muted-foreground">
+							{playerCount} {playerCount === 1 ? "player" : "players"}
+						</span>
 					</div>
-					<div>
-						<TeamActions team={team} />
-					</div>
+				</div>
+
+				<div className="shrink-0">
+					<TeamActions team={team} />
 				</div>
 			</CardContent>
 		</Card>

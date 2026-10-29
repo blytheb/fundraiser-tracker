@@ -9,6 +9,23 @@ export const auth = betterAuth({
 		provider: "postgresql",
 	}),
 
+	user: {
+		additionalFields: {
+			role: {
+				type: "string",
+				required: false,
+				defaultValue: "PARENT",
+				input: false,
+			},
+			hasParentAccess: {
+				type: "boolean",
+				required: false,
+				defaultValue: false,
+				input: false,
+			},
+		},
+	},
+
 	emailAndPassword: {
 		enabled: true,
 	},

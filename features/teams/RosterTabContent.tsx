@@ -1,8 +1,6 @@
-import React from "react";
-
 import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
-import TeamPlayerList from "@/features/teams/TeamPlayerList";
-
+import PlayerListItem from "@/features/players/PlayerListItem";
+import { ItemGroup } from "@/components/ui/item";
 import type { Player } from "@prisma/client";
 
 type TabProps = {
@@ -17,13 +15,12 @@ export default function RosterTabContent({
 	availablePlayers,
 }: TabProps) {
 	return (
-		<>
-			<div className="mb-3 flex items-center justify-between">
-				<div>
+		<section className="space-y-4">
+			<div className="flex items-center justify-between gap-3">
+				<div className="min-w-0">
 					<h2 className="font-semibold">Roster</h2>
-
 					<p className="text-sm text-muted-foreground">
-						{players.length} players
+						{players.length} {players.length === 1 ? "player" : "players"}
 					</p>
 				</div>
 
@@ -32,7 +29,18 @@ export default function RosterTabContent({
 					availablePlayers={availablePlayers}
 				/>
 			</div>
-			<TeamPlayerList players={players} teamId={teamId} />
-		</>
+
+			{players.length === 0 ? (
+				<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+					No players on this team yet.
+				</div>
+			) : (
+				<ItemGroup>
+					{players.map((player) => (
+						<PlayerListItem key={player.id} player={player} />
+					))}
+				</ItemGroup>
+			)}
+		</section>
 	);
 }

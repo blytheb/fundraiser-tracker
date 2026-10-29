@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -42,8 +41,14 @@ export function LoginForm() {
 			setLoading(false);
 			return;
 		}
+		const { data: currentSession } = await authClient.getSession();
 
-		router.push("/teams");
+		if (currentSession?.user.role === "ADMIN") {
+			router.push("/admin");
+		} else {
+			router.push("/my-players");
+		}
+
 		router.refresh();
 	}
 

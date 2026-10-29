@@ -1,9 +1,21 @@
 import { prisma } from "@/lib/prisma";
-import type { Team, Player } from "@prisma/client";
+import type { Team } from "@prisma/client";
 import type { TeamWithPlayers } from "../types";
+import { requireAdmin } from "@/lib/permissions";
 
-export async function getTeams(): Promise<Team[]> {
+export async function getTeams(search?: string): Promise<Team[]> {
+	await requireAdmin();
+
 	return prisma.team.findMany({
+		where: search
+			? {
+					name: {
+						contains: search,
+						mode: "insensitive",
+					},
+				}
+			: undefined,
+
 		orderBy: {
 			name: "asc",
 		},
@@ -74,42 +86,3 @@ export async function getTeamWithPlayers(
 		players: team.players,
 	};
 }
-
-// export async function getTeamWithFundraisers(
-// 	id: string,
-// ): Promise<TeamWithFundraisers | null> {
-// 	return prisma.team.findUnique({
-// 		where: {
-// 			id,
-// 		},
-// 		include: {
-// 			fundraiserTeams: {
-// 				include: {
-// 					fundraiser: true,
-// 				},
-// 			},
-// 		},
-// 	});
-// }
-
-// export async function getTeamData(
-// 	id: string,
-// ): Promise<TeamWithPlayersAndFundraisers> {
-// 	return prisma.team.findUnique({
-// 		where: {
-// 			id,
-// 		},
-// 		include: {
-// 			players: {
-// 				include: {
-// 					player: true,
-// 				},
-// 			},
-// 			fundraiserTeams: {
-// 				include: {
-// 					fundraiser: true,
-// 				},
-// 			},
-// 		},
-// 	});
-// }

@@ -1,21 +1,13 @@
 "use client";
 
-import {
-	Dialog,
-	DialogDescription,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-
+import { useState } from "react";
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import { useRouter } from "next/navigation";
-import { removePlayerFromTeam } from "@/features/teams/actions/teamPlayers";
+import { removePlayerFromTeam } from "@/features/teams/actions/remove-player-from-team";
 
 import type { Player } from "@prisma/client";
 
-type DeleteTeamDialogProps = {
+type RemovePlayerFromTeamDialogProps = {
 	teamId: string;
 	player: Player;
 	open: boolean;
@@ -27,36 +19,44 @@ export default function RemovePlayerFromTeamDialog({
 	player,
 	open,
 	onOpenChange,
-}: DeleteTeamDialogProps) {
+}: RemovePlayerFromTeamDialogProps) {
+	const [error, setError] = useState("");
+	const [isPending, setIsPending] = useState(false);
 	const router = useRouter();
+	function handleOpenChange(nextOpen: boolean) {
+		if (!nextOpen) {
+			setError("");
+		}
+
+		onOpenChange(nextOpen);
+	}
 
 	async function handleDelete() {
+		setError("");
+		setIsPending(true);
+
 		try {
 			await removePlayerFromTeam(teamId, player.id);
 			router.refresh();
-			onOpenChange(false);
+			handleOpenChange(false);
 		} catch (error) {
 			console.error("Failed to remove player from team:", error);
+			setError("Unable to remove this player from the team. Please try again.");
+		} finally {
+			setIsPending(false);
 		}
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Remove {player.firstName}</DialogTitle>
-				</DialogHeader>
-
-				<DialogDescription>
-					Are you sure you want to remove this player from this team?
-				</DialogDescription>
-
-				<DialogFooter>
-					<Button onClick={handleDelete}>
-						Yes, remove this {player.firstName} {player.lastName}
-					</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<ConfirmDeleteDialog
+			open={open}
+			onOpenChange={handleOpenChange}
+			title={`Remove ${player.firstName}`}
+			description="Are you sure you want to remove this player from this team?"
+			confirmLabel={`Yes, remove this ${player.firstName} ${player.lastName}`}
+			onConfirm={handleDelete}
+			error={error}
+			isPending={isPending}
+		/>
 	);
 }

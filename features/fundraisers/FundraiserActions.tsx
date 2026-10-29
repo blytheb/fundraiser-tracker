@@ -8,18 +8,14 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import { MoreVertical } from "lucide-react";
 
-import Link from "next/link";
-import {
-	changeCompletedStatus,
-	changePublishStatus,
-} from "@/features/fundraisers/actions/fundraisers";
+import { publishFundraiser } from "@/features/fundraisers/actions/publish-fundraiser";
+import { reopenFundraiser } from "@/features/fundraisers/actions/reopen-fundraiser";
+import { completeFundraiser } from "@/features/fundraisers/actions/complete-fundraiser";
 import EditFundraiserDialog from "@/components/forms/fundraisers/EditFundraiserDialog";
-import DeleteFundraiserDialog from "@/components/forms/fundraisers/DeleteFundraiserDialog";
+import DeleteFundraiserDialog from "@/components/dialogs/DeleteFundraiserDialog";
 
 import type { Fundraiser } from "@prisma/client";
 
@@ -36,7 +32,7 @@ export default function FundraiserActions({
 
 	async function handleComplete() {
 		try {
-			await changeCompletedStatus(fundraiser.id);
+			await completeFundraiser(fundraiser.id);
 			router.refresh();
 		} catch (error) {
 			console.error(error);
@@ -45,7 +41,16 @@ export default function FundraiserActions({
 
 	async function handlePublish() {
 		try {
-			await changePublishStatus(fundraiser.id);
+			await publishFundraiser(fundraiser.id);
+			router.refresh();
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	async function handleReopen() {
+		try {
+			await reopenFundraiser(fundraiser.id);
 			router.refresh();
 		} catch (error) {
 			console.error(error);
@@ -61,12 +66,24 @@ export default function FundraiserActions({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={handleComplete}>
-							Toggle Edit Mode
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={handlePublish}>
-							Toggle Publish Mode
-						</DropdownMenuItem>
+						{!fundraiser.isCompleted ? (
+							<DropdownMenuItem onClick={handleComplete}>
+								Complete Fundraiser
+							</DropdownMenuItem>
+						) : (
+							<>
+								{!fundraiser.isPublished && (
+									<DropdownMenuItem onClick={handlePublish}>
+										Publish Fundraiser
+									</DropdownMenuItem>
+								)}
+
+								<DropdownMenuItem onClick={handleReopen}>
+									Reopen to Draft
+								</DropdownMenuItem>
+							</>
+						)}
+
 						<DropdownMenuItem
 							onClick={(e) => {
 								e.preventDefault();

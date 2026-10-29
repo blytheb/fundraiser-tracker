@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 import { updateFundraiser } from "@/features/fundraisers/actions/fundraisers";
-
+import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import {
 	Dialog,
 	DialogContent,
@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 import type { Fundraiser } from "@prisma/client";
 
@@ -67,35 +65,22 @@ export default function EditFundraiserDialog({
 					<DialogTitle>Edit this Fundraiser</DialogTitle>
 				</DialogHeader>
 
-				<div className="space-y-4 py-4">
-					<div className="space-y-2">
-						<Label htmlFor="name">Fundraiser Name</Label>
-						<Input
-							id="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="description">Fundraiser Description</Label>
-						<Input
-							id="description"
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="startDate">Fundraiser Date</Label>
-						<Input
-							id="startDate"
-							value={startDate}
-							onChange={(e) => setStartDate(e.target.value)}
-						/>
-					</div>
-				</div>
+				<FundraiserForm
+					name={name}
+					description={description}
+					startDate={startDate}
+					onNameChange={setName}
+					onDescriptionChange={setDescription}
+					onStartDateChange={setStartDate}
+				/>
 
 				<DialogFooter>
-					<Button onClick={handleEdit}>Save Changes</Button>
+					<Button
+						type="button"
+						onClick={handleEdit}
+						disabled={!name.trim() || !startDate}>
+						Save Changes
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

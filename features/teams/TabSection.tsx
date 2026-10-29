@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import RosterTabContent from "@/features/teams/RosterTabContent";
@@ -23,14 +21,12 @@ export default function TabSection({
 	availableFundraisers,
 }: TabProps) {
 	return (
-		<Tabs defaultValue="roster" className="flex flex-col w-full">
-			<TabsList className="flex w-full flex-row">
+		<Tabs defaultValue="roster" className="w-full">
+			<TabsList className="grid h-10 w-full grid-cols-2">
 				<TabsTrigger value="roster">Roster</TabsTrigger>
-
 				<TabsTrigger value="fundraisers">Fundraisers</TabsTrigger>
-
-				{/* <TabsTrigger value="trips">{`Trips (${team.trips.length})`}</TabsTrigger> */}
 			</TabsList>
+
 			<TabsContent value="roster" className="mt-4">
 				<RosterTabContent
 					teamId={teamId}
@@ -38,6 +34,7 @@ export default function TabSection({
 					availablePlayers={availablePlayers}
 				/>
 			</TabsContent>
+
 			<TabsContent value="fundraisers" className="mt-4">
 				<FundraiserTabContent
 					teamId={teamId}

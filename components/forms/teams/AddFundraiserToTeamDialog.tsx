@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import {
 	Dialog,
 	DialogContent,
@@ -14,10 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-	addTeamToFundraiser,
-	createFundraiserAndAddToTeam,
-} from "@/features/fundraisers/actions/fundraiserTeams";
+import { addTeamToFundraiser } from "@/features/fundraisers/actions/add-team-to-fundraiser";
+import { createFundraiserAndAddToTeam } from "@/features/fundraisers/actions/create-fundraiser-and-add-to-team";
 
 import type { Fundraiser } from "@prisma/client";
 
@@ -136,10 +134,15 @@ export default function AddFundraiserToTeamDialog({
 					</div>
 				) : (
 					<div className="space-y-4">
-						<Input
-							placeholder="First name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
+						<FundraiserForm
+							name={name}
+							description=""
+							startDate={new Date().toLocaleDateString("en-CA", {
+								timeZone: "Pacific/Honolulu",
+							})}
+							onNameChange={setName}
+							onDescriptionChange={() => {}}
+							onStartDateChange={() => {}}
 						/>
 
 						<div className="flex gap-2">

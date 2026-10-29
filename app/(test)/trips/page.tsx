@@ -4,7 +4,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { MoreVertical } from "lucide-react";
-import SummaryBlock from "@/components/ui-reusable/SummaryBlock";
+import SummaryBlock from "@/components/reusable/SummaryBlock";
 import { CircleDollarSign } from "lucide-react";
 
 import {

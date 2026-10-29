@@ -7,8 +7,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -24,12 +24,24 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
+  role          UserRole  @default(PARENT)
+  hasParentAccess Boolean @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
 
+  accessRequests     PlayerAccessRequest[] @relation("AccessRequestUser")
+  reviewedRequests   PlayerAccessRequest[] @relation("AccessRequestReviewer")
+  createdPlayerLinks ParentPlayerLink[]    @relation("PlayerLinkCreator")
+  playerLinks        ParentPlayerLink[]
+
   @@map("user")
+}
+
+enum UserRole {
+  ADMIN
+  PARENT
 }
 
 model Session {
@@ -87,20 +99,22 @@ model Verification {
 // to multiple teams over time.
 
 model Player {
-  id                     String                  @id @default(cuid())
-  firstName              String
-  lastName               String
-  imageUrl               String?
-  status                 Boolean                 @default(true)
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String
+  imageUrl  String?
+  status    Boolean @default(true)
 
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  fundraiserParticipants FundraiserParticipant[]    // fundraisers this player has participated in
-  transactions           PlayerTransaction[]        //financial transactions belonging to this player
-  teams                  TeamPlayer[]               //teams this player belongs to
+  fundraiserParticipants FundraiserParticipant[] // fundraisers this player has participated in
+  transactions           PlayerTransaction[] //financial transactions belonging to this player
+  teams                  TeamPlayer[] //teams this player belongs to
+
+  accessRequests PlayerAccessRequest[]
+  parentLinks    ParentPlayerLink[]
 }
-
 
 // ------------------------------------------------------------
 // Team
@@ -109,18 +123,17 @@ model Player {
 // Teams can be used across different fundraisers.
 
 model Team {
-  id              String           @id @default(cuid())
-  name            String
-  status          TeamStatus       @default(IN_SEASON)
-  imageUrl        String?
+  id       String     @id @default(cuid())
+  name     String
+  status   TeamStatus @default(IN_SEASON)
+  imageUrl String?
 
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   fundraiserTeams FundraiserTeam[] // fundraisers that includes this team
-  players         TeamPlayer[]     //players currently assiciated with team (aka roster)
+  players         TeamPlayer[] //players currently assiciated with team (aka roster)
 }
-
 
 // ------------------------------------------------------------
 // TeamPlayer
@@ -157,20 +170,20 @@ model TeamPlayer {
 // - Player financial transactions
 
 model Fundraiser {
-  id            String                   @id @default(cuid())
-  name          String
-  description   String
-  isCompleted   Boolean                   @default(false)
-  isPublished   Boolean                   @default(false)
-  startDate     DateTime
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  isCompleted Boolean  @default(false)
+  isPublished Boolean  @default(false)
+  startDate   DateTime
 
-  createdAt     DateTime                 @default(now())
-  updatedAt     DateTime                 @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  contributions FundraiserContribution[]  //money contributed INTO the fundraiser
-  participants  FundraiserParticipant[]   //players participating in the fundraiser
-  teams         FundraiserTeam[]          //teams associated with the fundraiser  
-  transactions  PlayerTransaction[]       //player financial transactions associated with the fundraiser
+  contributions FundraiserContribution[] //money contributed INTO the fundraiser
+  participants  FundraiserParticipant[] //players participating in the fundraiser
+  teams         FundraiserTeam[] //teams associated with the fundraiser  
+  transactions  PlayerTransaction[] //player financial transactions associated with the fundraiser
 }
 
 // ------------------------------------------------------------
@@ -181,7 +194,6 @@ model Fundraiser {
 //
 // A team can participate in many fundraisers.
 // A fundraiser can contain many teams.
-
 
 model FundraiserTeam {
   id           String     @id @default(cuid())
@@ -208,27 +220,25 @@ model FundraiserTeam {
 // allocation history can be preserved.
 
 model FundraiserParticipant {
-  id              String     @id @default(cuid())
-  fundraiserId    String
-  playerId        String
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @default(now()) @updatedAt
+  id           String   @id @default(cuid())
+  fundraiserId String
+  playerId     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
 
-  fundraiser      Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-  player          Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  allocations     FundraiserAllocation[]      //allocations for this player in this fundraiser
+  fundraiser  Fundraiser             @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+  player      Player                 @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  allocations FundraiserAllocation[] //allocations for this player in this fundraiser
 
   @@unique([fundraiserId, playerId]) //prevent the same player from being added twice to a fundraiser
   @@index([fundraiserId])
 }
-
 
 // ============================================================
 // FUNDRAISER MONEY
 // ============================================================
 // These models describe money entering the fundraiser and how
 // that money is assigned to players.
-
 
 // ------------------------------------------------------------
 // FundraiserContribution
@@ -244,19 +254,19 @@ model FundraiserParticipant {
 // an individual player.
 
 model FundraiserContribution {
-  id            String           @id @default(cuid())
-  fundraiserId  String
+  id           String @id @default(cuid())
+  fundraiserId String
 
   amount        Decimal          @db.Decimal(10, 2)
   paymentMethod PaymentMethod
   source        ContributionType
   date          DateTime         @default(now())
   description   String?
-  
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  
-  fundraiser    Fundraiser       @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fundraiser Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
 
   @@index([fundraiserId])
 }
@@ -281,18 +291,19 @@ model FundraiserContribution {
 // allowing the history to remain in the database.
 
 model FundraiserAllocation {
-  id                       String                   @id @default(cuid())
-  fundraiserParticipantId  String
+  id                      String @id @default(cuid())
+  fundraiserParticipantId String
 
-  amount                   Decimal                  @db.Decimal(10, 2)
-  status                   AllocationStatus         @default(ACTIVE)
-  
-  createdAt                DateTime                 @default(now())
-  updatedAt                DateTime                 @default(now()) @updatedAt
+  amount Decimal          @db.Decimal(10, 2)
+  status AllocationStatus @default(ACTIVE)
 
-  fundraiserParticipant    FundraiserParticipant    @relation(fields: [fundraiserParticipantId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  transactions              PlayerTransaction[]      //financial transactions created from this allocation
+  fundraiserParticipant FundraiserParticipant @relation(fields: [fundraiserParticipantId], references: [id], onDelete: Cascade)
+
+  transactions PlayerTransaction[] //financial transactions created from this allocation
+
   @@index([fundraiserParticipantId])
 }
 
@@ -311,23 +322,24 @@ model FundraiserAllocation {
 // "Jane received/was credited $1,000."
 
 model PlayerTransaction {
-  id          String                @id @default(cuid())
-  playerId    String
+  id       String @id @default(cuid())
+  playerId String
 
-  fundraiserId String?              //optional since some transactions may not be associated with a fundraiser
-  allocationId String?              //optional because not every transaction comes from an allocation
-    
+  fundraiserId String? //optional since some transactions may not be associated with a fundraiser
+  allocationId String? //optional because not every transaction comes from an allocation
+
   amount      Decimal               @db.Decimal(10, 2)
   type        PlayerTransactionType
   description String?
   date        DateTime              @default(now())
+  status      TransactionStatus     @default(ACTIVE)
 
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  player      Player                @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  fundraiser  Fundraiser?           @relation(fields: [fundraiserId], references: [id], onDelete: SetNull)
-  allocation  FundraiserAllocation?           @relation(fields: [allocationId], references: [id], onDelete: SetNull)
+  player     Player                @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  fundraiser Fundraiser?           @relation(fields: [fundraiserId], references: [id], onDelete: SetNull)
+  allocation FundraiserAllocation? @relation(fields: [allocationId], references: [id], onDelete: SetNull)
 
   @@index([playerId])
   @@index([fundraiserId])
@@ -337,7 +349,6 @@ model PlayerTransaction {
 // ============================================================
 // ENUMS
 // ============================================================
-
 
 // ------------------------------------------------------------
 // TeamStatus
@@ -349,7 +360,6 @@ enum TeamStatus {
   SEASON_ENDED
 }
 
-
 // ------------------------------------------------------------
 // AllocationStatus
 // ------------------------------------------------------------
@@ -359,7 +369,6 @@ enum TeamStatus {
 // VOID:
 //   Allocation is no longer active but is kept for history.
 //   Useful when a fundraiser is unpublished or redistributed.
-
 
 enum AllocationStatus {
   ACTIVE
@@ -411,4 +420,61 @@ enum PlayerTransactionType {
   PAYMENT
   ADJUSTMENT
   DISTRIBUTION
+}
+
+// ------------------------------------------------------------
+// TransactionStatus
+// ------------------------------------------------------------
+// ACTIVE:
+//   Current transaction.
+//
+// VOID:
+//   Transaction is no longer active but is kept for history.
+//   Useful when a fundraiser is unpublished or redistributed.
+
+enum TransactionStatus {
+  ACTIVE
+  VOID
+}
+
+model PlayerAccessRequest {
+  id           String              @id @default(cuid())
+  userId       String
+  playerId     String
+  status       AccessRequestStatus @default(PENDING)
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  user       User   @relation("AccessRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  player     Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  reviewedBy User?  @relation("AccessRequestReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([playerId, status])
+  @@index([reviewedById])
+}
+
+model ParentPlayerLink {
+  id          String   @id @default(cuid())
+  userId      String
+  playerId    String
+  createdById String
+  createdBy   User     @relation("PlayerLinkCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, playerId])
+  @@index([playerId])
+  @@index([createdById])
+}
+
+enum AccessRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
 }

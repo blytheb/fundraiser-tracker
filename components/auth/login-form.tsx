@@ -44,7 +44,7 @@ export function LoginForm() {
 		const { data: currentSession } = await authClient.getSession();
 
 		if (currentSession?.user.role === "ADMIN") {
-			router.push("/admin");
+			router.push("/dashboard");
 		} else {
 			router.push("/my-players");
 		}

@@ -68,7 +68,6 @@ export async function reviewPlayerAccess(
 	});
 
 	revalidatePath("/dashboard");
-	revalidatePath("/admin");
 
 	return { success: true };
 }

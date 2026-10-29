@@ -30,7 +30,6 @@ export default function AdminNavbar({
 				<NavigationMenuList className="flex w-full justify-between">
 					<div className="flex min-w-0 flex-wrap items-center gap-1">
 						<AdminNavLinks isAdmin={role === "ADMIN"} />
-
 						{canSwitchViews && <ViewSwitcher currentView="admin" />}
 					</div>
 

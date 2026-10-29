@@ -3,6 +3,7 @@ import {
 	NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
+import { House } from "lucide-react";
 import { navLinkClassName } from "@/components/reusable/nav-link-styles";
 
 type AdminNavLinksProps = {
@@ -12,6 +13,15 @@ type AdminNavLinksProps = {
 export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 	return (
 		<>
+			{isAdmin && (
+				<NavigationMenuItem>
+					<NavigationMenuLink
+						className={navLinkClassName}
+						render={<Link href="/dashboard" />}>
+						<House />
+					</NavigationMenuLink>
+				</NavigationMenuItem>
+			)}
 			<NavigationMenuItem>
 				<NavigationMenuLink
 					className={navLinkClassName}
@@ -35,16 +45,6 @@ export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 					Fundraisers
 				</NavigationMenuLink>
 			</NavigationMenuItem>
-
-			{isAdmin && (
-				<NavigationMenuItem>
-					<NavigationMenuLink
-						className={navLinkClassName}
-						render={<Link href="/admin" />}>
-						Admin
-					</NavigationMenuLink>
-				</NavigationMenuItem>
-			)}
 		</>
 	);
 }

@@ -36,7 +36,7 @@ export default function FundraiserListItem({
 	return (
 		<Item variant="outline" size="sm">
 			<Link
-				href={`/fundraisers/${fundraiser.id}`}
+				href={`/admin/fundraisers/${fundraiser.id}`}
 				className="flex min-w-0 flex-1 items-center gap-3">
 				<ItemMedia>
 					<StatusIcon className="size-5 text-muted-foreground" />

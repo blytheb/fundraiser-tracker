@@ -17,7 +17,7 @@ export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 				<NavigationMenuItem>
 					<NavigationMenuLink
 						className={navLinkClassName}
-						render={<Link href="/dashboard" />}>
+						render={<Link href="/admin/dashboard" />}>
 						<House />
 					</NavigationMenuLink>
 				</NavigationMenuItem>
@@ -25,7 +25,7 @@ export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 			<NavigationMenuItem>
 				<NavigationMenuLink
 					className={navLinkClassName}
-					render={<Link href="/teams" />}>
+					render={<Link href="/admin/teams" />}>
 					Teams
 				</NavigationMenuLink>
 			</NavigationMenuItem>
@@ -33,7 +33,7 @@ export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 			<NavigationMenuItem>
 				<NavigationMenuLink
 					className={navLinkClassName}
-					render={<Link href="/players" />}>
+					render={<Link href="/admin/players" />}>
 					Players
 				</NavigationMenuLink>
 			</NavigationMenuItem>
@@ -41,7 +41,7 @@ export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 			<NavigationMenuItem>
 				<NavigationMenuLink
 					className={navLinkClassName}
-					render={<Link href="/fundraisers" />}>
+					render={<Link href="/admin/fundraisers" />}>
 					Fundraisers
 				</NavigationMenuLink>
 			</NavigationMenuItem>

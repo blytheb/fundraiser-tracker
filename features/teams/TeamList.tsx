@@ -33,7 +33,7 @@ export default function TeamList({ teams }: TeamListProps) {
 							variant="outline"
 							className="overflow-hidden p-0">
 							<Link
-								href={`/teams/${team.id}`}
+								href={`/admin/teams/${team.id}`}
 								className="flex min-h-24 w-full items-center gap-3 px-3 py-2 transition-colors hover:bg-muted/50">
 								<ItemMedia className="size-14 shrink-0 overflow-hidden rounded-md">
 									<Image

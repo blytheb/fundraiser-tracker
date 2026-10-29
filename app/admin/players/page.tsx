@@ -31,7 +31,7 @@ export default async function AllPlayersPage({ searchParams }: PageProps) {
 	const players = await getPlayers(search);
 
 	return (
-		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
+		<main className="mx-auto w-full max-w-4xl space-y-4 p-6 sm:px-6 lg:px-10">
 			<PageHeader heading="Players" action={<AddPlayerDialog />} />
 
 			<SearchBar placeholder="Search players..." />

@@ -13,7 +13,7 @@ export default function PlayerListItem({ player }: PlayerListItemProps) {
 	return (
 		<Item variant="outline" size="sm">
 			<Link
-				href={`/players/${player.id}`}
+				href={`/admin/players/${player.id}`}
 				className="flex min-w-0 flex-1 items-center gap-3">
 				<ItemMedia>
 					<Avatar className="size-10">

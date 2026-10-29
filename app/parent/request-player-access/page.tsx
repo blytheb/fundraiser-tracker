@@ -1,40 +1,23 @@
-import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/permissions";
 import { PlayerAccessRequestForm } from "@/components/forms/player-access/PlayerAccessRequestForm";
 import Link from "next/link";
 import { getMyAccessRequests } from "@/features/player-access/data/get-my-access-requests";
 import { AccessRequestStatus } from "@/features/player-access/AccessRequestStatus";
 import { CancelPlayerAccessRequestButton } from "@/components/forms/player-access/CancelPlayerAccessRequestButton";
+import { getUnlinkedPlayers } from "@/features/player-access/data/get-unlinked-players";
+import { getMyLinkedPlayerIds } from "@/features/player-access/data/get-my-linked-player-ids";
 
 export default async function RequestPlayerAccessPage() {
-	const user = await requireUser();
+	// if (user.role !== "PARENT") {
+	// 	return (
+	// 		<main className="p-8">
+	// 			Only parent accounts can request player access.
+	// 		</main>
+	// 	);
+	// }
 
-	if (user.role !== "PARENT") {
-		return (
-			<main className="p-8">
-				Only parent accounts can request player access.
-			</main>
-		);
-	}
-
-	const players = await prisma.player.findMany({
-		where: { status: true },
-		select: {
-			id: true,
-			firstName: true,
-			lastName: true,
-		},
-		orderBy: { lastName: "asc" },
-	});
+	const players = await getUnlinkedPlayers();
 	const requests = await getMyAccessRequests();
-	const existingLinks = await prisma.parentPlayerLink.findMany({
-		where: {
-			userId: user.id,
-		},
-		select: {
-			playerId: true,
-		},
-	});
+	const existingLinks = await getMyLinkedPlayerIds();
 
 	return (
 		<main className="mx-auto max-w-3xl p-6">

@@ -6,24 +6,24 @@ import { requireUser } from "@/lib/permissions";
 export async function getPlayerFinancialSummary(playerId: string) {
 	const user = await requireUser();
 
-	if (user.role === "PARENT") {
-		const link = await prisma.parentPlayerLink.findUnique({
-			where: {
-				userId_playerId: {
-					userId: user.id,
-					playerId,
-				},
+	const link = await prisma.parentPlayerLink.findUnique({
+		where: {
+			userId_playerId: {
+				userId: user.id,
+				playerId,
 			},
-			select: { id: true },
-		});
-		if (!link) {
-			throw new Error("You do not have access to this player's finances");
-		}
+		},
+		select: { id: true },
+	});
+	if (!link) {
+		throw new Error("You do not have access to this player's finances");
 	}
 	const player = await prisma.player.findUnique({
 		where: { id: playerId },
 		select: {
 			id: true,
+			teams: true,
+			transactions: true,
 		},
 	});
 

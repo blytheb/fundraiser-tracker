@@ -29,7 +29,7 @@ export default async function AllTeamsPage({ searchParams }: PageProps) {
 	const teams = await getTeams(search);
 
 	return (
-		<main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
+		<main className="mx-auto w-full max-w-4xl space-y-4 px-4 py-2 sm:px-6 lg:px-10">
 			<PageHeader
 				heading="Teams"
 				subheading="All Menehune Teams"

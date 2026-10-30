@@ -20,7 +20,7 @@ export const auth = betterAuth({
 			hasParentAccess: {
 				type: "boolean",
 				required: false,
-				defaultValue: false,
+				defaultValue: true,
 				input: false,
 			},
 		},

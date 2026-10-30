@@ -27,8 +27,8 @@ export async function requireAdmin() {
 export async function requireParentAccess() {
 	const user = await requireUser();
 
-	if (user.role === "PARENT" && user.hasParentAccess) {
-		redirect("/dashboard");
+	if (user.role !== "PARENT" && !user.hasParentAccess) {
+		redirect("/");
 	}
 
 	return user;

@@ -12,18 +12,12 @@ type NavbarProps = {
 	role: string | null | undefined;
 	name: string;
 	email: string;
-	hasParentAccess: boolean;
 };
 
-export default function ParentNavbar({
-	role,
-	name,
-	email,
-	hasParentAccess,
-}: NavbarProps) {
+export default function ParentNavbar({ role, name, email }: NavbarProps) {
 	const displayName = name || "User";
 
-	const canSwitchViews = role === "ADMIN" && hasParentAccess;
+	const canSwitchViews = role === "ADMIN_PARENT";
 
 	return (
 		<nav aria-label="Main navigation" className="mb-4 border-b">

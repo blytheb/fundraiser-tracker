@@ -10,7 +10,6 @@ export async function getAdminUsers() {
 			name: true,
 			email: true,
 			role: true,
-			hasParentAccess: true,
 			createdAt: true,
 			playerLinks: {
 				select: {

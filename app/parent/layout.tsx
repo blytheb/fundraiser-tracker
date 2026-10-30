@@ -10,12 +10,7 @@ export default async function ParentLayout({
 
 	return (
 		<div className="flex h-screen flex-col">
-			<ParentNavbar
-				role={user.role}
-				name={user.name}
-				email={user.email}
-				hasParentAccess={user.hasParentAccess ?? false}
-			/>
+			<ParentNavbar role={user.role} name={user.name} email={user.email} />
 
 			<main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
 		</div>

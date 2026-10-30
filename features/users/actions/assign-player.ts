@@ -12,11 +12,10 @@ export async function assignPlayerToUser(userId: string, playerId: string) {
 		select: {
 			id: true,
 			role: true,
-			hasParentAccess: true,
 		},
 	});
 
-	if (!user || (!user.hasParentAccess && user.role !== "PARENT")) {
+	if (!user || (user.role !== "ADMIN_PARENT" && user.role !== "PARENT")) {
 		throw new Error("This account does not have parent access.");
 	}
 

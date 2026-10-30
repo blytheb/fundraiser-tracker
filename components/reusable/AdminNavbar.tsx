@@ -12,24 +12,20 @@ type NavbarProps = {
 	role: string | null | undefined;
 	name: string;
 	email: string;
-	hasParentAccess: boolean;
 };
 
-export default function AdminNavbar({
-	role,
-	name,
-	email,
-	hasParentAccess,
-}: NavbarProps) {
+export default function AdminNavbar({ role, name, email }: NavbarProps) {
 	const displayName = name || "User";
-	const canSwitchViews = role === "ADMIN" && hasParentAccess;
+	const canSwitchViews = role === "ADMIN_PARENT";
 
 	return (
 		<nav aria-label="Main navigation" className="mb-4 border-b">
 			<NavigationMenu className="mx-auto min-h-14 w-full max-w-7xl px-4">
 				<NavigationMenuList className="flex w-full justify-between">
 					<div className="flex min-w-0 flex-wrap items-center gap-1">
-						<AdminNavLinks isAdmin={role === "ADMIN"} />
+						<AdminNavLinks
+							isAdmin={role === "ADMIN" || role === "ADMIN_PARENT"}
+						/>
 						{canSwitchViews && <ViewSwitcher currentView="admin" />}
 					</div>
 

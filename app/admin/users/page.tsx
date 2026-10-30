@@ -3,10 +3,10 @@ import { getAdminUsers } from "@/features/users/data/get-admin-users";
 import { Users, UserRound, ShieldCheck } from "lucide-react";
 import { getAvailablePlayers } from "@/features/users/data/get-available-players";
 import { ManagePlayers } from "@/features/users/manage-players";
+import { ManageUserRole } from "@/features/users/manage-user-role";
 
 export default async function AdminUsersPage() {
-	await requireAdmin();
-
+	const currentAdmin = await requireAdmin();
 	const users = await getAdminUsers();
 	const availablePlayers = await getAvailablePlayers();
 	console.log(users);
@@ -44,7 +44,12 @@ export default async function AdminUsersPage() {
 						<p className="text-sm text-muted-foreground">Parent Accounts</p>
 					</div>
 					<p className="mt-4 text-3xl font-bold tabular-nums">
-						{users.filter((user) => user.hasParentAccess).length}
+						{
+							users.filter(
+								(user) =>
+									user.role === "PARENT" || user.role === "ADMIN_PARENT",
+							).length
+						}
 					</p>
 				</div>
 
@@ -56,7 +61,11 @@ export default async function AdminUsersPage() {
 						<p className="text-sm text-muted-foreground">Admin Accounts</p>
 					</div>
 					<p className="mt-4 text-3xl font-bold tabular-nums">
-						{users.filter((user) => user.role === "ADMIN").length}
+						{
+							users.filter(
+								(user) => user.role === "ADMIN" || user.role === "ADMIN_PARENT",
+							).length
+						}
 					</p>
 				</div>
 			</section>
@@ -103,22 +112,28 @@ export default async function AdminUsersPage() {
 
 											<td className="px-4 py-4">
 												<div className="flex flex-wrap gap-2">
-													{user.role === "ADMIN" && (
+													{(user.role === "ADMIN" ||
+														user.role === "ADMIN_PARENT") && (
 														<span className="rounded-full border px-2.5 py-1 text-xs font-medium">
 															Admin
 														</span>
 													)}
-													{user.hasParentAccess && (
+
+													{(user.role === "PARENT" ||
+														user.role === "ADMIN_PARENT") && (
 														<span className="rounded-full border px-2.5 py-1 text-xs font-medium">
 															Parent
 														</span>
 													)}
-													{user.role === "PARENT" && !user.hasParentAccess && (
-														<span className="text-xs text-muted-foreground">
-															No parent access
-														</span>
-													)}
 												</div>
+												{user.id !== currentAdmin.id && (
+													<div className="mt-3">
+														<ManageUserRole
+															userId={user.id}
+															currentRole={user.role}
+														/>
+													</div>
+												)}
 											</td>
 
 											<td className="px-4 py-4">
@@ -142,7 +157,8 @@ export default async function AdminUsersPage() {
 														)}
 													</div>
 
-													{(user.hasParentAccess || user.role === "PARENT") && (
+													{(user.role === "ADMIN_PARENT" ||
+														user.role === "PARENT") && (
 														<ManagePlayers
 															userId={user.id}
 															playerLinks={user.playerLinks}

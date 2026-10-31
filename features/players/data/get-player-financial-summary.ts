@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/permissions";
+import { requireUser } from "@/lib/permissions";
 import { getPlayerTeams } from "@/features/players/data/get-player-teams";
 
 export async function getPlayerFinancialSummary(playerId: string) {
-	const user = await requireAdmin();
+	const user = await requireUser();
 
 	// Admins can view any player. Parents can view only linked players.
 	const link = await prisma.parentPlayerLink.findUnique({

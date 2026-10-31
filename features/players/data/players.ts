@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { requireParentAccess, requireAdmin } from "@/lib/permissions";
+import {
+	requireParentAccess,
+	requireAdmin,
+	requireUser,
+} from "@/lib/permissions";
 import type { Player } from "@prisma/client";
 import type { PlayerWithFundraisers, PlayerWithTeams } from "../types";
 

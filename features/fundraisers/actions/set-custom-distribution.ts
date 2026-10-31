@@ -19,7 +19,7 @@ export async function setCustomDistribution(
 					id: fundraiserId,
 				},
 				select: {
-					isCompleted: true,
+					status: true,
 				},
 			});
 
@@ -27,7 +27,7 @@ export async function setCustomDistribution(
 				throw new Error("Fundraiser not found");
 			}
 
-			if (fundraiser.isCompleted) {
+			if (fundraiser.status !== "DRAFT") {
 				throw new Error("Completed fundraisers cannot be edited.");
 			}
 

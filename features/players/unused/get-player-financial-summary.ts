@@ -44,8 +44,7 @@ export async function getPlayerFinancialSummary(playerId: string) {
 					type: "DISTRIBUTION",
 					fundraiser: {
 						is: {
-							isCompleted: true,
-							isPublished: true,
+							status: "PUBLISHED",
 						},
 					},
 				},

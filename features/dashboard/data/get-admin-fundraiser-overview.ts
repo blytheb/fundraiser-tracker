@@ -8,17 +8,9 @@ export async function getAdminFundraiserOverview() {
 		select: {
 			id: true,
 			name: true,
-			isCompleted: true,
-			isPublished: true,
+			status: true,
 		},
 	});
 
-	return fundraisers.map((fundraiser) => ({
-		...fundraiser,
-		status: fundraiser.isPublished
-			? "Published"
-			: fundraiser.isCompleted
-				? "Completed"
-				: "Draft",
-	}));
+	return fundraisers;
 }

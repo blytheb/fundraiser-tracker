@@ -38,7 +38,7 @@ describe("addPlayerToFundraiser", () => {
 
 		prismaMock.fundraiserParticipant.create.mockResolvedValue(participant);
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		const result = await addPlayerToFundraiser("fundraiser-1", "player-1");
@@ -53,7 +53,7 @@ describe("addPlayerToFundraiser", () => {
 	});
 	it("rejects adding a player to a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await expect(
@@ -74,7 +74,7 @@ describe("removePlayerFromFundraiser", () => {
 
 		prismaMock.fundraiserParticipant.delete.mockResolvedValue(participant);
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		const result = await removePlayerFromFundraiser("fundraiser-1", "player-1");
@@ -92,7 +92,7 @@ describe("removePlayerFromFundraiser", () => {
 
 	it("rejects removing a player from a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await expect(
@@ -116,7 +116,7 @@ describe("saveFundraiserParticipants", () => {
 		const txMock = {
 			fundraiser: {
 				findUnique: vi.fn().mockResolvedValue({
-					isCompleted: false,
+					status: "DRAFT",
 				}),
 			},
 			fundraiserParticipant: {
@@ -157,7 +157,7 @@ describe("saveFundraiserParticipants", () => {
 		const txMock = {
 			fundraiser: {
 				findUnique: vi.fn().mockResolvedValue({
-					isCompleted: false,
+					status: "DRAFT",
 				}),
 			},
 			fundraiserParticipant: {
@@ -187,7 +187,7 @@ describe("saveFundraiserParticipants", () => {
 		const txMock = {
 			fundraiser: {
 				findUnique: vi.fn().mockResolvedValue({
-					isCompleted: true,
+					status: "COMPLETED",
 				}),
 			},
 			fundraiserParticipant: {

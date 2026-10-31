@@ -23,20 +23,17 @@ export async function getAdminDashboardSummary() {
 		}),
 		prisma.fundraiser.count({
 			where: {
-				isCompleted: false,
-				isPublished: false,
+				status: "DRAFT",
 			},
 		}),
 		prisma.fundraiser.count({
 			where: {
-				isCompleted: true,
-				isPublished: false,
+				status: "COMPLETED",
 			},
 		}),
 		prisma.fundraiser.count({
 			where: {
-				isCompleted: true,
-				isPublished: true,
+				status: "PUBLISHED",
 			},
 		}),
 		prisma.fundraiser.count(),

@@ -86,8 +86,8 @@ describe("getTeamFundraisers", () => {
 describe("getAvailableFundraisersForTeam", () => {
 	it("returns incomplete fundraisers not already associated with the team", async () => {
 		const fundraisers = [
-			{ id: "fundraiser-1", name: "Cookie Sale", isCompleted: false },
-			{ id: "fundraiser-2", name: "Car Wash", isCompleted: false },
+			{ id: "fundraiser-1", name: "Cookie Sale", status: "DRAFT" },
+			{ id: "fundraiser-2", name: "Car Wash", status: "DRAFT" },
 		];
 
 		prismaMock.fundraiser.findMany.mockResolvedValue(fundraisers);
@@ -96,7 +96,7 @@ describe("getAvailableFundraisersForTeam", () => {
 
 		expect(prismaMock.fundraiser.findMany).toHaveBeenCalledWith({
 			where: {
-				isCompleted: false,
+				status: "DRAFT",
 				teams: {
 					none: {
 						teamId: "team-1",

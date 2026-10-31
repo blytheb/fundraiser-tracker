@@ -4,8 +4,6 @@ export type FundraiserFormData = {
 	name: string;
 	description: string;
 	startDate: Date;
-	isCompleted?: boolean;
-	isPublished?: boolean;
 };
 
 export type FundraiserContributionListItem = {

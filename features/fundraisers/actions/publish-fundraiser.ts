@@ -3,7 +3,7 @@
 
 import { prisma } from "@/lib/prisma";
 
-//complete to publish status
+// completed to published status
 export async function publishFundraiser(fundraiserId: string) {
 	return prisma.$transaction(async (tx) => {
 		const fundraiser = await tx.fundraiser.findUnique({
@@ -11,9 +11,12 @@ export async function publishFundraiser(fundraiserId: string) {
 				id: fundraiserId,
 			},
 			select: {
-				isCompleted: true,
-				isPublished: true,
-				participants: true,
+				status: true,
+				_count: {
+					select: {
+						participants: true,
+					},
+				},
 			},
 		});
 
@@ -21,16 +24,17 @@ export async function publishFundraiser(fundraiserId: string) {
 			throw new Error("Fundraiser not found");
 		}
 
-		if (fundraiser.isPublished) {
+		if (fundraiser.status === "PUBLISHED") {
 			throw new Error("Fundraiser is already published");
 		}
-		if (!fundraiser.isCompleted) {
+
+		if (fundraiser.status !== "COMPLETED") {
 			throw new Error(
 				"A fundraiser must be completed before it can be published",
 			);
 		}
 
-		if (fundraiser.participants.length === 0) {
+		if (fundraiser._count.participants === 0) {
 			throw new Error("A fundraiser must have at least one participant");
 		}
 
@@ -39,49 +43,7 @@ export async function publishFundraiser(fundraiserId: string) {
 				id: fundraiserId,
 			},
 			data: {
-				isPublished: true,
-			},
-		});
-
-		return {
-			success: true,
-		};
-	});
-}
-
-export async function reopenFundraiser(fundraiserId: string) {
-	return prisma.$transaction(async (tx) => {
-		const fundraiser = await tx.fundraiser.findUnique({
-			where: {
-				id: fundraiserId,
-			},
-		});
-		if (!fundraiser) {
-			throw new Error("Fundraiser not found");
-		}
-
-		if (!fundraiser.isCompleted) {
-			throw new Error("Fundraiser is already in draft mode.");
-		}
-
-		await tx.playerTransaction.updateMany({
-			where: {
-				fundraiserId,
-				status: "ACTIVE",
-				type: "DISTRIBUTION",
-			},
-			data: {
-				status: "VOID",
-			},
-		});
-
-		await tx.fundraiser.update({
-			where: {
-				id: fundraiserId,
-			},
-			data: {
-				isCompleted: false,
-				isPublished: false,
+				status: "PUBLISHED",
 			},
 		});
 

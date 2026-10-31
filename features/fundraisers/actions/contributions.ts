@@ -18,7 +18,7 @@ export async function addContribution(data: ContributionData) {
 			id: data.fundraiserId,
 		},
 		select: {
-			isCompleted: true,
+			status: true,
 		},
 	});
 
@@ -26,7 +26,7 @@ export async function addContribution(data: ContributionData) {
 		throw new Error("Fundraiser not found");
 	}
 
-	if (fundraiser.isCompleted) {
+	if (fundraiser.status !== "DRAFT") {
 		throw new Error("Completed Fundraisers cannot be edited");
 	}
 	await prisma.fundraiserContribution.create({
@@ -63,7 +63,7 @@ export async function updateContribution(
 			id: contribution.fundraiserId,
 		},
 		select: {
-			isCompleted: true,
+			status: true,
 		},
 	});
 
@@ -71,7 +71,7 @@ export async function updateContribution(
 		throw new Error("Fundraiser not found");
 	}
 
-	if (fundraiser.isCompleted) {
+	if (fundraiser.status !== "DRAFT") {
 		throw new Error("Completed Fundraisers cannot be edited");
 	}
 
@@ -108,7 +108,7 @@ export async function deleteContribution(id: string) {
 			id: contribution.fundraiserId,
 		},
 		select: {
-			isCompleted: true,
+			status: true,
 		},
 	});
 
@@ -116,7 +116,7 @@ export async function deleteContribution(id: string) {
 		throw new Error("Fundraiser not found");
 	}
 
-	if (fundraiser.isCompleted) {
+	if (fundraiser.status !== "DRAFT") {
 		throw new Error("Completed Fundraisers cannot be edited");
 	}
 

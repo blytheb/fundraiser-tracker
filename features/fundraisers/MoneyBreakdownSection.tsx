@@ -13,18 +13,17 @@ import { ChevronsUpDown } from "lucide-react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import type { FundraiserContributionListItem } from "@/features/fundraisers/types";
 import AddContribution from "@/components/forms/fundraisers/AddContribution";
+import { FundraiserStatus } from "@prisma/client";
 
 type SectionProps = {
 	fundraiserId: string;
-	isCompleted: boolean;
-	isPublished: boolean;
 	totalRaised: number;
+	status: FundraiserStatus;
 	funds: FundraiserContributionListItem[];
 };
 export default function MoneyBreakdownSection({
 	fundraiserId,
-	isCompleted,
-	isPublished,
+	status,
 	totalRaised,
 	funds,
 }: SectionProps) {
@@ -45,7 +44,9 @@ export default function MoneyBreakdownSection({
 						<CardTitle className="text-base">Money Breakdown</CardTitle>
 					</div>
 					<div className="flex items-center gap-2">
-						{!isCompleted && <AddContribution fundraiserId={fundraiserId} />}
+						{status === "DRAFT" && (
+							<AddContribution fundraiserId={fundraiserId} />
+						)}
 					</div>
 				</div>
 			</CardHeader>
@@ -94,7 +95,7 @@ export default function MoneyBreakdownSection({
 												currency: "USD",
 											})}
 										</p>
-										{!isCompleted && (
+										{status === "DRAFT" && (
 											<ContributionActions contribution={fund} />
 										)}
 									</div>

@@ -44,7 +44,7 @@ describe("addTeamToFundraiser", () => {
 
 		prismaMock.fundraiserTeam.create.mockResolvedValue(fundraiserTeam);
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		const result = await addTeamToFundraiser("fundraiser-1", "team-1");
@@ -59,7 +59,7 @@ describe("addTeamToFundraiser", () => {
 	});
 	it("rejects adding a team to a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await expect(addTeamToFundraiser("fundraiser-1", "team-1")).rejects.toThrow(
@@ -79,7 +79,7 @@ describe("removeTeamFromFundraiser", () => {
 
 		prismaMock.fundraiserTeam.delete.mockResolvedValue(fundraiserTeam);
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		const result = await removeTeamFromFundraiser("fundraiser-1", "team-1");
@@ -97,7 +97,7 @@ describe("removeTeamFromFundraiser", () => {
 	});
 	it("rejects removing a team from a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await expect(
@@ -175,7 +175,7 @@ describe("saveFundraiserTeams", () => {
 				deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
 			},
 			fundraiser: {
-				findUnique: vi.fn().mockResolvedValue({ isCompleted: false }),
+				findUnique: vi.fn().mockResolvedValue({ status: "DRAFT" }),
 			},
 		};
 
@@ -224,7 +224,7 @@ describe("saveFundraiserTeams", () => {
 				deleteMany: vi.fn().mockResolvedValue({ count: 3 }),
 			},
 			fundraiser: {
-				findUnique: vi.fn().mockResolvedValue({ isCompleted: false }),
+				findUnique: vi.fn().mockResolvedValue({ status: "DRAFT" }),
 			},
 		};
 
@@ -248,7 +248,7 @@ describe("saveFundraiserTeams", () => {
 	it("rejects saving teams when the fundraiser is completed", async () => {
 		const txMock = {
 			fundraiser: {
-				findUnique: vi.fn().mockResolvedValue({ isCompleted: true }),
+				findUnique: vi.fn().mockResolvedValue({ status: "COMPLETED" }),
 			},
 			fundraiserTeam: {
 				deleteMany: vi.fn(),

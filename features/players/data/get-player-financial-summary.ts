@@ -1,25 +1,23 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/permissions";
+import { requireAdmin } from "@/lib/permissions";
 import { getPlayerTeams } from "@/features/players/data/get-player-teams";
 
 export async function getPlayerFinancialSummary(playerId: string) {
-	const user = await requireUser();
+	const user = await requireAdmin();
 
 	// Admins can view any player. Parents can view only linked players.
-	if (user.role !== "ADMIN") {
-		const link = await prisma.parentPlayerLink.findUnique({
-			where: {
-				userId_playerId: {
-					userId: user.id,
-					playerId,
-				},
+	const link = await prisma.parentPlayerLink.findUnique({
+		where: {
+			userId_playerId: {
+				userId: user.id,
+				playerId,
 			},
-			select: { id: true },
-		});
+		},
+		select: { id: true },
+	});
 
-		if (!link) {
-			throw new Error("You do not have access to this player");
-		}
+	if (!link) {
+		throw new Error("You do not have access to this player");
 	}
 
 	const [player, teams, transactions] = await Promise.all([
@@ -46,8 +44,7 @@ export async function getPlayerFinancialSummary(playerId: string) {
 						type: "DISTRIBUTION",
 						fundraiser: {
 							is: {
-								isCompleted: true,
-								isPublished: true,
+								status: "PUBLISHED",
 							},
 						},
 					},

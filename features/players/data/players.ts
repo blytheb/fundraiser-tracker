@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser, requireAdmin } from "@/lib/permissions";
+import { requireParentAccess, requireAdmin } from "@/lib/permissions";
 import type { Player } from "@prisma/client";
 import type { PlayerWithFundraisers, PlayerWithTeams } from "../types";
 
@@ -36,23 +36,22 @@ export async function getPlayers(search?: string): Promise<Player[]> {
 }
 
 export async function getPlayerById(id: string): Promise<Player | null> {
-	const user = await requireUser();
+	const user = await requireParentAccess();
 
-	if (user.role === "PARENT") {
-		const link = await prisma.parentPlayerLink.findUnique({
-			where: {
-				userId_playerId: {
-					userId: user.id,
-					playerId: id,
-				},
+	const link = await prisma.parentPlayerLink.findUnique({
+		where: {
+			userId_playerId: {
+				userId: user.id,
+				playerId: id,
 			},
-			select: { id: true },
-		});
+		},
+		select: { id: true },
+	});
 
-		if (!link) {
-			throw new Error("You do not have access to this player.");
-		}
+	if (!link) {
+		throw new Error("You do not have access to this player.");
 	}
+
 	return prisma.player.findUnique({
 		where: {
 			id,
@@ -158,8 +157,7 @@ export async function getPlayerTransactions(playerId: string) {
 					type: "DISTRIBUTION",
 					fundraiser: {
 						is: {
-							isCompleted: true,
-							isPublished: true,
+							status: "PUBLISHED",
 						},
 					},
 				},

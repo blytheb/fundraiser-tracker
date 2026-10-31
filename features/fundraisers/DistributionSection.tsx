@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
 import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
 import { TeamWithPlayers } from "@/features/teams/types";
-import type { Team, AllocationStatus } from "@prisma/client";
+import type { Team, AllocationStatus, FundraiserStatus } from "@prisma/client";
 import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 
 type SectionProps = {
 	fundraiserId: string;
-	isCompleted: boolean;
+	status: FundraiserStatus;
 	selectedTeamIds: string[];
 	participants: FundraiserParticipantWithPlayer[];
 	activeTeams: Team[];
@@ -35,7 +35,7 @@ type SectionProps = {
 
 export default function DistributionSection({
 	fundraiserId,
-	isCompleted,
+	status,
 	selectedTeamIds,
 	participants,
 	activeTeams,
@@ -114,7 +114,7 @@ export default function DistributionSection({
 						<CardTitle className="text-base">Participant Breakdown</CardTitle>
 					</div>
 					<div className="flex items-center gap-2">
-						{!isCompleted && (
+						{status === "DRAFT" && (
 							<SelectFundraiserRoster
 								fundraiserId={fundraiserId}
 								selectedTeamIds={selectedTeamIds}
@@ -145,7 +145,7 @@ export default function DistributionSection({
 										{participant.player.firstName} {participant.player.lastName}
 									</p>
 								</div>
-								{!isCompleted ? (
+								{status === "DRAFT" ? (
 									<Input
 										type="number"
 										min="0"
@@ -171,7 +171,7 @@ export default function DistributionSection({
 						);
 					})}
 				</div>
-				{!isCompleted && (
+				{status === "DRAFT" && (
 					<div className="border-t pt-3">
 						<div className="flex justify-end gap-4 px-3">
 							<span className="font-semibold">Total Raised</span>

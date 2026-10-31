@@ -1,4 +1,3 @@
-//when does the fundraiser become official
 "use server";
 
 import { prisma } from "@/lib/prisma";
@@ -9,12 +8,16 @@ export async function reopenFundraiser(fundraiserId: string) {
 			where: {
 				id: fundraiserId,
 			},
+			select: {
+				status: true,
+			},
 		});
+
 		if (!fundraiser) {
 			throw new Error("Fundraiser not found");
 		}
 
-		if (!fundraiser.isCompleted) {
+		if (fundraiser.status === "DRAFT") {
 			throw new Error("Fundraiser is already in draft mode.");
 		}
 
@@ -34,8 +37,7 @@ export async function reopenFundraiser(fundraiserId: string) {
 				id: fundraiserId,
 			},
 			data: {
-				isCompleted: false,
-				isPublished: false,
+				status: "DRAFT",
 			},
 		});
 

@@ -72,8 +72,7 @@ describe("publishFundraiser", () => {
 
 	it("throws an error when the fundraiser is already published", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
-			isPublished: true,
+			status: "PUBLISHED",
 			participants: [{ id: "participant-1" }],
 		});
 
@@ -86,8 +85,7 @@ describe("publishFundraiser", () => {
 
 	it("throws an error when the fundraiser has no participants", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
-			isPublished: false,
+			status: "COMPLETED",
 			participants: [],
 		});
 
@@ -100,29 +98,27 @@ describe("publishFundraiser", () => {
 
 	it("publishes a fundraiser with participants", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
-			isPublished: false,
+			status: "COMPLETED",
 			participants: [{ id: "participant-1" }],
 		});
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isPublished: true,
+			status: "PUBLISHED",
 		});
 
 		const result = await publishFundraiser("fundraiser-1");
 
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
-			data: { isPublished: true },
+			data: { status: "PUBLISHED" },
 		});
 
 		expect(result).toEqual({ success: true });
 	});
 	it("throws an error when the fundraiser is incomplete", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
-			isPublished: false,
+			status: "DRAFT",
 			participants: [{ id: "participant-1" }],
 		});
 
@@ -146,7 +142,7 @@ describe("reopenFundraiser", () => {
 	});
 	it("throws an error when the fundraiser is already in draft mode", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		await expect(reopenFundraiser("fundraiser-1")).rejects.toThrow(
@@ -159,14 +155,12 @@ describe("reopenFundraiser", () => {
 	it("reopens a published fundraiser successfully", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
-			isPublished: true,
-			isCompleted: true,
+			status: "PUBLISHED",
 		});
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isPublished: false,
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		const result = await reopenFundraiser("fundraiser-1");
@@ -182,14 +176,14 @@ describe("reopenFundraiser", () => {
 
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
-			data: { isCompleted: false, isPublished: false },
+			data: { status: "DRAFT" },
 		});
 
 		expect(result).toEqual({ success: true });
 	});
 	it("returns a published fundraiser to draft mode", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		txMock.playerTransaction.updateMany.mockResolvedValue({
@@ -198,8 +192,7 @@ describe("reopenFundraiser", () => {
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
-			isPublished: false,
+			status: "DRAFT",
 		});
 
 		const result = await reopenFundraiser("fundraiser-1");
@@ -220,8 +213,7 @@ describe("reopenFundraiser", () => {
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
 			data: {
-				isCompleted: false,
-				isPublished: false,
+				status: "DRAFT",
 			},
 		});
 
@@ -232,7 +224,7 @@ describe("reopenFundraiser", () => {
 
 	it("returns a published fundraiser to draft mode when no transactions exist", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		txMock.playerTransaction.updateMany.mockResolvedValue({
@@ -241,8 +233,7 @@ describe("reopenFundraiser", () => {
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
-			isPublished: false,
+			status: "DRAFT",
 		});
 
 		const result = await reopenFundraiser("fundraiser-1");
@@ -261,8 +252,7 @@ describe("reopenFundraiser", () => {
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
 			data: {
-				isCompleted: false,
-				isPublished: false,
+				status: "DRAFT",
 			},
 		});
 
@@ -282,11 +272,11 @@ describe("completeFundraiser", () => {
 	});
 	it("throws an error when the fundraiser is already completed", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await expect(completeFundraiser("fundraiser-1")).rejects.toThrow(
-			"Fundraiser is already completed",
+			"Only draft fundraisers can be completed.",
 		);
 
 		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
@@ -294,7 +284,7 @@ describe("completeFundraiser", () => {
 
 	it("throws an error when funds remain unallocated", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 			participants: [],
 		});
 
@@ -312,7 +302,7 @@ describe("completeFundraiser", () => {
 	it("completes a fundraiser successfully", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
+			status: "DRAFT",
 			participants: [
 				{
 					playerId: "player-1",
@@ -332,17 +322,9 @@ describe("completeFundraiser", () => {
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 		const result = await completeFundraiser("fundraiser-1");
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalledWith(
-			expect.objectContaining({
-				data: expect.objectContaining({
-					isPublished: expect.anything(),
-				}),
-			}),
-		);
 
 		expect(txMock.playerTransaction.createMany).toHaveBeenCalledWith({
 			data: [
@@ -359,19 +341,19 @@ describe("completeFundraiser", () => {
 
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
-			data: { isCompleted: true },
+			data: { status: "COMPLETED" },
 		});
 
 		expect(result).toEqual({
 			id: "fundraiser-1",
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 	});
 
 	it("completes when a participant has no allocation and creates transactions only for allocated participants", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
+			status: "DRAFT",
 			participants: [
 				{
 					playerId: "player-1",
@@ -391,7 +373,7 @@ describe("completeFundraiser", () => {
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await completeFundraiser("fundraiser-1");
@@ -412,7 +394,7 @@ describe("completeFundraiser", () => {
 	it("throws an error when allocations exceed funds raised", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
+			status: "DRAFT",
 			participants: [],
 		});
 
@@ -435,7 +417,7 @@ describe("completeFundraiser", () => {
 	it("completes a fundraiser with zero funds and creates no transactions", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
+			status: "DRAFT",
 			participants: [
 				{
 					playerId: "player-1",
@@ -454,7 +436,7 @@ describe("completeFundraiser", () => {
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		const result = await completeFundraiser("fundraiser-1");
@@ -463,18 +445,18 @@ describe("completeFundraiser", () => {
 
 		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
-			data: { isCompleted: true },
+			data: { status: "COMPLETED" },
 		});
 
 		expect(result).toEqual({
 			id: "fundraiser-1",
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 	});
 	it("creates a new distribution transaction when completing again after a previous distribution was voided", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
+			status: "DRAFT",
 			participants: [
 				{
 					playerId: "player-1",
@@ -498,7 +480,7 @@ describe("completeFundraiser", () => {
 
 		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await completeFundraiser("fundraiser-1");
@@ -520,7 +502,7 @@ describe("completeFundraiser", () => {
 	it("does not mark the fundraiser completed when distribution creation fails", async () => {
 		txMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
-			isCompleted: false,
+			status: "DRAFT",
 			participants: [
 				{
 					playerId: "player-1",
@@ -557,8 +539,7 @@ describe("completeFundraiser", () => {
 it("reopens a completed but unpublished fundraiser", async () => {
 	txMock.fundraiser.findUnique.mockResolvedValue({
 		id: "fundraiser-1",
-		isCompleted: true,
-		isPublished: false,
+		status: "COMPLETED",
 	});
 
 	txMock.playerTransaction.updateMany.mockResolvedValue({
@@ -567,8 +548,7 @@ it("reopens a completed but unpublished fundraiser", async () => {
 
 	txMock.fundraiser.update.mockResolvedValue({
 		id: "fundraiser-1",
-		isCompleted: false,
-		isPublished: false,
+		status: "DRAFT",
 	});
 
 	const result = await reopenFundraiser("fundraiser-1");
@@ -584,7 +564,7 @@ it("reopens a completed but unpublished fundraiser", async () => {
 
 	expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 		where: { id: "fundraiser-1" },
-		data: { isCompleted: false, isPublished: false },
+		data: { status: "DRAFT" },
 	});
 
 	expect(result).toEqual({ success: true });

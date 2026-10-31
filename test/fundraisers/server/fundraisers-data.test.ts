@@ -25,7 +25,6 @@ vi.mock("@/lib/prisma", () => ({
 
 import {
 	getFundraisers,
-	getInCompleteFundraisers,
 	getFundraiserById,
 	getFundraiserWithTeams,
 	getFundraiserWithParticipants,
@@ -76,24 +75,6 @@ describe("getFundraisers", () => {
 					mode: "insensitive",
 				},
 			},
-			orderBy: { startDate: "desc" },
-		});
-		expect(result).toEqual(fundraisers);
-	});
-});
-
-describe("getInCompleteFundraisers", () => {
-	it("gets all incomplete fundraisers ordered by start date", async () => {
-		const fundraisers = [
-			{ id: "fundraiser-1", name: "Cookie Sale", isCompleted: false },
-		];
-
-		prismaMock.fundraiser.findMany.mockResolvedValue(fundraisers);
-
-		const result = await getInCompleteFundraisers();
-
-		expect(prismaMock.fundraiser.findMany).toHaveBeenCalledWith({
-			where: { isCompleted: false },
 			orderBy: { startDate: "desc" },
 		});
 		expect(result).toEqual(fundraisers);
@@ -186,8 +167,7 @@ describe("getPublishedFundraisersByPlayer", () => {
 			{
 				id: "fundraiser-1",
 				name: "Cookie Sale",
-				isPublished: true,
-				isCompleted: true,
+				status: "PUBLISHED",
 				transactions: [
 					{
 						id: "transaction-1",
@@ -206,7 +186,7 @@ describe("getPublishedFundraisersByPlayer", () => {
 
 		expect(prismaMock.fundraiser.findMany).toHaveBeenCalledWith({
 			where: {
-				isPublished: true,
+				status: "PUBLISHED",
 				participants: {
 					some: {
 						playerId: "player-1",

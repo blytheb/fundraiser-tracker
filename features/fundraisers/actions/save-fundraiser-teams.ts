@@ -9,14 +9,14 @@ export async function saveFundraiserTeams(
 	await prisma.$transaction(async (tx) => {
 		const fundraiser = await tx.fundraiser.findUnique({
 			where: { id: fundraiserId },
-			select: { isCompleted: true },
+			select: { status: true },
 		});
 
 		if (!fundraiser) {
 			throw new Error("Fundraiser not found");
 		}
 
-		if (fundraiser.isCompleted) {
+		if (fundraiser.status !== "DRAFT") {
 			throw new Error("Completed fundraisers cannot be edited.");
 		}
 		// 1. Find all players who are eligible based on

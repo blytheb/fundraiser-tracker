@@ -42,8 +42,7 @@ describe("createFundraiser", () => {
 		const fundraiser = {
 			id: "fundraiser-1",
 			...data,
-			isCompleted: false,
-			isPublished: false,
+			status: "DRAFT",
 		};
 
 		prismaMock.fundraiser.create.mockResolvedValue(fundraiser);
@@ -66,13 +65,12 @@ describe("updateFundraiser", () => {
 		const fundraiser = {
 			id: "fundraiser-1",
 			...data,
-			isCompleted: false,
-			isPublished: false,
+			status: "PUBLISHED",
 		};
 
 		prismaMock.fundraiser.update.mockResolvedValue(fundraiser);
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		const result = await updateFundraiser("fundraiser-1", data as never);
@@ -92,7 +90,7 @@ describe("updateFundraiser", () => {
 		};
 
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		await expect(
@@ -112,7 +110,7 @@ describe("deleteFundraiser", () => {
 
 		prismaMock.fundraiser.delete.mockResolvedValue(fundraiser);
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		const result = await deleteFundraiser("fundraiser-1");
@@ -125,8 +123,8 @@ describe("deleteFundraiser", () => {
 	});
 	it("rejects deleting a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
-		} as any);
+			status: "COMPLETED",
+		});
 
 		await expect(deleteFundraiser("fundraiser-1")).rejects.toThrow(
 			"Completed fundraisers cannot be deleted.",

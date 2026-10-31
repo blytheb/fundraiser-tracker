@@ -21,17 +21,19 @@ type FundraiserListItemProps = {
 export default function FundraiserListItem({
 	fundraiser,
 }: FundraiserListItemProps) {
-	const status = fundraiser.isCompleted
-		? "Completed"
-		: fundraiser.isPublished
-			? "Published"
-			: "Draft";
+	const status =
+		fundraiser.status === "DRAFT"
+			? "Draft"
+			: fundraiser.status === "COMPLETED"
+				? "Completed"
+				: "Published";
 
-	const StatusIcon = fundraiser.isCompleted
-		? BadgeCheck
-		: fundraiser.isPublished
-			? CalendarClock
-			: FileEdit;
+	const StatusIcon =
+		fundraiser.status === "DRAFT"
+			? FileEdit
+			: fundraiser.status === "COMPLETED"
+				? BadgeCheck
+				: CalendarClock;
 
 	return (
 		<Item variant="outline" size="sm">

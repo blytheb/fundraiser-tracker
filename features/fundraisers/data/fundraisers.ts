@@ -4,7 +4,7 @@ import type {
 	FundraiserWithTeams,
 	FundraiserWithParticipants,
 } from "@/features/fundraisers/types";
-import { requireUser } from "@/lib/permissions";
+import { requireParentAccess } from "@/lib/permissions";
 
 //get All fundraisers
 export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
@@ -18,17 +18,6 @@ export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
 				}
 			: undefined,
 
-		orderBy: {
-			startDate: "desc",
-		},
-	});
-}
-
-export async function getInCompleteFundraisers(): Promise<Fundraiser[]> {
-	return prisma.fundraiser.findMany({
-		where: {
-			isCompleted: false,
-		},
 		orderBy: {
 			startDate: "desc",
 		},
@@ -81,26 +70,24 @@ export async function getFundraiserWithParticipants(
 }
 
 export async function getPublishedFundraisersByPlayer(playerId: string) {
-	const user = await requireUser();
+	const user = await requireParentAccess();
 
-	if (user.role === "PARENT") {
-		const link = await prisma.parentPlayerLink.findUnique({
-			where: {
-				userId_playerId: {
-					userId: user.id,
-					playerId,
-				},
+	const link = await prisma.parentPlayerLink.findUnique({
+		where: {
+			userId_playerId: {
+				userId: user.id,
+				playerId,
 			},
-			select: { id: true },
-		});
+		},
+		select: { id: true },
+	});
 
-		if (!link) {
-			throw new Error("You do not have access to this player.");
-		}
+	if (!link) {
+		throw new Error("You do not have access to this player.");
 	}
 	return await prisma.fundraiser.findMany({
 		where: {
-			isPublished: true,
+			status: "PUBLISHED",
 			participants: {
 				some: {
 					playerId,

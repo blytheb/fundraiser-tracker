@@ -173,8 +173,7 @@ model Fundraiser {
   id          String   @id @default(cuid())
   name        String
   description String
-  isCompleted Boolean  @default(false)
-  isPublished Boolean  @default(false)
+  status        FundraiserStatus @default(DRAFT)
   startDate   DateTime
 
   createdAt DateTime @default(now())
@@ -184,6 +183,12 @@ model Fundraiser {
   participants  FundraiserParticipant[] //players participating in the fundraiser
   teams         FundraiserTeam[] //teams associated with the fundraiser  
   transactions  PlayerTransaction[] //player financial transactions associated with the fundraiser
+}
+
+enum FundraiserStatus {
+  DRAFT
+  COMPLETED
+  PUBLISHED
 }
 
 // ------------------------------------------------------------

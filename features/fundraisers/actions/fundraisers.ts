@@ -16,14 +16,14 @@ export async function updateFundraiser(
 ): Promise<Fundraiser> {
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id },
-		select: { isCompleted: true },
+		select: { status: true },
 	});
 
 	if (!fundraiser) {
 		throw new Error("Fundraiser not found");
 	}
 
-	if (fundraiser.isCompleted) {
+	if (fundraiser.status !== "DRAFT") {
 		throw new Error("Completed fundraisers cannot be edited.");
 	}
 
@@ -36,14 +36,14 @@ export async function updateFundraiser(
 export async function deleteFundraiser(id: string): Promise<Fundraiser> {
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id },
-		select: { isCompleted: true },
+		select: { status: true },
 	});
 
 	if (!fundraiser) {
 		throw new Error("Fundraiser not found");
 	}
 
-	if (fundraiser.isCompleted) {
+	if (fundraiser.status !== "DRAFT") {
 		throw new Error("Completed fundraisers cannot be deleted.");
 	}
 

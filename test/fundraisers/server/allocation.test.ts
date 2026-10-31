@@ -45,9 +45,9 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
-import { getActiveFundraiserAllocations } from "@/features/fundraisers/actions/get-active-fundraiser-allocations";
-import { getParticipantFinancialSummary } from "@/features/fundraisers/actions/get-participant-financial-summary";
-import { getFundraiserFinancialSummary } from "@/features/fundraisers/actions/get-fundraiser-financial-summary";
+import { getActiveFundraiserAllocations } from "@/features/fundraisers/data/get-active-fundraiser-allocations";
+import { getParticipantFinancialSummary } from "@/features/fundraisers/data/get-participant-financial-summary";
+import { getFundraiserFinancialSummary } from "@/features/fundraisers/data/get-fundraiser-financial-summary";
 
 describe("setCustomDistribution", () => {
 	beforeEach(() => {
@@ -60,7 +60,7 @@ describe("setCustomDistribution", () => {
 		);
 
 		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([
@@ -88,7 +88,7 @@ describe("setCustomDistribution", () => {
 
 	it("rejects changes to a completed fundraiser", async () => {
 		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: true,
+			status: "COMPLETED",
 		});
 
 		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([
@@ -258,7 +258,7 @@ describe("setCustomDistribution", () => {
 
 	it("treats null total contributions as zero", async () => {
 		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([
@@ -290,7 +290,7 @@ describe("setCustomDistribution", () => {
 
 	it("creates an allocation when a participant has no existing allocation", async () => {
 		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([
@@ -328,7 +328,7 @@ describe("setCustomDistribution", () => {
 
 	it("voids an existing allocation without creating a new zero allocation", async () => {
 		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			isCompleted: false,
+			status: "DRAFT",
 		});
 
 		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([

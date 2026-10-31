@@ -15,7 +15,7 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-import { getParticipantFinancialSummary } from "@/features/fundraisers/actions/get-participant-financial-summary";
+import { getParticipantFinancialSummary } from "@/features/fundraisers/data/get-participant-financial-summary";
 
 describe("getParticipantFinancialSummary", () => {
 	beforeEach(() => {

@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 
-import PlayerPage from "@/app/(protected)/players/[playerId]/page";
+import PlayerPage from "@/app/admin/players/[playerId]/page";
 
 const { getPlayerByIdMock, getPlayerTeamsMock } = vi.hoisted(() => ({
 	getPlayerByIdMock: vi.fn(),

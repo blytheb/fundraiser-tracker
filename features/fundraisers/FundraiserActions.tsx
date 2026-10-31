@@ -66,13 +66,13 @@ export default function FundraiserActions({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align="end">
-						{!fundraiser.isCompleted ? (
+						{fundraiser.status === "DRAFT" ? (
 							<DropdownMenuItem onClick={handleComplete}>
 								Complete Fundraiser
 							</DropdownMenuItem>
 						) : (
 							<>
-								{!fundraiser.isPublished && (
+								{fundraiser.status === "COMPLETED" && (
 									<DropdownMenuItem onClick={handlePublish}>
 										Publish Fundraiser
 									</DropdownMenuItem>

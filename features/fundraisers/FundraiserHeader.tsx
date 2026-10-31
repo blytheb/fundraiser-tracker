@@ -14,7 +14,6 @@ import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 import { FundraiserParticipantWithPlayer } from "@/features/fundraisers/types";
 
 import type { Team, Fundraiser } from "@prisma/client";
-import { FundraiserParticipant } from "@prisma/client";
 
 type SectionProps = {
 	fundraiser: Fundraiser;
@@ -39,15 +38,13 @@ export default function FundraiserHeader({
 				<CardContent className="p-5">
 					<div className="flex items-start justify-between gap-4">
 						<div className="space-y-4">
-							{!fundraiser.isCompleted && !fundraiser.isPublished && (
-								<Badge variant="secondary">Draft</Badge>
-							)}
-							{fundraiser.isCompleted && !fundraiser.isPublished && (
-								<Badge variant="secondary">Completed</Badge>
-							)}
-							{fundraiser.isCompleted && fundraiser.isPublished && (
-								<Badge variant="secondary">Published</Badge>
-							)}
+							<Badge variant="secondary">
+								{fundraiser.status === "DRAFT"
+									? "Draft"
+									: fundraiser.status === "COMPLETED"
+										? "Completed"
+										: "Published"}
+							</Badge>
 
 							<PageHeader
 								heading={fundraiser.name}

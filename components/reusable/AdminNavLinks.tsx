@@ -45,6 +45,13 @@ export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 					Fundraisers
 				</NavigationMenuLink>
 			</NavigationMenuItem>
+			<NavigationMenuItem>
+				<NavigationMenuLink
+					className={navLinkClassName}
+					render={<Link href="/admin/users" />}>
+					Users
+				</NavigationMenuLink>
+			</NavigationMenuItem>
 		</>
 	);
 }

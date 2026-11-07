@@ -1,10 +1,14 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function getParticipantFinancialSummary(
 	fundraiserParticipantId: string,
 ) {
+	await requireAdmin();
+
 	const participant = await prisma.fundraiserParticipant.findUnique({
 		where: {
 			id: fundraiserParticipantId,
@@ -37,25 +41,26 @@ export async function getParticipantFinancialSummary(
 		},
 	});
 
-	const allocationAmount = allocations.reduce(
-		(total, allocation) => total + Number(allocation.amount),
-		0,
+	const zero = new Prisma.Decimal(0);
+	const allocationAmount = Prisma.Decimal.sum(
+		zero,
+		...allocations.map((allocation) => allocation.amount),
 	);
-	const distributedAmount = allocations.reduce(
-		(total, allocation) =>
-			total +
-			allocation.transactions.reduce(
-				(sum, transaction) => sum + Number(transaction.amount),
-				0,
-			),
-		0,
+	const distributedAmount = Prisma.Decimal.sum(
+		zero,
+		...allocations.flatMap((allocation) =>
+			allocation.transactions.map((transaction) => transaction.amount),
+		),
+	);
+	const remainingAmount = Prisma.Decimal.max(
+		zero,
+		allocationAmount.minus(distributedAmount),
 	);
 
-	const remainingAmount = Math.max(0, allocationAmount - distributedAmount);
 	return {
 		participant,
-		allocationAmount,
-		distributedAmount,
-		remainingAmount,
+		allocationAmount: allocationAmount.toNumber(),
+		distributedAmount: distributedAmount.toNumber(),
+		remainingAmount: remainingAmount.toNumber(),
 	};
 }

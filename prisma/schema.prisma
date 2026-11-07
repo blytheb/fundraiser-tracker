@@ -430,12 +430,16 @@ enum PlayerTransactionType {
 // ------------------------------------------------------------
 // TransactionStatus
 // ------------------------------------------------------------
-// ACTIVE:
-//   Current transaction.
+// INTERNAL:
+//   Visible to admins only. Distributions start here when a
+//   fundraiser is completed, and return here when it is unpublished.
+//
+// PUBLISHED:
+//   Visible to parents and counted in player balances.
 //
 // VOID:
-//   Transaction is no longer active but is kept for history.
-//   Useful when a fundraiser is unpublished or redistributed.
+//   No longer valid but kept for history.
+//   Distributions are voided when a fundraiser is reopened.
 
 enum TransactionStatus {
   INTERNAL

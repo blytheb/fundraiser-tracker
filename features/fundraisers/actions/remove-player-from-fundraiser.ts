@@ -1,11 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function removePlayerFromFundraiser(
 	fundraiserId: string,
 	playerId: string,
 ) {
+	await requireAdmin();
+
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id: fundraiserId },
 		select: { status: true },

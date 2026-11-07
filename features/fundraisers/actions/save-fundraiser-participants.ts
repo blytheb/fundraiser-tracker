@@ -1,11 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function saveFundraiserParticipants(
 	fundraiserId: string,
 	playerIds: string[],
 ) {
+	await requireAdmin();
+
 	return prisma.$transaction(async (tx) => {
 		const fundraiser = await tx.fundraiser.findUnique({
 			where: { id: fundraiserId },
@@ -37,6 +40,25 @@ export async function saveFundraiserParticipants(
 					playerId,
 				})),
 				skipDuplicates: true,
+			});
+		}
+
+		//every participant needs an allocation: new participants start at $0
+		const withoutAllocation = await tx.fundraiserParticipant.findMany({
+			where: {
+				fundraiserId,
+				allocations: { none: { status: "ACTIVE" } },
+			},
+			select: { id: true },
+		});
+
+		if (withoutAllocation.length > 0) {
+			await tx.fundraiserAllocation.createMany({
+				data: withoutAllocation.map((participant) => ({
+					fundraiserParticipantId: participant.id,
+					amount: 0,
+					status: "ACTIVE" as const,
+				})),
 			});
 		}
 

@@ -1,11 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function saveFundraiserTeams(
 	fundraiserId: string,
 	teamIds: string[],
 ): Promise<void> {
+	await requireAdmin();
+
 	await prisma.$transaction(async (tx) => {
 		const fundraiser = await tx.fundraiser.findUnique({
 			where: { id: fundraiserId },

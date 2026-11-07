@@ -1,11 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function addPlayerToFundraiser(
 	fundraiserId: string,
 	playerId: string,
 ) {
+	await requireAdmin();
+
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id: fundraiserId },
 		select: { status: true },
@@ -23,6 +26,10 @@ export async function addPlayerToFundraiser(
 		data: {
 			fundraiserId,
 			playerId,
+			//every participant starts with a $0 allocation
+			allocations: {
+				create: { amount: 0, status: "ACTIVE" },
+			},
 		},
 	});
 }

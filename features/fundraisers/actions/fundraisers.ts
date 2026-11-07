@@ -1,12 +1,15 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 import type { Fundraiser } from "@prisma/client";
 import type { FundraiserFormData } from "../types";
 
 export async function createFundraiser(
 	data: FundraiserFormData,
 ): Promise<Fundraiser> {
+	await requireAdmin();
+
 	return prisma.fundraiser.create({ data });
 }
 
@@ -14,6 +17,8 @@ export async function updateFundraiser(
 	id: string,
 	data: FundraiserFormData,
 ): Promise<Fundraiser> {
+	await requireAdmin();
+
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id },
 		select: { status: true },
@@ -34,6 +39,8 @@ export async function updateFundraiser(
 }
 
 export async function deleteFundraiser(id: string): Promise<Fundraiser> {
+	await requireAdmin();
+
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: { id },
 		select: { status: true },

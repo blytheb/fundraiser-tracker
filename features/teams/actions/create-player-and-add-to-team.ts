@@ -1,12 +1,15 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 import type { PlayerFormData } from "@/features/players/types";
 
 export async function createPlayerAndAddToTeam(
 	teamId: string,
 	data: PlayerFormData,
 ) {
+	await requireAdmin();
+
 	return prisma.$transaction(async (tx) => {
 		const player = await tx.player.create({
 			data: {

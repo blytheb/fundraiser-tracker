@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 import type { ContributionType, PaymentMethod } from "@prisma/client";
 
 type ContributionData = {
@@ -13,6 +14,8 @@ type ContributionData = {
 };
 
 export async function addContribution(data: ContributionData) {
+	await requireAdmin();
+
 	const fundraiser = await prisma.fundraiser.findUnique({
 		where: {
 			id: data.fundraiserId,
@@ -45,6 +48,8 @@ export async function updateContribution(
 	id: string,
 	data: Omit<ContributionData, "fundraiserId">,
 ) {
+	await requireAdmin();
+
 	const contribution = await prisma.fundraiserContribution.findUnique({
 		where: {
 			id,
@@ -90,6 +95,8 @@ export async function updateContribution(
 }
 
 export async function deleteContribution(id: string) {
+	await requireAdmin();
+
 	const contribution = await prisma.fundraiserContribution.findUnique({
 		where: {
 			id,

@@ -1,8 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function getActiveFundraiserAllocations(fundraiserId: string) {
+	await requireAdmin();
+
 	const allocations = await prisma.fundraiserAllocation.findMany({
 		where: {
 			fundraiserParticipant: {

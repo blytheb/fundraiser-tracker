@@ -30,6 +30,26 @@ export async function completeFundraiser(fundraiserId: string) {
 		}
 
 		//any error thrown below rolls the status back to DRAFT automatically
+		const participantsWithoutAllocation =
+			await tx.fundraiserParticipant.findMany({
+				where: {
+					fundraiserId,
+					allocations: { none: { status: "ACTIVE" } },
+				},
+				select: { id: true },
+			});
+
+		//every participant needs an allocation: anyone left blank gets $0
+		if (participantsWithoutAllocation.length > 0) {
+			await tx.fundraiserAllocation.createMany({
+				data: participantsWithoutAllocation.map((p) => ({
+					fundraiserParticipantId: p.id,
+					amount: new Prisma.Decimal(0),
+					status: "ACTIVE" as const,
+				})),
+			});
+		}
+
 		const fundraiser = await tx.fundraiser.findUniqueOrThrow({
 			where: { id: fundraiserId },
 			include: {
@@ -49,48 +69,38 @@ export async function completeFundraiser(fundraiserId: string) {
 			throw new Error("A fundraiser must have at least one participant");
 		}
 
-		if (fundraiser.participants.some((p) => p.allocations.length === 0)) {
+		if (fundraiser.participants.some((p) => p.allocations.length !== 1)) {
 			throw new Error(
-				"Each participant must have one allocation before completing",
+				"Each participant must have exactly one allocation before completing",
 			);
 		}
 
-		const [contributions, allocations] = await Promise.all([
-			tx.fundraiserContribution.aggregate({
-				where: { fundraiserId },
-				_sum: { amount: true },
-			}),
-			tx.fundraiserAllocation.aggregate({
-				where: {
-					fundraiserParticipant: { fundraiserId },
-					status: "ACTIVE",
-				},
-				_sum: { amount: true },
-			}),
-		]);
+		const contributions = await tx.fundraiserContribution.aggregate({
+			where: { fundraiserId },
+			_sum: { amount: true },
+		});
 
 		const totalRaised = contributions._sum.amount ?? new Prisma.Decimal(0);
-		const allocated = allocations._sum.amount ?? new Prisma.Decimal(0);
-
-		if (allocated.greaterThan(totalRaised)) {
-			throw new Error("Allocated funds cannot exceed funds raised");
-		}
+		const allocated = Prisma.Decimal.sum(
+			new Prisma.Decimal(0),
+			...fundraiser.participants.map((p) => p.allocations[0].amount),
+		);
 
 		if (!allocated.equals(totalRaised)) {
-			throw new Error("All funds must be allocated before completing");
+			throw new Error(
+				`All funds must be allocated before completing. Allocated ${allocated.toFixed(2)} of ${totalRaised.toFixed(2)}`,
+			);
 		}
 
-		const distributions = fundraiser.participants
-			.filter((participant) => participant.allocations.length === 1)
-			.map((participant) => ({
-				playerId: participant.playerId,
-				fundraiserId: fundraiser.id,
-				allocationId: participant.allocations[0].id,
-				amount: participant.allocations[0].amount,
-				type: "DISTRIBUTION" as const,
-				status: "INTERNAL" as const, //admin only until published
-				description: "Fundraiser distribution",
-			}));
+		const distributions = fundraiser.participants.map((participant) => ({
+			playerId: participant.playerId,
+			fundraiserId: fundraiser.id,
+			allocationId: participant.allocations[0].id,
+			amount: participant.allocations[0].amount,
+			type: "DISTRIBUTION" as const,
+			status: "INTERNAL" as const, //admin only until published
+			description: "Fundraiser distribution",
+		}));
 
 		if (distributions.length > 0) {
 			await tx.playerTransaction.createMany({

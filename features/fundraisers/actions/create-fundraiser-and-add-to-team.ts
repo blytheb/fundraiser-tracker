@@ -1,12 +1,15 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 import { FundraiserFormData } from "@/features/fundraisers/types";
 
 export async function createFundraiserAndAddToTeam(
 	teamId: string,
 	data: FundraiserFormData,
 ) {
+	await requireAdmin();
+
 	return prisma.$transaction(async (tx) => {
 		const fundraiser = await tx.fundraiser.create({
 			data: {

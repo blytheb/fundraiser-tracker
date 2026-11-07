@@ -1,26 +1,27 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 type CustomAllocation = {
 	participantId: string;
 	amount: number;
 };
 
+//every participant in the fundraiser ends up with exactly one ACTIVE allocation.
+//participants left out of the request (or left blank) are allocated $0.
 export async function setCustomDistribution(
 	fundraiserId: string,
 	allocations: CustomAllocation[],
 ) {
+	await requireAdmin();
+
 	return prisma.$transaction(
 		async (tx) => {
-			// Check fundraiser
 			const fundraiser = await tx.fundraiser.findUnique({
-				where: {
-					id: fundraiserId,
-				},
-				select: {
-					status: true,
-				},
+				where: { id: fundraiserId },
+				select: { status: true },
 			});
 
 			if (!fundraiser) {
@@ -31,74 +32,74 @@ export async function setCustomDistribution(
 				throw new Error("Completed fundraisers cannot be edited.");
 			}
 
-			// Get participants
 			const participants = await tx.fundraiserParticipant.findMany({
-				where: {
-					fundraiserId,
-				},
-				select: {
-					id: true,
-				},
+				where: { fundraiserId },
+				select: { id: true },
 			});
 
 			if (participants.length === 0) {
 				throw new Error("No participants found");
 			}
 
-			const participantIds = new Set(
-				participants.map((participant) => participant.id),
+			//start every participant at $0, then apply submitted amounts
+			const desiredByParticipant = new Map<string, Prisma.Decimal>(
+				participants.map((p) => [p.id, new Prisma.Decimal(0)]),
 			);
 
-			// Validate submitted participants and amounts
+			const seen = new Set<string>();
 			for (const allocation of allocations) {
-				if (!participantIds.has(allocation.participantId)) {
+				if (!desiredByParticipant.has(allocation.participantId)) {
 					throw new Error(
 						`Participant ${allocation.participantId} does not belong to fundraiser ${fundraiserId}`,
 					);
 				}
 
-				if (allocation.amount < 0) {
+				if (seen.has(allocation.participantId)) {
+					throw new Error(
+						`Participant ${allocation.participantId} was submitted more than once`,
+					);
+				}
+				seen.add(allocation.participantId);
+
+				if (!Number.isFinite(allocation.amount)) {
+					throw new Error(
+						`Allocation amount for participant ${allocation.participantId} is not a valid number`,
+					);
+				}
+
+				const amount = new Prisma.Decimal(allocation.amount).toDecimalPlaces(
+					2,
+					Prisma.Decimal.ROUND_HALF_UP,
+				);
+
+				if (amount.isNegative()) {
 					throw new Error(
 						`Allocation amount for participant ${allocation.participantId} cannot be negative`,
 					);
 				}
+
+				desiredByParticipant.set(allocation.participantId, amount);
 			}
 
-			// Get total money raised
 			const contributions = await tx.fundraiserContribution.aggregate({
-				where: {
-					fundraiserId,
-				},
-				_sum: {
-					amount: true,
-				},
+				where: { fundraiserId },
+				_sum: { amount: true },
 			});
 
-			const totalRaised = Number(contributions._sum.amount ?? 0);
-
-			// Convert submitted total to cents
-			const requestedCents = allocations.reduce(
-				(total, allocation) => total + Math.round(allocation.amount * 100),
-				0,
+			const totalRaised = contributions._sum.amount ?? new Prisma.Decimal(0);
+			const requestedTotal = Prisma.Decimal.sum(
+				...desiredByParticipant.values(),
 			);
 
-			const totalRaisedCents = Math.round(totalRaised * 100);
-
-			// Make sure all raised money is allocated
-			if (requestedCents !== totalRaisedCents) {
+			if (!requestedTotal.equals(totalRaised)) {
 				throw new Error(
-					`Total allocation of ${
-						requestedCents / 100
-					} does not match total raised of ${totalRaisedCents / 100}`,
+					`Total allocation of ${requestedTotal.toFixed(2)} does not match total raised of ${totalRaised.toFixed(2)}`,
 				);
 			}
 
-			// Get existing active allocations
 			const existingAllocations = await tx.fundraiserAllocation.findMany({
 				where: {
-					fundraiserParticipant: {
-						fundraiserId,
-					},
+					fundraiserParticipant: { fundraiserId },
 					status: "ACTIVE",
 				},
 				select: {
@@ -108,64 +109,46 @@ export async function setCustomDistribution(
 				},
 			});
 
-			//calculate current total for each participant
-			const currentByParticipant = new Map<string, number>();
-
+			const existingByParticipant = new Map<
+				string,
+				typeof existingAllocations
+			>();
 			for (const allocation of existingAllocations) {
-				const current =
-					currentByParticipant.get(allocation.fundraiserParticipantId) ?? 0;
-				currentByParticipant.set(
-					allocation.fundraiserParticipantId,
-					current + Number(allocation.amount),
-				);
+				const list =
+					existingByParticipant.get(allocation.fundraiserParticipantId) ?? [];
+				list.push(allocation);
+				existingByParticipant.set(allocation.fundraiserParticipantId, list);
 			}
 
-			//update only participants whose allocation changed
-			for (const allocation of allocations) {
-				const currentAmount =
-					currentByParticipant.get(allocation.participantId) ?? 0;
+			for (const [participantId, desiredAmount] of desiredByParticipant) {
+				const existing = existingByParticipant.get(participantId) ?? [];
 
-				const desiredAmount = allocation.amount;
-
-				const currentCents = Math.round(currentAmount * 100);
-				const desiredCents = Math.round(desiredAmount * 100);
-
-				//nothing changes
-				if (currentCents === desiredCents) {
+				//already exactly one active allocation with the same amount: nothing to do
+				if (existing.length === 1 && existing[0].amount.equals(desiredAmount)) {
 					continue;
 				}
 
-				//void existing active allocations for this participant
-				const participantAllocations = existingAllocations.filter(
-					(existing) =>
-						existing.fundraiserParticipantId === allocation.participantId,
-				);
-
-				if (participantAllocations.length > 0) {
+				if (existing.length > 0) {
 					await tx.fundraiserAllocation.updateMany({
-						where: {
-							id: {
-								in: participantAllocations.map((existing) => existing.id),
-							},
-						},
-						data: {
-							status: "VOID",
-						},
+						where: { id: { in: existing.map((a) => a.id) } },
+						data: { status: "VOID" },
 					});
 				}
 
-				// create new allocation only if the desired amount is greater than 0
-				if (desiredAmount > 0) {
-					await tx.fundraiserAllocation.create({
-						data: {
-							fundraiserParticipantId: allocation.participantId,
-							amount: Math.round(desiredAmount * 100) / 100,
-							status: "ACTIVE",
-						},
-					});
-				}
+				//always create an allocation, even for $0
+				await tx.fundraiserAllocation.create({
+					data: {
+						fundraiserParticipantId: participantId,
+						amount: desiredAmount,
+						status: "ACTIVE",
+					},
+				});
 			}
-			return allocations;
+
+			return Array.from(desiredByParticipant, ([participantId, amount]) => ({
+				participantId,
+				amount: amount.toNumber(),
+			}));
 		},
 		{
 			timeout: 10000,

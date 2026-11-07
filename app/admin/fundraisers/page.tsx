@@ -1,7 +1,3 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 import { getFundraisers } from "@/features/fundraisers/data/fundraisers";
 
 import PageHeader from "@/components/reusable/PageHeader";
@@ -16,18 +12,6 @@ type PageProps = {
 };
 
 export default async function AllFundraisersPage({ searchParams }: PageProps) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
-
-	if (!session?.user) {
-		redirect("/");
-	}
-
-	if (session.user.role !== "ADMIN") {
-		redirect("/parent/my-players");
-	}
-
 	const { search } = await searchParams;
 	const fundraisers = await getFundraisers(search);
 

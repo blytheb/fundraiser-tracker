@@ -1,12 +1,9 @@
-import { requireAdmin } from "@/lib/permissions";
 import ReviewPlayerAccessButtons from "@/components/forms/player-access/ReviewPlayerAccessButtons";
 import { getPendingPlayerAccessRequests } from "@/features/player-access/data/get-pending-player-access-requests";
 import { ArrowLeft, CheckCircle2, Clock3, Users } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminPage() {
-	await requireAdmin();
-
 	const requests = await getPendingPlayerAccessRequests();
 
 	return (

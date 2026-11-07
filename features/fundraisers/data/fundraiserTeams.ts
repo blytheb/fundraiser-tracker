@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 import type { Team, Fundraiser } from "@prisma/client";
 
 export async function getFundraiserTeams(
 	fundraiserId: string,
 ): Promise<Team[]> {
+	await requireAdmin();
 	return prisma.team.findMany({
 		where: {
 			fundraiserTeams: {
@@ -22,6 +24,7 @@ export async function getFundraiserTeams(
 export async function getTeamFundraisers(
 	teamId: string,
 ): Promise<Fundraiser[]> {
+	await requireAdmin();
 	const allFundraisers = await prisma.fundraiserTeam.findMany({
 		where: {
 			teamId,
@@ -37,6 +40,7 @@ export async function getTeamFundraisers(
 export async function getAvailableFundraisersForTeam(
 	teamId: string,
 ): Promise<Fundraiser[]> {
+	await requireAdmin();
 	return prisma.fundraiser.findMany({
 		where: {
 			status: "DRAFT",

@@ -13,8 +13,7 @@ import {
 	getPlayerTransactions,
 } from "@/features/players/data/players";
 import { getPlayerTeams } from "@/features/players/data/get-player-teams";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+
 import PlayerTransactionForm from "@/components/forms/players/PlayerTransactionForm";
 
 type PlayerPageProps = {
@@ -38,11 +37,7 @@ function formatDate(date: Date) {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
 
-	const isAdmin = session?.user?.role === "ADMIN";
 	let player;
 
 	try {
@@ -269,7 +264,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 					</div>
 				</div>
 			</section>
-			{isAdmin && <PlayerTransactionForm playerId={playerId} />}
+			<PlayerTransactionForm playerId={playerId} />
 
 			{/* Unified transaction history */}
 			<section className="space-y-4">

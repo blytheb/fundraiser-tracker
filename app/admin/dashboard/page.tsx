@@ -8,7 +8,6 @@ import {
 	Wallet,
 } from "lucide-react";
 
-import { requireAdmin } from "@/lib/permissions";
 import { getAdminDashboardSummary } from "@/features/dashboard/data/get-admin-dashboard-summary";
 import { getAdminFundraiserOverview } from "@/features/dashboard/data/get-admin-fundraiser-overview";
 
@@ -45,8 +44,6 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function AdminPage() {
-	await requireAdmin();
-
 	const [summary, fundraisers] = await Promise.all([
 		getAdminDashboardSummary(),
 		getAdminFundraiserOverview(),

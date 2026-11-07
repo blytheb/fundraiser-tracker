@@ -1,7 +1,3 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 import PageHeader from "@/components/reusable/PageHeader";
 import TeamList from "@/features/teams/TeamList";
 import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
@@ -14,17 +10,6 @@ type PageProps = {
 };
 
 export default async function AllTeamsPage({ searchParams }: PageProps) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
-
-	if (!session?.user) {
-		redirect("/");
-	}
-
-	if (session.user.role !== "ADMIN") {
-		redirect("/parent/my-players");
-	}
 	const { search } = await searchParams;
 	const teams = await getTeams(search);
 

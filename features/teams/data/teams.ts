@@ -23,6 +23,7 @@ export async function getTeams(search?: string): Promise<Team[]> {
 }
 
 export async function getActiveTeams(): Promise<Team[]> {
+	await requireAdmin();
 	return prisma.team.findMany({
 		where: {
 			status: "IN_SEASON",
@@ -35,6 +36,7 @@ export async function getActiveTeams(): Promise<Team[]> {
 }
 
 export async function getActiveTeamsWithPlayers(): Promise<TeamWithPlayers[]> {
+	await requireAdmin();
 	const teams = await prisma.team.findMany({
 		where: {
 			status: "IN_SEASON",
@@ -55,6 +57,7 @@ export async function getActiveTeamsWithPlayers(): Promise<TeamWithPlayers[]> {
 }
 
 export async function getTeamById(id: string): Promise<Team | null> {
+	await requireAdmin();
 	return prisma.team.findUnique({
 		where: {
 			id,
@@ -65,6 +68,7 @@ export async function getTeamById(id: string): Promise<Team | null> {
 export async function getTeamWithPlayers(
 	id: string,
 ): Promise<TeamWithPlayers | null> {
+	await requireAdmin();
 	const team = await prisma.team.findUnique({
 		where: {
 			id,

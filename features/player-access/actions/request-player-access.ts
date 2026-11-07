@@ -8,10 +8,6 @@ import { Prisma } from "@prisma/client";
 export async function requestPlayerAccess(playerId: string) {
 	const user = await requireUser();
 
-	if (user.role !== "PARENT") {
-		throw new Error("Only parent accounts can request player access.");
-	}
-
 	if (!playerId?.trim()) {
 		throw new Error("A player must be selected");
 	}

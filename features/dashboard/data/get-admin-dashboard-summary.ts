@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 import { getPendingPlayerAccessRequests } from "@/features/player-access/data/get-pending-player-access-requests";
 
 export async function getAdminDashboardSummary() {
+	await requireAdmin();
 	const [
 		activePlayerCount,
 		totalRaised,

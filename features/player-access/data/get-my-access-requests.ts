@@ -4,10 +4,6 @@ import { requireUser } from "@/lib/permissions";
 export async function getMyAccessRequests() {
 	const user = await requireUser();
 
-	if (user.role !== "PARENT") {
-		throw new Error("Only parents can view their access requests.");
-	}
-
 	return prisma.playerAccessRequest.findMany({
 		where: {
 			userId: user.id,

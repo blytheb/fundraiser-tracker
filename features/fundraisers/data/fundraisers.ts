@@ -4,10 +4,11 @@ import type {
 	FundraiserWithTeams,
 	FundraiserWithParticipants,
 } from "@/features/fundraisers/types";
-import { requireParentAccess } from "@/lib/permissions";
+import { requireAdmin, requireParentAccess } from "@/lib/permissions";
 
 //get All fundraisers
 export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
+	await requireAdmin();
 	return await prisma.fundraiser.findMany({
 		where: search
 			? {
@@ -28,6 +29,7 @@ export async function getFundraisers(search?: string): Promise<Fundraiser[]> {
 export async function getFundraiserById(
 	id: string,
 ): Promise<Fundraiser | null> {
+	await requireAdmin();
 	return await prisma.fundraiser.findUnique({
 		where: {
 			id,
@@ -38,6 +40,7 @@ export async function getFundraiserById(
 export async function getFundraiserWithTeams(
 	id: string,
 ): Promise<FundraiserWithTeams | null> {
+	await requireAdmin();
 	return prisma.fundraiser.findUnique({
 		where: {
 			id,
@@ -55,6 +58,7 @@ export async function getFundraiserWithTeams(
 export async function getFundraiserWithParticipants(
 	id: string,
 ): Promise<FundraiserWithParticipants | null> {
+	await requireAdmin();
 	return prisma.fundraiser.findUnique({
 		where: {
 			id,

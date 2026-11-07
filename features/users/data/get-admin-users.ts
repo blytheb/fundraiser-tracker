@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function getAdminUsers() {
+	await requireAdmin();
 	return await prisma.user.findMany({
 		orderBy: {
 			createdAt: "desc",

@@ -1,12 +1,36 @@
 //when does the fundraiser become official
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
-//draft to complete status
+//draft to complete status: locks numbers and creates internal distributions
 export async function completeFundraiser(fundraiserId: string) {
+	await requireAdmin();
+
 	return prisma.$transaction(async (tx) => {
-		const fundraiser = await tx.fundraiser.findUnique({
+		//claim status change first. This locks the row so double click or retry cant create a second distribution
+		const claimed = await tx.fundraiser.updateMany({
+			where: { id: fundraiserId, status: "DRAFT" },
+			data: { status: "COMPLETED" },
+		});
+
+		if (claimed.count === 0) {
+			const exists = await tx.fundraiser.findUnique({
+				where: { id: fundraiserId },
+				select: { id: true, status: true },
+			});
+
+			throw new Error(
+				exists
+					? `Fundraiser is already ${exists.status.toLowerCase()}`
+					: "Fundraiser not found",
+			);
+		}
+
+		//any error thrown below rolls the status back to DRAFT automatically
+		const fundraiser = await tx.fundraiser.findUniqueOrThrow({
 			where: { id: fundraiserId },
 			include: {
 				participants: {
@@ -21,23 +45,16 @@ export async function completeFundraiser(fundraiserId: string) {
 			},
 		});
 
-		if (!fundraiser) {
-			throw new Error("Fundraiser not found");
+		if (fundraiser.participants.length === 0) {
+			throw new Error("A fundraiser must have at least one participant");
 		}
 
-		if (fundraiser.status !== "DRAFT") {
-			throw new Error("Only draft fundraisers can be completed.");
-		}
-
-		if (
-			fundraiser.participants.some(
-				(participant) => participant.allocations.length > 1,
-			)
-		) {
+		if (fundraiser.participants.some((p) => p.allocations.length === 0)) {
 			throw new Error(
-				"Each participant can have at most one active allocation before completing",
+				"Each participant must have one allocation before completing",
 			);
 		}
+
 		const [contributions, allocations] = await Promise.all([
 			tx.fundraiserContribution.aggregate({
 				where: { fundraiserId },
@@ -52,16 +69,14 @@ export async function completeFundraiser(fundraiserId: string) {
 			}),
 		]);
 
-		const totalRaised = Number(contributions._sum.amount ?? 0);
-		const currentlyAllocated = Number(allocations._sum.amount ?? 0);
+		const totalRaised = contributions._sum.amount ?? new Prisma.Decimal(0);
+		const allocated = allocations._sum.amount ?? new Prisma.Decimal(0);
 
-		if (currentlyAllocated > totalRaised) {
+		if (allocated.greaterThan(totalRaised)) {
 			throw new Error("Allocated funds cannot exceed funds raised");
 		}
 
-		const availableToAllocate = totalRaised - currentlyAllocated;
-
-		if (availableToAllocate > 0) {
+		if (!allocated.equals(totalRaised)) {
 			throw new Error("All funds must be allocated before completing");
 		}
 
@@ -73,6 +88,7 @@ export async function completeFundraiser(fundraiserId: string) {
 				allocationId: participant.allocations[0].id,
 				amount: participant.allocations[0].amount,
 				type: "DISTRIBUTION" as const,
+				status: "INTERNAL" as const, //admin only until published
 				description: "Fundraiser distribution",
 			}));
 
@@ -82,9 +98,6 @@ export async function completeFundraiser(fundraiserId: string) {
 			});
 		}
 
-		return tx.fundraiser.update({
-			where: { id: fundraiserId },
-			data: { status: "COMPLETED" },
-		});
+		return fundraiser;
 	});
 }

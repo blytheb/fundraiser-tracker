@@ -337,7 +337,7 @@ model PlayerTransaction {
   type        PlayerTransactionType
   description String?
   date        DateTime              @default(now())
-  status      TransactionStatus     @default(ACTIVE)
+  status      TransactionStatus     
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -438,7 +438,8 @@ enum PlayerTransactionType {
 //   Useful when a fundraiser is unpublished or redistributed.
 
 enum TransactionStatus {
-  ACTIVE
+  INTERNAL
+  PUBLISHED
   VOID
 }
 

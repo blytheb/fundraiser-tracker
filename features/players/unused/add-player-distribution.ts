@@ -21,6 +21,7 @@ export async function addPlayerDistribution(data: PlayerTransactionData) {
 			allocationId: data.allocationId,
 			amount: data.amount,
 			type: "DISTRIBUTION",
+			status: "PUBLISHED",
 			description: data.description,
 			date: new Date(data.date),
 		},

@@ -21,6 +21,7 @@ export async function addPlayerAdjustment(data: PlayerTransactionData) {
 			allocationId: data.allocationId,
 			amount: data.amount,
 			type: "ADJUSTMENT",
+			status: "PUBLISHED",
 			description: data.description,
 			date: new Date(data.date),
 		},

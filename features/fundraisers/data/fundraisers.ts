@@ -98,7 +98,7 @@ export async function getPublishedFundraisersByPlayer(playerId: string) {
 			transactions: {
 				where: {
 					playerId,
-					status: "ACTIVE",
+					status: "PUBLISHED",
 					type: "DISTRIBUTION",
 				},
 				orderBy: {

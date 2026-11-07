@@ -21,6 +21,7 @@ export async function addPlayerPayment(data: PlayerTransactionData) {
 			allocationId: data.allocationId,
 			amount: data.amount,
 			type: "PAYMENT",
+			status: "PUBLISHED",
 			description: data.description,
 			date: new Date(data.date),
 		},

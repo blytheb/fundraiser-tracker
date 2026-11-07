@@ -150,7 +150,7 @@ export async function getPlayerTransactions(playerId: string) {
 	return prisma.playerTransaction.findMany({
 		where: {
 			playerId,
-			status: "ACTIVE",
+			status: "PUBLISHED",
 			OR: [
 				{
 					type: {

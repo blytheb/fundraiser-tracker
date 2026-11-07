@@ -1,43 +1,51 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/permissions";
 
 export async function reopenFundraiser(fundraiserId: string) {
+	await requireAdmin();
+
 	return prisma.$transaction(async (tx) => {
-		const fundraiser = await tx.fundraiser.findUnique({
+		// claim the status changefirst so two reopens cant race eachother.
+
+		const claimed = await tx.fundraiser.updateMany({
 			where: {
 				id: fundraiserId,
+				status: { in: ["COMPLETED", "PUBLISHED"] },
 			},
-			select: {
-				status: true,
+			data: {
+				status: "DRAFT",
 			},
 		});
 
-		if (!fundraiser) {
-			throw new Error("Fundraiser not found");
+		if (claimed.count === 0) {
+			const fundraiser = await tx.fundraiser.findUnique({
+				where: {
+					id: fundraiserId,
+				},
+				select: {
+					id: true,
+					status: true,
+				},
+			});
+			throw new Error(
+				fundraiser
+					? `Fundraiser is already in ${fundraiser.status.toLowerCase()} mode`
+					: "Fundraiser not found",
+			);
 		}
 
-		if (fundraiser.status === "DRAFT") {
-			throw new Error("Fundraiser is already in draft mode.");
-		}
-
+		//void distributions whether they were internal or already visable to parent.
+		// This is because the fundraiser is being reopened and the distributions are no longer valid.
 		await tx.playerTransaction.updateMany({
 			where: {
 				fundraiserId,
-				status: "ACTIVE",
+				status: { in: ["INTERNAL", "PUBLISHED"] },
 				type: "DISTRIBUTION",
 			},
 			data: {
 				status: "VOID",
-			},
-		});
-
-		await tx.fundraiser.update({
-			where: {
-				id: fundraiserId,
-			},
-			data: {
-				status: "DRAFT",
 			},
 		});
 

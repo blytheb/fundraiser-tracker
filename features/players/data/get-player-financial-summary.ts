@@ -37,7 +37,7 @@ export async function getPlayerFinancialSummary(playerId: string) {
 		prisma.playerTransaction.findMany({
 			where: {
 				playerId,
-				status: "ACTIVE",
+				status: "PUBLISHED",
 				OR: [
 					{ type: { not: "DISTRIBUTION" } },
 					{

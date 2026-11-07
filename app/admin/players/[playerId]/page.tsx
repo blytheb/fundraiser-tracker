@@ -58,40 +58,40 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 		getPlayerTransactions(playerId),
 	]);
 
-	// Only active transactions affect the player's balance.
-	const activeTransactions = transactions.filter(
-		(transaction) => transaction.status === "ACTIVE",
+	// Only published transactions affect the player's balance.
+	const publishedTransactions = transactions.filter(
+		(transaction) => transaction.status === "PUBLISHED",
 	);
 
-	const totalDeposits = activeTransactions
+	const totalDeposits = publishedTransactions
 		.filter((transaction) => transaction.type === "PAYMENT")
 		.reduce(
 			(total, transaction) => total + Math.abs(Number(transaction.amount)),
 			0,
 		);
 
-	const totalDistributions = activeTransactions
+	const totalDistributions = publishedTransactions
 		.filter((transaction) => transaction.type === "DISTRIBUTION")
 		.reduce(
 			(total, transaction) => total + Math.abs(Number(transaction.amount)),
 			0,
 		);
 
-	const totalExpenses = activeTransactions
+	const totalExpenses = publishedTransactions
 		.filter((transaction) => transaction.type === "EXPENSE")
 		.reduce(
 			(total, transaction) => total + Math.abs(Number(transaction.amount)),
 			0,
 		);
 
-	const adjustmentBalance = activeTransactions
+	const adjustmentBalance = publishedTransactions
 		.filter((transaction) => transaction.type === "ADJUSTMENT")
 		.reduce((total, transaction) => total + Number(transaction.amount), 0);
 
 	const totalMoneyIn =
 		totalDeposits +
 		totalDistributions +
-		activeTransactions
+		publishedTransactions
 			.filter(
 				(transaction) =>
 					transaction.type === "ADJUSTMENT" && Number(transaction.amount) > 0,
@@ -101,7 +101,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 	const totalMoneyOut =
 		totalExpenses +
 		Math.abs(
-			activeTransactions
+			publishedTransactions
 				.filter(
 					(transaction) =>
 						transaction.type === "ADJUSTMENT" && Number(transaction.amount) < 0,
@@ -111,7 +111,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 
 	const currentBalance = totalMoneyIn - totalMoneyOut;
 
-	const history = activeTransactions
+	const history = publishedTransactions
 		.map((transaction) => {
 			const amount = Number(transaction.amount);
 

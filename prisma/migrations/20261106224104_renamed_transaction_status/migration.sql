@@ -1,0 +1,3 @@
+ALTER TYPE "TransactionStatus" RENAME VALUE 'ACTIVE' TO 'PUBLISHED';
+ALTER TYPE "TransactionStatus" ADD VALUE 'INTERNAL';
+ALTER TABLE "PlayerTransaction" ALTER COLUMN "status" DROP DEFAULT;

@@ -1,15 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/permissions";
+import { requireParentAccess } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 
 export async function cancelPlayerAccessRequest(requestId: string) {
-	const user = await requireUser();
-
-	if (user.role !== "PARENT") {
-		throw new Error("Only parent accounts can cancel access requests.");
-	}
+	const user = await requireParentAccess();
 
 	const request = await prisma.playerAccessRequest.findFirst({
 		where: {

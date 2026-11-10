@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
 	title: "Fundraiser Tracker",
@@ -17,6 +18,7 @@ export default function RootLayout({
 			<body className="h-full flex flex-col">
 				<TooltipProvider>
 					<main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
+					<Toaster richColors position="top-center" />
 				</TooltipProvider>
 			</body>
 		</html>

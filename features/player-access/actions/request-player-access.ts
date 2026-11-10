@@ -1,12 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/permissions";
+import { requireParentAccess } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 
 export async function requestPlayerAccess(playerId: string) {
-	const user = await requireUser();
+	const user = await requireParentAccess();
 
 	if (!playerId?.trim()) {
 		throw new Error("A player must be selected");

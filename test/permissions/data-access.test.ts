@@ -250,12 +250,11 @@ describe("getPlayerFinancialSummary (parent player page)", () => {
 		linkParent();
 		db.playerTransaction.findMany.mockResolvedValue([]);
 
-		const summary = await getPlayerFinancialSummary("p1");
+		const result = await getPlayerFinancialSummary("p1");
 
-		expect(summary.player.id).toBe("p1");
-		expect(summary.teams).toEqual([{ id: "t1", name: "U12" }]);
-		expect(summary.initials).toBe("JD");
-		expect(summary.currentBalance).toBe(0);
+		expect(result.player.id).toBe("p1");
+		expect(result.teams).toEqual([{ id: "t1", name: "U12" }]);
+		expect(result.summary.currentBalance).toBe(0);
 	});
 
 	it("checks the link for the current user and player", async () => {
@@ -287,43 +286,18 @@ describe("getPlayerFinancialSummary (parent player page)", () => {
 		await expectRedirect(() => getPlayerFinancialSummary("p1"));
 	});
 
-	it("calculates money in, money out and balance", async () => {
+	// detailed balance math is tested in test/players/summarize-transactions.test.ts
+	it("summarizes the transactions it loads", async () => {
 		asParent();
 		linkParent();
-		const date = (day: number) => new Date(`2026-01-${day}`);
 		db.playerTransaction.findMany.mockResolvedValue([
-			{ id: "1", type: "PAYMENT", amount: 50, description: null, date: date(10), fundraiser: null },
-			{ id: "2", type: "DISTRIBUTION", amount: 100, description: null, date: date(11), fundraiser: { name: "Car wash" } },
-			{ id: "3", type: "EXPENSE", amount: 30, description: "Shoes", date: date(12), fundraiser: null },
-			{ id: "4", type: "ADJUSTMENT", amount: 20, description: null, date: date(13), fundraiser: null },
-			{ id: "5", type: "ADJUSTMENT", amount: -5, description: null, date: date(14), fundraiser: null },
+			{ id: "1", type: "PAYMENT", amount: 50, description: null, date: new Date("2026-01-10"), fundraiser: null },
+			{ id: "2", type: "EXPENSE", amount: 30, description: null, date: new Date("2026-01-11"), fundraiser: null },
 		]);
 
-		const summary = await getPlayerFinancialSummary("p1");
+		const { summary } = await getPlayerFinancialSummary("p1");
 
-		expect(summary.totalDeposits).toBe(50);
-		expect(summary.totalDistributions).toBe(100);
-		expect(summary.totalExpenses).toBe(30);
-		expect(summary.totalMoneyIn).toBe(170); // 50 + 100 + 20
-		expect(summary.totalMoneyOut).toBe(35); // 30 + |-5|
-		expect(summary.currentBalance).toBe(135);
-
-		// history: newest first, expenses negative, adjustments keep their sign
-		expect(summary.history.map((entry) => entry.id)).toEqual([
-			"5",
-			"4",
-			"3",
-			"2",
-			"1",
-		]);
-		expect(summary.history.find((entry) => entry.id === "3")?.amount).toBe(
-			-30,
-		);
-		expect(summary.history.find((entry) => entry.id === "5")?.amount).toBe(
-			-5,
-		);
-		expect(summary.history.find((entry) => entry.id === "2")?.title).toBe(
-			"Car wash",
-		);
+		expect(summary.currentBalance).toBe(20);
+		expect(summary.history).toHaveLength(2);
 	});
 });

@@ -4,6 +4,7 @@ import { Users, UserRound, ShieldCheck } from "lucide-react";
 import { getAvailablePlayers } from "@/features/users/data/get-available-players";
 import { ManagePlayers } from "@/features/users/manage-players";
 import { ManageUserRole } from "@/features/users/manage-user-role";
+import { formatDate } from "@/lib/format";
 
 export default async function AdminUsersPage() {
 	const currentAdmin = await requireAdmin();
@@ -169,11 +170,7 @@ export default async function AdminUsersPage() {
 											</td>
 
 											<td className="whitespace-nowrap px-4 py-4 text-muted-foreground">
-												{user.createdAt.toLocaleDateString("en-US", {
-													month: "short",
-													day: "numeric",
-													year: "numeric",
-												})}
+												{formatDate(user.createdAt)}
 											</td>
 										</tr>
 									))}

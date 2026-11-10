@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/item";
 
 import type { Team } from "@prisma/client";
+import { TEAM_STATUS_LABELS } from "@/lib/labels";
 
 type TeamListProps = {
 	teams: Team[];
@@ -50,7 +51,7 @@ export default function TeamList({ teams }: TeamListProps) {
 										{team.name}
 									</ItemTitle>
 									<ItemDescription className="mt-1 text-xs">
-										{team.status}
+										{TEAM_STATUS_LABELS[team.status]}
 									</ItemDescription>
 								</ItemContent>
 

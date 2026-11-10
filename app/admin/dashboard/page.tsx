@@ -13,35 +13,8 @@ import { getAdminFundraiserOverview } from "@/features/dashboard/data/get-admin-
 
 import AddFundraiserDialog from "@/components/forms/fundraisers/AddFundraiserDialog";
 import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
-
-function formatCurrency(amount: number) {
-	return amount.toLocaleString("en-US", {
-		style: "currency",
-		currency: "USD",
-		maximumFractionDigits: 2,
-	});
-}
-
-function StatusBadge({ status }: { status: string }) {
-	const styles: Record<string, string> = {
-		Draft:
-			"border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300",
-		Completed:
-			"border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300",
-		Published:
-			"border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300",
-	};
-
-	return (
-		<span
-			className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${
-				styles[status] ?? styles.Draft
-			}`}>
-			<span className="mr-1.5 size-1.5 rounded-full bg-current" />
-			{status}
-		</span>
-	);
-}
+import FundraiserStatusBadge from "@/components/reusable/FundraiserStatusBadge";
+import { formatCurrency } from "@/lib/format";
 
 export default async function AdminPage() {
 	const [summary, fundraisers] = await Promise.all([
@@ -246,7 +219,7 @@ export default async function AdminPage() {
 												<p className="font-medium">{fundraiser.name}</p>
 											</td>
 											<td className="px-5 py-4">
-												<StatusBadge status={fundraiser.status} />
+												<FundraiserStatusBadge status={fundraiser.status} />
 											</td>
 											<td className="px-5 py-4 text-right">
 												<Link

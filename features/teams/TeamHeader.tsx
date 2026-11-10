@@ -3,6 +3,7 @@ import type { Team } from "@prisma/client";
 import TeamActions from "@/features/teams/TeamActions";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { TEAM_STATUS_LABELS } from "@/lib/labels";
 
 type TeamHeaderProps = {
 	team: Team;
@@ -22,7 +23,7 @@ export default function TeamHeader({ team, playerCount }: TeamHeaderProps) {
 
 					<div className="flex flex-wrap items-center gap-2">
 						<Badge variant={isActive ? "default" : "secondary"}>
-							{isActive ? "Active" : "Inactive"}
+							{TEAM_STATUS_LABELS[team.status]}
 						</Badge>
 
 						<span className="text-sm text-muted-foreground">

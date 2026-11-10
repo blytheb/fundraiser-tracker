@@ -17,6 +17,9 @@ import FundraiserActions from "@/features/fundraisers/FundraiserActions";
 import ContributionActions from "@/features/fundraisers/ContributionActions";
 import AddContribution from "@/components/forms/fundraisers/AddContribution";
 import SelectFundraiserRoster from "@/components/forms/fundraisers/SelectFundraiserRoster";
+import FundraiserStatusBadge from "@/components/reusable/FundraiserStatusBadge";
+import { formatCurrency, formatDate } from "@/lib/format";
+import { CONTRIBUTION_SOURCE_LABELS } from "@/lib/labels";
 
 import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
 import type {
@@ -86,13 +89,6 @@ export default function FundraiserWorkspace({
 
 	const remainingToAllocate = financialSummary.totalRaised - allocationTotal;
 
-	const sourceLabels = {
-		EVENT_PROFIT: "Event Profit",
-		SALES: "Sales",
-		TIPS: "Tips",
-		OTHER: "Other",
-	};
-
 	async function handleSaveDistribution() {
 		startTransition(async () => {
 			const allocations = participants.map((participant) => ({
@@ -138,13 +134,7 @@ export default function FundraiserWorkspace({
 					<div className="flex items-start justify-between gap-4">
 						<div className="min-w-0 space-y-3">
 							<div className="flex flex-wrap items-center gap-2">
-								<Badge variant="secondary">
-									{fundraiser.status === "DRAFT"
-										? "Draft"
-										: fundraiser.status === "COMPLETED"
-											? "Completed"
-											: "Published"}
-								</Badge>
+								<FundraiserStatusBadge status={fundraiser.status} />
 
 								{teams.map((team) => (
 									<Badge key={team.id} variant="outline">
@@ -165,7 +155,7 @@ export default function FundraiserWorkspace({
 							</div>
 
 							<p className="text-sm text-muted-foreground">
-								Event date: {fundraiser.startDate.toLocaleDateString()}
+								Event date: {formatDate(fundraiser.startDate)}
 							</p>
 
 							<div className="flex flex-wrap items-center gap-2">
@@ -206,10 +196,7 @@ export default function FundraiserWorkspace({
 					<CardContent className="p-5">
 						<p className="text-sm text-muted-foreground">Total raised</p>
 						<p className="mt-2 text-2xl font-bold tabular-nums">
-							{financialSummary.totalRaised.toLocaleString("en-US", {
-								style: "currency",
-								currency: "USD",
-							})}
+							{formatCurrency(financialSummary.totalRaised)}
 						</p>
 					</CardContent>
 				</Card>
@@ -218,10 +205,7 @@ export default function FundraiserWorkspace({
 					<CardContent className="p-5">
 						<p className="text-sm text-muted-foreground">Total allocated</p>
 						<p className="mt-2 text-2xl font-bold tabular-nums">
-							{allocationTotal.toLocaleString("en-US", {
-								style: "currency",
-								currency: "USD",
-							})}
+							{formatCurrency(allocationTotal)}
 						</p>
 					</CardContent>
 				</Card>
@@ -236,10 +220,7 @@ export default function FundraiserWorkspace({
 						<p className="mt-2 text-2xl font-bold tabular-nums">
 							{fundraiser.status !== "DRAFT"
 								? "Finalized"
-								: remainingToAllocate.toLocaleString("en-US", {
-										style: "currency",
-										currency: "USD",
-									})}
+								: formatCurrency(remainingToAllocate)}
 						</p>
 					</CardContent>
 				</Card>
@@ -293,13 +274,10 @@ export default function FundraiserWorkspace({
 									className="flex items-center justify-between gap-3 rounded-lg border p-3">
 									<div>
 										<p className="font-medium">
-											{sourceLabels[contribution.source]}
+											{CONTRIBUTION_SOURCE_LABELS[contribution.source]}
 										</p>
 										<p className="text-sm text-muted-foreground">
-											{contribution.amount.toLocaleString("en-US", {
-												style: "currency",
-												currency: "USD",
-											})}
+											{formatCurrency(contribution.amount)}
 										</p>
 									</div>
 
@@ -391,12 +369,7 @@ export default function FundraiserWorkspace({
 								/>
 							) : (
 								<p className="text-right font-medium tabular-nums">
-									{(
-										allocatedByParticipant.get(participant.id) ?? 0
-									).toLocaleString("en-US", {
-										style: "currency",
-										currency: "USD",
-									})}
+									{formatCurrency(allocatedByParticipant.get(participant.id) ?? 0)}
 								</p>
 							)}
 						</div>
@@ -414,28 +387,19 @@ export default function FundraiserWorkspace({
 								<div className="flex justify-between gap-4 text-sm">
 									<span className="text-muted-foreground">Total raised</span>
 									<span className="font-medium tabular-nums">
-										{financialSummary.totalRaised.toLocaleString("en-US", {
-											style: "currency",
-											currency: "USD",
-										})}
+										{formatCurrency(financialSummary.totalRaised)}
 									</span>
 								</div>
 								<div className="flex justify-between gap-4 text-sm">
 									<span className="text-muted-foreground">Allocated</span>
 									<span className="font-medium tabular-nums">
-										{allocationTotal.toLocaleString("en-US", {
-											style: "currency",
-											currency: "USD",
-										})}
+										{formatCurrency(allocationTotal)}
 									</span>
 								</div>
 								<div className="flex justify-between gap-4 border-t pt-2">
 									<span className="font-semibold">Remaining</span>
 									<span className="font-semibold tabular-nums">
-										{remainingToAllocate.toLocaleString("en-US", {
-											style: "currency",
-											currency: "USD",
-										})}
+										{formatCurrency(remainingToAllocate)}
 									</span>
 								</div>
 							</div>

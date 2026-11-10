@@ -13,6 +13,7 @@ import {
 	ItemTitle,
 } from "@/components/ui/item";
 import type { Fundraiser } from "@prisma/client";
+import { FUNDRAISER_STATUS_LABELS } from "@/lib/labels";
 
 type FundraiserListItemProps = {
 	fundraiser: Fundraiser;
@@ -21,12 +22,7 @@ type FundraiserListItemProps = {
 export default function FundraiserListItem({
 	fundraiser,
 }: FundraiserListItemProps) {
-	const status =
-		fundraiser.status === "DRAFT"
-			? "Draft"
-			: fundraiser.status === "COMPLETED"
-				? "Completed"
-				: "Published";
+	const status = FUNDRAISER_STATUS_LABELS[fundraiser.status];
 
 	const StatusIcon =
 		fundraiser.status === "DRAFT"

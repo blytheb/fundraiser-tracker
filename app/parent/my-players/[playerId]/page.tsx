@@ -8,25 +8,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { getPlayerFinancialSummary } from "@/features/players/data/get-player-financial-summary";
+import { formatCurrency, formatDate } from "@/lib/format";
 
 type PlayerPageProps = {
 	params: Promise<{
 		playerId: string;
 	}>;
 };
-
-const currency = new Intl.NumberFormat("en-US", {
-	style: "currency",
-	currency: "USD",
-});
-
-function formatDate(date: Date) {
-	return date.toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
@@ -92,7 +80,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 						className={`mt-3 text-3xl font-bold tracking-tight sm:text-4xl ${
 							playerSummary.currentBalance < 0 ? "text-destructive" : ""
 						}`}>
-						{currency.format(playerSummary.currentBalance)}
+						{formatCurrency(playerSummary.currentBalance)}
 					</p>
 
 					<p className="mt-2 text-sm text-muted-foreground">
@@ -107,7 +95,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 							Money In
 						</div>
 						<p className="mt-2 text-xl font-semibold">
-							{currency.format(playerSummary.totalMoneyIn)}
+							{formatCurrency(playerSummary.totalMoneyIn)}
 						</p>
 						<p className="mt-1 text-xs text-muted-foreground">
 							Deposits and fundraiser distributions
@@ -120,7 +108,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 							Money Out
 						</div>
 						<p className="mt-2 text-xl font-semibold">
-							{currency.format(playerSummary.totalMoneyOut)}
+							{formatCurrency(playerSummary.totalMoneyOut)}
 						</p>
 						<p className="mt-1 text-xs text-muted-foreground">
 							Expenses and negative adjustments
@@ -133,7 +121,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 							Fundraiser Earnings
 						</div>
 						<p className="mt-2 text-xl font-semibold">
-							{currency.format(playerSummary.totalDistributions)}
+							{formatCurrency(playerSummary.totalDistributions)}
 						</p>
 						<p className="mt-1 text-xs text-muted-foreground">
 							Finalized distributions only
@@ -213,7 +201,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 													: ""
 										}`}>
 										{entry.amount > 0 ? "+" : ""}
-										{currency.format(entry.amount)}
+										{formatCurrency(entry.amount)}
 									</p>
 								</div>
 							))}

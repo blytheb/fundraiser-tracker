@@ -5,6 +5,7 @@ import { AccessRequestStatus } from "@/features/player-access/AccessRequestStatu
 import { CancelPlayerAccessRequestButton } from "@/components/forms/player-access/CancelPlayerAccessRequestButton";
 import { getUnlinkedPlayers } from "@/features/player-access/data/get-unlinked-players";
 import { getMyLinkedPlayerIds } from "@/features/player-access/data/get-my-linked-player-ids";
+import { formatDate } from "@/lib/format";
 
 export default async function RequestPlayerAccessPage() {
 	// if (user.role !== "PARENT") {
@@ -59,7 +60,7 @@ export default async function RequestPlayerAccessPage() {
 										{request.player.firstName} {request.player.lastName}
 									</h2>
 									<p className="text-sm text-muted-foreground">
-										Submitted {request.createdAt.toLocaleDateString()}
+										Submitted {formatDate(request.createdAt)}
 									</p>
 								</div>
 

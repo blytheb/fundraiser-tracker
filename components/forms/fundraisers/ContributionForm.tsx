@@ -12,6 +12,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { CONTRIBUTION_SOURCE_LABELS, PAYMENT_METHOD_LABELS } from "@/lib/labels";
 
 type ContributionFormProps = {
 	amount: string;
@@ -57,16 +58,18 @@ export default function ContributionForm({
 			<div className="space-y-2">
 				<Label htmlFor="contribution-source">Contribution Type</Label>
 				<Select
+					items={CONTRIBUTION_SOURCE_LABELS}
 					value={source}
 					onValueChange={(value) => onSourceChange(value as ContributionType)}>
 					<SelectTrigger id="contribution-source">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="SALES">Sales</SelectItem>
-						<SelectItem value="EVENT_PROFIT">Event Profit</SelectItem>
-						<SelectItem value="TIPS">Tips</SelectItem>
-						<SelectItem value="OTHER">Other</SelectItem>
+						{Object.entries(CONTRIBUTION_SOURCE_LABELS).map(([value, label]) => (
+							<SelectItem key={value} value={value}>
+								{label}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 			</div>
@@ -74,6 +77,7 @@ export default function ContributionForm({
 			<div className="space-y-2">
 				<Label htmlFor="contribution-payment-method">Payment Method</Label>
 				<Select
+					items={PAYMENT_METHOD_LABELS}
 					value={paymentMethod}
 					onValueChange={(value) =>
 						onPaymentMethodChange(value as PaymentMethod)
@@ -82,10 +86,11 @@ export default function ContributionForm({
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="CASH">Cash</SelectItem>
-						<SelectItem value="CHECK">Check</SelectItem>
-						<SelectItem value="VENMO">Venmo</SelectItem>
-						<SelectItem value="OTHER">Other</SelectItem>
+						{Object.entries(PAYMENT_METHOD_LABELS).map(([value, label]) => (
+							<SelectItem key={value} value={value}>
+								{label}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 			</div>

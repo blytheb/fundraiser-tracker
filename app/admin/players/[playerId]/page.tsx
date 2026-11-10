@@ -15,25 +15,13 @@ import {
 import { getPlayerTeams } from "@/features/players/data/get-player-teams";
 
 import PlayerTransactionForm from "@/components/forms/players/PlayerTransactionForm";
+import { formatCurrency, formatDate } from "@/lib/format";
 
 type PlayerPageProps = {
 	params: Promise<{
 		playerId: string;
 	}>;
 };
-
-const currency = new Intl.NumberFormat("en-US", {
-	style: "currency",
-	currency: "USD",
-});
-
-function formatDate(date: Date) {
-	return date.toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
@@ -208,7 +196,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 						className={`mt-3 text-3xl font-bold tracking-tight sm:text-4xl ${
 							currentBalance < 0 ? "text-destructive" : ""
 						}`}>
-						{currency.format(currentBalance)}
+						{formatCurrency(currentBalance)}
 					</p>
 
 					<p className="mt-2 text-sm text-muted-foreground">
@@ -223,7 +211,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 							Money In
 						</div>
 						<p className="mt-2 text-xl font-semibold">
-							{currency.format(totalMoneyIn)}
+							{formatCurrency(totalMoneyIn)}
 						</p>
 						<p className="mt-1 text-xs text-muted-foreground">
 							Deposits and fundraiser distributions
@@ -236,7 +224,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 							Money Out
 						</div>
 						<p className="mt-2 text-xl font-semibold">
-							{currency.format(totalMoneyOut)}
+							{formatCurrency(totalMoneyOut)}
 						</p>
 						<p className="mt-1 text-xs text-muted-foreground">
 							Expenses and negative adjustments
@@ -249,7 +237,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 							Fundraiser Earnings
 						</div>
 						<p className="mt-2 text-xl font-semibold">
-							{currency.format(totalDistributions)}
+							{formatCurrency(totalDistributions)}
 						</p>
 						<p className="mt-1 text-xs text-muted-foreground">
 							Finalized distributions only
@@ -330,7 +318,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 													: ""
 										}`}>
 										{entry.amount > 0 ? "+" : ""}
-										{currency.format(entry.amount)}
+										{formatCurrency(entry.amount)}
 									</p>
 								</div>
 							))}

@@ -2,6 +2,7 @@ import ReviewPlayerAccessButtons from "@/components/forms/player-access/ReviewPl
 import { getPendingPlayerAccessRequests } from "@/features/player-access/data/get-pending-player-access-requests";
 import { ArrowLeft, CheckCircle2, Clock3, Users } from "lucide-react";
 import Link from "next/link";
+import { formatDate } from "@/lib/format";
 
 export default async function AdminPage() {
 	const requests = await getPendingPlayerAccessRequests();
@@ -104,11 +105,7 @@ export default async function AdminPage() {
 
 								<p className="mt-4 text-xs text-muted-foreground">
 									Submitted{" "}
-									{request.createdAt.toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-										year: "numeric",
-									})}
+									{formatDate(request.createdAt)}
 								</p>
 
 								<div className="mt-4 border-t pt-4">

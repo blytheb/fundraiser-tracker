@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/permissions";
-import { getPlayerTeams } from "@/features/players/data/get-player-teams";
 
 export async function getPlayerFinancialSummary(playerId: string) {
 	const user = await requireUser();
@@ -32,7 +31,14 @@ export async function getPlayerFinancialSummary(playerId: string) {
 			},
 		}),
 
-		getPlayerTeams(playerId),
+		//access was checked above, so query teams directly
+		//(getPlayerTeams is admin only)
+		prisma.teamPlayer
+			.findMany({
+				where: { playerId },
+				include: { team: true },
+			})
+			.then((rows) => rows.map((row) => row.team)),
 
 		prisma.playerTransaction.findMany({
 			where: {

@@ -21,6 +21,7 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
+import { asParent, expectRedirect } from "../../helpers/auth";
 import {
 	createFundraiser,
 	updateFundraiser,
@@ -50,7 +51,7 @@ describe("createFundraiser", () => {
 		const result = await createFundraiser(data as never);
 
 		expect(prismaMock.fundraiser.create).toHaveBeenCalledWith({ data });
-		expect(result).toEqual(fundraiser);
+		expect(result).toEqual({ ok: true, data: fundraiser });
 	});
 });
 
@@ -80,7 +81,7 @@ describe("updateFundraiser", () => {
 			data,
 		});
 
-		expect(result).toEqual(fundraiser);
+		expect(result).toEqual({ ok: true, data: fundraiser });
 	});
 	it("rejects updating a completed fundraiser", async () => {
 		const data = {
@@ -93,9 +94,12 @@ describe("updateFundraiser", () => {
 			status: "COMPLETED",
 		});
 
-		await expect(
-			updateFundraiser("fundraiser-1", data as never),
-		).rejects.toThrow("Completed fundraisers cannot be edited.");
+		const result = await updateFundraiser("fundraiser-1", data as never);
+
+		expect(result).toEqual({
+			ok: false,
+			error: "Completed fundraisers cannot be edited.",
+		});
 
 		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
 	});
@@ -119,17 +123,35 @@ describe("deleteFundraiser", () => {
 			where: { id: "fundraiser-1" },
 		});
 
-		expect(result).toEqual(fundraiser);
+		expect(result).toEqual({ ok: true, data: fundraiser });
 	});
 	it("rejects deleting a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
 			status: "COMPLETED",
 		});
 
-		await expect(deleteFundraiser("fundraiser-1")).rejects.toThrow(
-			"Completed fundraisers cannot be deleted.",
-		);
+		const result = await deleteFundraiser("fundraiser-1");
 
+		expect(result).toEqual({
+			ok: false,
+			error: "Completed fundraisers cannot be deleted.",
+		});
+
+		expect(prismaMock.fundraiser.delete).not.toHaveBeenCalled();
+	});
+});
+
+describe("fundraiser action permissions", () => {
+	it("redirects parents and does not touch the database", async () => {
+		asParent();
+
+		await expectRedirect(() => createFundraiser({ name: "X" } as never));
+		await expectRedirect(() => updateFundraiser("fundraiser-1", {} as never));
+		await expectRedirect(() => deleteFundraiser("fundraiser-1"));
+
+		expect(prismaMock.fundraiser.create).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
 		expect(prismaMock.fundraiser.delete).not.toHaveBeenCalled();
 	});
 });

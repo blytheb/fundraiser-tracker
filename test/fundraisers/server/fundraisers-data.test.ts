@@ -11,18 +11,11 @@ const { prismaMock } = vi.hoisted(() => ({
 		},
 	},
 }));
-const { requireUserMock } = vi.hoisted(() => ({
-	requireUserMock: vi.fn(),
-}));
-
-vi.mock("@/lib/permissions", () => ({
-	requireUser: requireUserMock,
-}));
-
 vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
+import { asParent, expectRedirect } from "../../helpers/auth";
 import {
 	getFundraisers,
 	getFundraiserById,
@@ -33,13 +26,9 @@ import {
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	requireUserMock.mockResolvedValue({
-		id: "parent-1",
-		role: "PARENT",
-	});
+	// admin functions run as the default test user (plain ADMIN)
 	prismaMock.parentPlayerLink.findUnique.mockResolvedValue({
-		userId: "parent-1",
-		playerId: "player-1",
+		id: "link-1",
 	} as never);
 });
 
@@ -162,7 +151,11 @@ describe("getFundraiserWithParticipants", () => {
 });
 
 describe("getPublishedFundraisersByPlayer", () => {
-	it("gets published fundraisers for a player with active distribution transactions", async () => {
+	beforeEach(() => {
+		asParent("parent-1");
+	});
+
+	it("gets published fundraisers for a player with published distribution transactions", async () => {
 		const fundraisers = [
 			{
 				id: "fundraiser-1",
@@ -174,7 +167,7 @@ describe("getPublishedFundraisersByPlayer", () => {
 						playerId: "player-1",
 						amount: 50,
 						type: "DISTRIBUTION",
-						status: "ACTIVE",
+						status: "PUBLISHED",
 					},
 				],
 			},
@@ -197,7 +190,7 @@ describe("getPublishedFundraisersByPlayer", () => {
 				transactions: {
 					where: {
 						playerId: "player-1",
-						status: "ACTIVE",
+						status: "PUBLISHED",
 						type: "DISTRIBUTION",
 					},
 					orderBy: {
@@ -224,7 +217,7 @@ describe("getPublishedFundraisersByPlayer", () => {
 		expect(query.include).toHaveProperty("transactions");
 	});
 
-	it("filters transactions by player, active status, and distribution type", async () => {
+	it("filters transactions by player, published status, and distribution type", async () => {
 		prismaMock.fundraiser.findMany.mockResolvedValue([]);
 
 		await getPublishedFundraisersByPlayer("player-1");
@@ -233,7 +226,7 @@ describe("getPublishedFundraisersByPlayer", () => {
 
 		expect(query.include.transactions.where).toEqual({
 			playerId: "player-1",
-			status: "ACTIVE",
+			status: "PUBLISHED",
 			type: "DISTRIBUTION",
 		});
 	});
@@ -248,5 +241,36 @@ describe("getPublishedFundraisersByPlayer", () => {
 		expect(query.include.transactions.orderBy).toEqual({
 			date: "desc",
 		});
+	});
+});
+
+describe("fundraiser data permissions", () => {
+	it("redirects parents from admin fundraiser data", async () => {
+		asParent();
+
+		await expectRedirect(() => getFundraisers());
+		await expectRedirect(() => getFundraiserById("fundraiser-1"));
+		await expectRedirect(() => getFundraiserWithTeams("fundraiser-1"));
+		await expectRedirect(() => getFundraiserWithParticipants("fundraiser-1"));
+
+		expect(prismaMock.fundraiser.findMany).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
+	});
+
+	it("blocks parents from fundraisers of players they are not linked to", async () => {
+		asParent("parent-1");
+		prismaMock.parentPlayerLink.findUnique.mockResolvedValue(null);
+
+		await expect(getPublishedFundraisersByPlayer("player-2")).rejects.toThrow(
+			"You do not have access to this player.",
+		);
+
+		expect(prismaMock.parentPlayerLink.findUnique).toHaveBeenCalledWith({
+			where: {
+				userId_playerId: { userId: "parent-1", playerId: "player-2" },
+			},
+			select: { id: true },
+		});
+		expect(prismaMock.fundraiser.findMany).not.toHaveBeenCalled();
 	});
 });

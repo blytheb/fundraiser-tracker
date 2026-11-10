@@ -1,45 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { prismaMock, authorizationMock, revalidatePathMock } = vi.hoisted(
-	() => ({
-		prismaMock: {
-			playerAccessRequest: {
-				findUnique: vi.fn(),
-				updateMany: vi.fn(),
-			},
-			parentPlayerLink: {
-				upsert: vi.fn(),
-			},
-			$transaction: vi.fn(),
+const { prismaMock } = vi.hoisted(() => ({
+	prismaMock: {
+		playerAccessRequest: {
+			findUnique: vi.fn(),
+			updateMany: vi.fn(),
 		},
-		authorizationMock: {
-			requireAdmin: vi.fn(),
+		parentPlayerLink: {
+			upsert: vi.fn(),
 		},
-		revalidatePathMock: vi.fn(),
-	}),
-);
+		$transaction: vi.fn(),
+	},
+}));
 
 vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-vi.mock("@/lib/permissions", () => ({
-	requireAdmin: authorizationMock.requireAdmin,
-}));
-
-vi.mock("next/cache", () => ({
-	revalidatePath: revalidatePathMock,
-}));
-
+import { revalidatePath } from "next/cache";
+import { asParent, expectRedirect } from "../../helpers/auth";
 import { reviewPlayerAccess } from "@/features/player-access/actions/review-player-access";
 
 beforeEach(() => {
 	vi.clearAllMocks();
-
-	authorizationMock.requireAdmin.mockResolvedValue({
-		id: "admin-1",
-		role: "ADMIN",
-	});
 });
 
 describe("reviewPlayerAccess", () => {
@@ -66,7 +49,7 @@ describe("reviewPlayerAccess", () => {
 
 		const result = await reviewPlayerAccess("request-1", "APPROVED");
 
-		expect(result).toEqual({ success: true });
+		expect(result).toEqual({ ok: true, data: { success: true } });
 
 		expect(prismaMock.parentPlayerLink.upsert).toHaveBeenCalledWith({
 			where: {
@@ -117,9 +100,10 @@ describe("reviewPlayerAccess", () => {
 			}),
 		);
 
-		await expect(reviewPlayerAccess("request-1", "APPROVED")).rejects.toThrow(
-			"This request has already been reviewed.",
-		);
+		expect(await reviewPlayerAccess("request-1", "APPROVED")).toEqual({
+			ok: false,
+			error: "This request has already been reviewed.",
+		});
 
 		expect(prismaMock.playerAccessRequest.updateMany).toHaveBeenCalled();
 		expect(prismaMock.parentPlayerLink.upsert).toHaveBeenCalled();
@@ -139,9 +123,10 @@ describe("reviewPlayerAccess", () => {
 			}),
 		);
 
-		await expect(reviewPlayerAccess("request-1", "APPROVED")).rejects.toThrow(
-			"This request has already been reviewed.",
-		);
+		expect(await reviewPlayerAccess("request-1", "APPROVED")).toEqual({
+			ok: false,
+			error: "This request has already been reviewed.",
+		});
 
 		expect(prismaMock.parentPlayerLink.upsert).not.toHaveBeenCalled();
 		expect(prismaMock.playerAccessRequest.updateMany).not.toHaveBeenCalled();
@@ -167,7 +152,7 @@ describe("reviewPlayerAccess", () => {
 
 		const result = await reviewPlayerAccess("request-1", "REJECTED");
 
-		expect(result).toEqual({ success: true });
+		expect(result).toEqual({ ok: true, data: { success: true } });
 
 		expect(prismaMock.parentPlayerLink.upsert).not.toHaveBeenCalled();
 
@@ -184,13 +169,12 @@ describe("reviewPlayerAccess", () => {
 			}),
 		);
 	});
-	it("rejects unauthorized users", async () => {
-		authorizationMock.requireAdmin.mockRejectedValue(new Error("Unauthorized"));
+	it("redirects users who are not admins", async () => {
+		asParent();
 
-		await expect(reviewPlayerAccess("request-1", "APPROVED")).rejects.toThrow(
-			"Unauthorized",
-		);
+		await expectRedirect(() => reviewPlayerAccess("request-1", "APPROVED"));
 
 		expect(prismaMock.$transaction).not.toHaveBeenCalled();
+		expect(revalidatePath).not.toHaveBeenCalled();
 	});
 });

@@ -21,6 +21,8 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
+import { Prisma } from "@prisma/client";
+import { asParent, expectRedirect } from "../../helpers/auth";
 import { getFundraiserFinancialSummary } from "@/features/fundraisers/data/get-fundraiser-financial-summary";
 
 describe("getFundraiserFinancialSummary", () => {
@@ -32,11 +34,11 @@ describe("getFundraiserFinancialSummary", () => {
 		});
 
 		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
+			_sum: { amount: new Prisma.Decimal(100) },
 		});
 
 		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: 60 },
+			_sum: { amount: new Prisma.Decimal(60) },
 		});
 
 		prismaMock.fundraiserParticipant.count.mockResolvedValue(4);
@@ -76,11 +78,11 @@ describe("getFundraiserFinancialSummary", () => {
 
 	it("never returns negative available funds", async () => {
 		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
+			_sum: { amount: new Prisma.Decimal(100) },
 		});
 
 		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: 120 },
+			_sum: { amount: new Prisma.Decimal(120) },
 		});
 
 		await expect(
@@ -91,6 +93,27 @@ describe("getFundraiserFinancialSummary", () => {
 			availableToAllocate: 0,
 			participantCount: 4,
 		});
+	});
+
+	it("keeps cents exact (no floating point drift)", async () => {
+		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
+			_sum: { amount: new Prisma.Decimal("0.3") },
+		});
+		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
+			_sum: { amount: new Prisma.Decimal("0.1") },
+		});
+
+		const summary = await getFundraiserFinancialSummary("fundraiser-1");
+
+		// 0.3 - 0.1 is 0.19999999999999998 with plain numbers
+		expect(summary.availableToAllocate).toBe(0.2);
+	});
+
+	it("redirects parents", async () => {
+		asParent();
+
+		await expectRedirect(() => getFundraiserFinancialSummary("fundraiser-1"));
+		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
 	});
 
 	it("throws an error when the fundraiser does not exist", async () => {

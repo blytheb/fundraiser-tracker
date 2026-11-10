@@ -44,10 +44,6 @@ vi.mock("next/navigation", () => ({
 		back: vi.fn(),
 	}),
 }));
-vi.mock("@/features/players/PlayerHeader", () => ({
-	default: () => <div>Player Header</div>,
-}));
-
 vi.mock("@/components/reusable/SummaryBlock", () => ({
 	default: () => <div>Summary Block</div>,
 }));

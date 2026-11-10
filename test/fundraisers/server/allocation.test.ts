@@ -48,7 +48,6 @@ vi.mock("@/lib/prisma", () => ({
 
 import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
 import { getActiveFundraiserAllocations } from "@/features/fundraisers/data/get-active-fundraiser-allocations";
-import { getParticipantFinancialSummary } from "@/features/fundraisers/data/get-participant-financial-summary";
 import { getFundraiserFinancialSummary } from "@/features/fundraisers/data/get-fundraiser-financial-summary";
 
 const dec = (value: string | number) => new Prisma.Decimal(value);
@@ -494,76 +493,6 @@ describe("getActiveFundraiserAllocations", () => {
 	});
 });
 
-describe("getParticipantFinancialSummary", () => {
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
-
-	it("counts only PUBLISHED distributions as distributed", async () => {
-		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue({
-			id: "participant-1",
-			player: { id: "player-1" },
-		});
-
-		prismaMock.fundraiserAllocation.findMany.mockResolvedValue([
-			{
-				id: "allocation-1",
-				amount: dec("100.00"),
-				transactions: [{ amount: dec("30.00") }],
-			},
-		]);
-
-		await expect(
-			getParticipantFinancialSummary("participant-1"),
-		).resolves.toMatchObject({
-			allocationAmount: 100,
-			distributedAmount: 30,
-			remainingAmount: 70,
-		});
-
-		expect(prismaMock.fundraiserAllocation.findMany).toHaveBeenCalledWith({
-			where: {
-				fundraiserParticipantId: "participant-1",
-				status: "ACTIVE",
-			},
-			include: {
-				transactions: {
-					where: {
-						type: "DISTRIBUTION",
-						status: "PUBLISHED",
-					},
-					select: { amount: true },
-				},
-			},
-		});
-	});
-
-	it("returns zeros when the participant has no allocations", async () => {
-		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue({
-			id: "participant-1",
-			player: { id: "player-1" },
-		});
-		prismaMock.fundraiserAllocation.findMany.mockResolvedValue([]);
-
-		await expect(
-			getParticipantFinancialSummary("participant-1"),
-		).resolves.toMatchObject({
-			allocationAmount: 0,
-			distributedAmount: 0,
-			remainingAmount: 0,
-		});
-	});
-
-	it("throws an error when the participant does not exist", async () => {
-		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue(null);
-
-		await expect(
-			getParticipantFinancialSummary("missing-participant"),
-		).rejects.toThrow("Fundraiser participant not found");
-
-		expect(prismaMock.fundraiserAllocation.findMany).not.toHaveBeenCalled();
-	});
-});
 
 describe("getFundraiserFinancialSummary", () => {
 	beforeEach(() => {

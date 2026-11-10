@@ -209,7 +209,7 @@ describe("getPlayerTransactions", () => {
 		db.parentPlayerLink.findUnique.mockResolvedValue(null);
 
 		await expect(getPlayerTransactions("p1")).rejects.toThrow(
-			"You do not have access to this player's finances",
+			"You do not have access to this player.",
 		);
 		expect(db.playerTransaction.findMany).not.toHaveBeenCalled();
 	});

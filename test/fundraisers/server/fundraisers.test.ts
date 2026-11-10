@@ -1,21 +1,29 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { prismaMock } = vi.hoisted(() => ({
-	prismaMock: {
+const { prismaMock, txMock } = vi.hoisted(() => {
+	const txMock = {
 		fundraiser: {
-			create: vi.fn(),
+			updateMany: vi.fn(),
+			findUnique: vi.fn(),
 			update: vi.fn(),
 			delete: vi.fn(),
-			findUnique: vi.fn(),
 		},
-		fundraiserContribution: {
-			aggregate: vi.fn(),
+	};
+
+	return {
+		txMock,
+		prismaMock: {
+			$transaction: vi.fn(),
+			fundraiser: {
+				create: vi.fn(),
+				update: vi.fn(),
+				delete: vi.fn(),
+				findUnique: vi.fn(),
+				updateMany: vi.fn(),
+			},
 		},
-		fundraiserAllocation: {
-			aggregate: vi.fn(),
-		},
-	},
-}));
+	};
+});
 
 vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
@@ -30,6 +38,11 @@ import {
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	prismaMock.$transaction.mockImplementation(async (callback) =>
+		callback(txMock),
+	);
+	// default: fundraiser is a draft (assertDraft's lock update matches)
+	txMock.fundraiser.updateMany.mockResolvedValue({ count: 1 });
 });
 
 describe("createFundraiser", () => {
@@ -56,88 +69,81 @@ describe("createFundraiser", () => {
 });
 
 describe("updateFundraiser", () => {
-	it("updates a fundraiser with the provided data", async () => {
-		const data = {
-			name: "Updated Cookie Sale",
-			description: "Updated fundraiser",
-			startDate: new Date("2026-11-01"),
-		};
+	const data = {
+		name: "Updated Cookie Sale",
+		description: "Updated fundraiser",
+		startDate: new Date("2026-11-01"),
+	};
 
-		const fundraiser = {
-			id: "fundraiser-1",
-			...data,
-			status: "PUBLISHED",
-		};
-
-		prismaMock.fundraiser.update.mockResolvedValue(fundraiser);
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
+	it("updates a draft fundraiser inside a transaction", async () => {
+		const fundraiser = { id: "fundraiser-1", ...data, status: "DRAFT" };
+		txMock.fundraiser.update.mockResolvedValue(fundraiser);
 
 		const result = await updateFundraiser("fundraiser-1", data as never);
 
-		expect(prismaMock.fundraiser.update).toHaveBeenCalledWith({
+		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1", status: "DRAFT" },
+			data: { updatedAt: expect.any(Date) },
+		});
+		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
 			data,
 		});
-
+		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
 		expect(result).toEqual({ ok: true, data: fundraiser });
 	});
-	it("rejects updating a completed fundraiser", async () => {
-		const data = {
-			name: "Updated Cookie Sale",
-			description: "Updated fundraiser",
-			startDate: new Date("2026-11-01"),
-		};
 
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-		});
+	it("rejects updating a completed fundraiser", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue({ status: "COMPLETED" });
 
 		const result = await updateFundraiser("fundraiser-1", data as never);
 
 		expect(result).toEqual({
 			ok: false,
-			error: "Completed fundraisers cannot be edited.",
+			error:
+				"Only draft fundraisers can be edited. This fundraiser is completed.",
 		});
+		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
+	});
 
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
+	it("returns an error when the fundraiser does not exist", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue(null);
+
+		const result = await updateFundraiser("missing", data as never);
+
+		expect(result).toEqual({ ok: false, error: "Fundraiser not found" });
+		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
 	});
 });
 
 describe("deleteFundraiser", () => {
-	it("deletes the fundraiser with the specified ID", async () => {
-		const fundraiser = {
-			id: "fundraiser-1",
-			name: "Cookie Sale",
-		};
-
-		prismaMock.fundraiser.delete.mockResolvedValue(fundraiser);
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
+	it("deletes a draft fundraiser inside a transaction", async () => {
+		const fundraiser = { id: "fundraiser-1", name: "Cookie Sale" };
+		txMock.fundraiser.delete.mockResolvedValue(fundraiser);
 
 		const result = await deleteFundraiser("fundraiser-1");
 
-		expect(prismaMock.fundraiser.delete).toHaveBeenCalledWith({
+		expect(txMock.fundraiser.delete).toHaveBeenCalledWith({
 			where: { id: "fundraiser-1" },
 		});
-
+		expect(prismaMock.fundraiser.delete).not.toHaveBeenCalled();
 		expect(result).toEqual({ ok: true, data: fundraiser });
 	});
-	it("rejects deleting a completed fundraiser", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-		});
+
+	it("rejects deleting a published fundraiser", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue({ status: "PUBLISHED" });
 
 		const result = await deleteFundraiser("fundraiser-1");
 
 		expect(result).toEqual({
 			ok: false,
-			error: "Completed fundraisers cannot be deleted.",
+			error:
+				"Only draft fundraisers can be deleted. This fundraiser is published.",
 		});
-
-		expect(prismaMock.fundraiser.delete).not.toHaveBeenCalled();
+		expect(txMock.fundraiser.delete).not.toHaveBeenCalled();
 	});
 });
 
@@ -150,8 +156,8 @@ describe("fundraiser action permissions", () => {
 		await expectRedirect(() => deleteFundraiser("fundraiser-1"));
 
 		expect(prismaMock.fundraiser.create).not.toHaveBeenCalled();
-		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
-		expect(prismaMock.fundraiser.delete).not.toHaveBeenCalled();
+		expect(prismaMock.$transaction).not.toHaveBeenCalled();
+		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
+		expect(txMock.fundraiser.delete).not.toHaveBeenCalled();
 	});
 });

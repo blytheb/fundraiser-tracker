@@ -3,12 +3,10 @@
 import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
-import type { Fundraiser } from "@prisma/client";
+import { assertDraft } from "@/features/fundraisers/lib/fundraiser-status";
 import type { FundraiserFormData } from "../types";
 
-export async function createFundraiser(
-	data: FundraiserFormData,
-) {
+export async function createFundraiser(data: FundraiserFormData) {
 	return runAction(async () => {
 		await requireAdmin();
 
@@ -16,29 +14,17 @@ export async function createFundraiser(
 	});
 }
 
-export async function updateFundraiser(
-	id: string,
-	data: FundraiserFormData,
-) {
+export async function updateFundraiser(id: string, data: FundraiserFormData) {
 	return runAction(async () => {
 		await requireAdmin();
 
-		const fundraiser = await prisma.fundraiser.findUnique({
-			where: { id },
-			select: { status: true },
-		});
+		return prisma.$transaction(async (tx) => {
+			await assertDraft(tx, id);
 
-		if (!fundraiser) {
-			throw new Error("Fundraiser not found");
-		}
-
-		if (fundraiser.status !== "DRAFT") {
-			throw new Error("Completed fundraisers cannot be edited.");
-		}
-
-		return prisma.fundraiser.update({
-			where: { id },
-			data,
+			return tx.fundraiser.update({
+				where: { id },
+				data,
+			});
 		});
 	});
 }
@@ -47,21 +33,12 @@ export async function deleteFundraiser(id: string) {
 	return runAction(async () => {
 		await requireAdmin();
 
-		const fundraiser = await prisma.fundraiser.findUnique({
-			where: { id },
-			select: { status: true },
-		});
+		return prisma.$transaction(async (tx) => {
+			await assertDraft(tx, id, "deleted");
 
-		if (!fundraiser) {
-			throw new Error("Fundraiser not found");
-		}
-
-		if (fundraiser.status !== "DRAFT") {
-			throw new Error("Completed fundraisers cannot be deleted.");
-		}
-
-		return prisma.fundraiser.delete({
-			where: { id },
+			return tx.fundraiser.delete({
+				where: { id },
+			});
 		});
 	});
 }

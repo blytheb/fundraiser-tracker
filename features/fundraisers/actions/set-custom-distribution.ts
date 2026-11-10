@@ -4,6 +4,7 @@ import { runAction } from "@/lib/action-result";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
+import { assertDraft } from "@/features/fundraisers/lib/fundraiser-status";
 
 type CustomAllocation = {
 	participantId: string;
@@ -21,18 +22,8 @@ export async function setCustomDistribution(
 
 		return prisma.$transaction(
 			async (tx) => {
-				const fundraiser = await tx.fundraiser.findUnique({
-					where: { id: fundraiserId },
-					select: { status: true },
-				});
+				await assertDraft(tx, fundraiserId);
 
-				if (!fundraiser) {
-					throw new Error("Fundraiser not found");
-				}
-
-				if (fundraiser.status !== "DRAFT") {
-					throw new Error("Completed fundraisers cannot be edited.");
-				}
 
 				const participants = await tx.fundraiserParticipant.findMany({
 					where: { fundraiserId },

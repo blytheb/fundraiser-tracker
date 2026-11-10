@@ -3,6 +3,7 @@
 import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
+import { assertDraft } from "@/features/fundraisers/lib/fundraiser-status";
 
 export async function addTeamToFundraiser(
 	fundraiserId: string,
@@ -11,21 +12,12 @@ export async function addTeamToFundraiser(
 	return runAction(async () => {
 		await requireAdmin();
 
-		const fundraiser = await prisma.fundraiser.findUnique({
-			where: { id: fundraiserId },
-			select: { status: true },
-		});
+		return prisma.$transaction(async (tx) => {
+			await assertDraft(tx, fundraiserId);
 
-		if (!fundraiser) {
-			throw new Error("Fundraiser not found");
-		}
-
-		if (fundraiser.status !== "DRAFT") {
-			throw new Error("Completed fundraisers cannot be edited.");
-		}
-
-		return prisma.fundraiserTeam.create({
-			data: { fundraiserId, teamId },
+			return tx.fundraiserTeam.create({
+				data: { fundraiserId, teamId },
+			});
 		});
 	});
 }

@@ -27,8 +27,6 @@ beforeEach(() => {
 	vi.clearAllMocks();
 });
 
-
-
 describe("saveFundraiserParticipants", () => {
 	it("saves selected players and returns current participants", async () => {
 		const participants = [
@@ -41,9 +39,7 @@ describe("saveFundraiserParticipants", () => {
 		];
 		const txMock = {
 			fundraiser: {
-				findUnique: vi.fn().mockResolvedValue({
-					status: "DRAFT",
-				}),
+				updateMany: vi.fn().mockResolvedValue({ count: 1 }),
 			},
 			fundraiserParticipant: {
 				deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
@@ -66,6 +62,11 @@ describe("saveFundraiserParticipants", () => {
 		const result = await saveFundraiserParticipants("fundraiser-1", [
 			"player-1",
 		]);
+
+		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1", status: "DRAFT" },
+			data: { updatedAt: expect.any(Date) },
+		});
 
 		expect(txMock.fundraiserParticipant.deleteMany).toHaveBeenCalledWith({
 			where: {
@@ -109,7 +110,7 @@ describe("saveFundraiserParticipants", () => {
 	it("does not create allocations when every participant already has one", async () => {
 		const txMock = {
 			fundraiser: {
-				findUnique: vi.fn().mockResolvedValue({ status: "DRAFT" }),
+				updateMany: vi.fn().mockResolvedValue({ count: 1 }),
 			},
 			fundraiserParticipant: {
 				deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
@@ -138,9 +139,7 @@ describe("saveFundraiserParticipants", () => {
 	it("removes all participants and skips adding players when the list is empty", async () => {
 		const txMock = {
 			fundraiser: {
-				findUnique: vi.fn().mockResolvedValue({
-					status: "DRAFT",
-				}),
+				updateMany: vi.fn().mockResolvedValue({ count: 1 }),
 			},
 			fundraiserParticipant: {
 				deleteMany: vi.fn().mockResolvedValue({ count: 2 }),
@@ -171,9 +170,8 @@ describe("saveFundraiserParticipants", () => {
 	it("rejects saving participants for a completed fundraiser", async () => {
 		const txMock = {
 			fundraiser: {
-				findUnique: vi.fn().mockResolvedValue({
-					status: "COMPLETED",
-				}),
+				updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+				findUnique: vi.fn().mockResolvedValue({ status: "COMPLETED" }),
 			},
 			fundraiserParticipant: {
 				deleteMany: vi.fn(),
@@ -188,7 +186,8 @@ describe("saveFundraiserParticipants", () => {
 
 		expect(await saveFundraiserParticipants("fundraiser-1", ["player-1"])).toEqual({
 			ok: false,
-			error: "Completed fundraisers cannot be edited.",
+			error:
+				"Only draft fundraisers can be edited. This fundraiser is completed.",
 		});
 
 		expect(txMock.fundraiserParticipant.deleteMany).not.toHaveBeenCalled();

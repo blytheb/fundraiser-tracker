@@ -3,40 +3,19 @@
 import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
+import { claimStatus } from "@/features/fundraisers/lib/fundraiser-status";
 
 export async function reopenFundraiser(fundraiserId: string) {
 	return runAction(async () => {
 		await requireAdmin();
 
 		return prisma.$transaction(async (tx) => {
-			// claim the status changefirst so two reopens cant race eachother.
-
-			const claimed = await tx.fundraiser.updateMany({
-				where: {
-					id: fundraiserId,
-					status: { in: ["COMPLETED", "PUBLISHED"] },
-				},
-				data: {
-					status: "DRAFT",
-				},
+			// claim the status change first so two reopens can't race each other
+			await claimStatus(tx, fundraiserId, {
+				from: ["COMPLETED", "PUBLISHED"],
+				to: "DRAFT",
+				action: "reopened",
 			});
-
-			if (claimed.count === 0) {
-				const fundraiser = await tx.fundraiser.findUnique({
-					where: {
-						id: fundraiserId,
-					},
-					select: {
-						id: true,
-						status: true,
-					},
-				});
-				throw new Error(
-					fundraiser
-						? `Fundraiser is already in ${fundraiser.status.toLowerCase()} mode`
-						: "Fundraiser not found",
-				);
-			}
 
 			//void distributions whether they were internal or already visable to parent.
 			// This is because the fundraiser is being reopened and the distributions are no longer valid.

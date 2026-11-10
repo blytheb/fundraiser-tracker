@@ -3,6 +3,7 @@
 import React from "react";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { Plus } from "lucide-react";
 import {
@@ -35,17 +36,23 @@ export default function ManageFundraiserTeamsDialog({
 }: DialogProps) {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 	const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>(
 		selectedTeams.map((team) => team.id),
 	);
 	async function handleSave() {
-		try {
-			await saveFundraiserTeams(fundraiserId, selectedTeamIds);
-			router.refresh();
-			setOpen(false);
-		} catch (error) {
-			console.error("Failed to add team to fundraiser", error);
+		setIsSaving(true);
+		const result = await saveFundraiserTeams(fundraiserId, selectedTeamIds);
+		setIsSaving(false);
+
+		if (!result.ok) {
+			toast.error(result.error);
+			return;
 		}
+
+		toast.success("Teams updated");
+		router.refresh();
+		setOpen(false);
 	}
 
 	function handleToggle(teamId: string) {
@@ -89,8 +96,8 @@ export default function ManageFundraiserTeamsDialog({
 				))}
 
 				<DialogFooter>
-					<Button type="button" onClick={handleSave}>
-						Save Team Selection
+					<Button type="button" onClick={handleSave} disabled={isSaving}>
+						{isSaving ? "Saving..." : "Save Team Selection"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

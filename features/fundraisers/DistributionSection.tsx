@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -78,12 +79,15 @@ export default function DistributionSection({
 				amount: Number(amounts[participant.id] || 0),
 			}));
 
-			try {
-				await setCustomDistribution(fundraiserId, allocations);
-				router.refresh();
-			} catch (error) {
-				console.error(error);
+			const result = await setCustomDistribution(fundraiserId, allocations);
+
+			if (!result.ok) {
+				toast.error(result.error);
+				return;
 			}
+
+			toast.success("Allocations saved");
+			router.refresh();
 		});
 	}
 

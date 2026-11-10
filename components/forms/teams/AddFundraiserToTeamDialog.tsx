@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import {
 	Dialog,
@@ -35,6 +36,7 @@ export default function AddFundraiserToTeamDialog({
 	const [mode, setMode] = useState<"existing" | "create">("existing");
 
 	const [name, setName] = useState("");
+	const [error, setError] = useState("");
 
 	const filtered = availableFundraisers.filter((fundraiser) => {
 		const searchText = fundraiser.name.toLowerCase();
@@ -43,33 +45,39 @@ export default function AddFundraiserToTeamDialog({
 	});
 
 	async function handleAdd(fundraiserId: string) {
-		try {
-			await addTeamToFundraiser(fundraiserId, teamId);
+		setError("");
+		const result = await addTeamToFundraiser(fundraiserId, teamId);
 
-			router.refresh();
-			setSearch("");
-			setOpen(false);
-		} catch (error) {
-			console.error("Failed to add fundraiser to team:", error);
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Fundraiser added to team");
+		router.refresh();
+		setSearch("");
+		setOpen(false);
 	}
 
 	async function handleCreate() {
-		try {
-			await createFundraiserAndAddToTeam(teamId, {
-				name: name.trim(),
-				description: "",
-				startDate: new Date(),
-			});
+		setError("");
+		const result = await createFundraiserAndAddToTeam(teamId, {
+			name: name.trim(),
+			description: "",
+			startDate: new Date(),
+		});
 
-			router.refresh();
-
-			setName("");
-			setMode("existing");
-			setOpen(false);
-		} catch (error) {
-			console.error("Failed to create fundraiser:", error);
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Fundraiser created and added to team");
+		router.refresh();
+
+		setName("");
+		setMode("existing");
+		setOpen(false);
 	}
 
 	function handleOpenChange(value: boolean) {
@@ -79,6 +87,7 @@ export default function AddFundraiserToTeamDialog({
 			setSearch("");
 			setName("");
 			setMode("existing");
+			setError("");
 		}
 	}
 
@@ -161,6 +170,11 @@ export default function AddFundraiserToTeamDialog({
 							</Button>
 						</div>
 					</div>
+				)}
+				{error && (
+					<p role="alert" className="text-sm text-destructive">
+						{error}
+					</p>
 				)}
 			</DialogContent>
 		</Dialog>

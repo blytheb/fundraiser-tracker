@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Settings2 } from "lucide-react";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { assignPlayerToUser } from "@/features/users/actions/assign-player";
 import { removePlayerFromUser } from "@/features/users/actions/remove-player";
 
@@ -63,14 +64,15 @@ export function ManagePlayers({
 		setError("");
 
 		startTransition(async () => {
-			try {
-				await assignPlayerToUser(userId, selectedPlayerId);
-				setSelectedPlayerId("");
-			} catch (error) {
-				setError(
-					error instanceof Error ? error.message : "Unable to assign player.",
-				);
+			const result = await assignPlayerToUser(userId, selectedPlayerId);
+
+			if (!result.ok) {
+				setError(result.error);
+				return;
 			}
+
+			toast.success("Player assigned");
+			setSelectedPlayerId("");
 		});
 	}
 
@@ -78,13 +80,14 @@ export function ManagePlayers({
 		setError("");
 
 		startTransition(async () => {
-			try {
-				await removePlayerFromUser(userId, playerId);
-			} catch (error) {
-				setError(
-					error instanceof Error ? error.message : "Unable to remove player.",
-				);
+			const result = await removePlayerFromUser(userId, playerId);
+
+			if (!result.ok) {
+				setError(result.error);
+				return;
 			}
+
+			toast.success("Player access removed");
 		});
 	}
 
@@ -134,7 +137,11 @@ export function ManagePlayers({
 						</button>
 					</div>
 
-					{error && <p className="text-sm text-destructive">{error}</p>}
+					{error && (
+						<p role="alert" className="text-sm text-destructive">
+							{error}
+						</p>
+					)}
 
 					<div className="space-y-2">
 						{playerLinks.length === 0 ? (

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { updateFundraiser } from "@/features/fundraisers/actions/fundraisers";
 import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import {
@@ -34,26 +35,34 @@ export default function EditFundraiserDialog({
 	const [startDate, setStartDate] = useState(
 		fundraiser.startDate.toISOString().split("T")[0],
 	);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// useEffect(() => {
 	// 	setName(fundraiser.name);
 	// }, [fundraiser]);
 
 	async function handleEdit() {
-		try {
-			await updateFundraiser(fundraiser.id, {
-				name,
-				description,
-				startDate: new Date(startDate),
-			});
-			router.refresh();
-			onOpenChange(false);
-			setName("");
-			setDescription("");
-			setStartDate("");
-		} catch (error) {
-			console.error("Failed to edit fundraiser:", error);
+		setIsSubmitting(true);
+
+		const result = await updateFundraiser(fundraiser.id, {
+			name,
+			description,
+			startDate: new Date(startDate),
+		});
+
+		setIsSubmitting(false);
+
+		if (!result.ok) {
+			toast.error(result.error);
+			return;
 		}
+
+		toast.success("Fundraiser updated");
+		router.refresh();
+		onOpenChange(false);
+		setName("");
+		setDescription("");
+		setStartDate("");
 	}
 
 	return (
@@ -76,8 +85,8 @@ export default function EditFundraiserDialog({
 					<Button
 						type="button"
 						onClick={handleEdit}
-						disabled={!name.trim() || !startDate}>
-						Save Changes
+						disabled={isSubmitting || !name.trim() || !startDate}>
+						{isSubmitting ? "Saving..." : "Save Changes"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

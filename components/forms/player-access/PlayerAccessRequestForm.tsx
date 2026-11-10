@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import { requestPlayerAccess } from "@/features/player-access/actions/request-player-access";
 
@@ -56,16 +57,17 @@ export function PlayerAccessRequestForm({
 		}
 
 		startTransition(async () => {
-			try {
-				const result = await requestPlayerAccess(playerId);
-				if (result.success) {
-					setMessage("Access request submitted successfully.");
-					router.refresh();
-				}
-			} catch (error) {
-				setMessage(error instanceof Error ? error.message : "Request failed.");
+			const result = await requestPlayerAccess(playerId);
+
+			if (!result.ok) {
+				setMessage(result.error);
 				setIsError(true);
+				return;
 			}
+
+			toast.success("Access request submitted");
+			setMessage("Access request submitted successfully.");
+			router.refresh();
 		});
 	}
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { deleteFundraiser } from "@/features/fundraisers/actions/fundraisers";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import type { Fundraiser } from "@prisma/client";
@@ -25,16 +26,17 @@ export default function DeleteFundraiserDialog({
 		setError("");
 		setIsPending(true);
 
-		try {
-			await deleteFundraiser(fundraiser.id);
-			router.refresh();
-			onOpenChange(false);
-		} catch (error) {
-			console.error("Failed to delete fundraiser:", error);
-			setError("Unable to delete this fundraiser. Please try again.");
-		} finally {
-			setIsPending(false);
+		const result = await deleteFundraiser(fundraiser.id);
+		setIsPending(false);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Fundraiser deleted");
+		router.refresh();
+		onOpenChange(false);
 	}
 
 	function handleOpenChange(nextOpen: boolean) {

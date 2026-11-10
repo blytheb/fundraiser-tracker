@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
 	Dialog,
@@ -37,6 +38,7 @@ export default function AddPlayerToTeamDialog({
 
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
+	const [error, setError] = useState("");
 
 	const filteredPlayers = availablePlayers.filter((player) => {
 		const searchText = `${player.firstName} ${player.lastName}`.toLowerCase();
@@ -45,34 +47,40 @@ export default function AddPlayerToTeamDialog({
 	});
 
 	async function handleAddPlayer(playerId: string) {
-		try {
-			await addPlayerToTeam(teamId, playerId);
+		setError("");
+		const result = await addPlayerToTeam(teamId, playerId);
 
-			router.refresh();
-			setSearch("");
-			setOpen(false);
-		} catch (error) {
-			console.error("Failed to add player:", error);
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Player added to roster");
+		router.refresh();
+		setSearch("");
+		setOpen(false);
 	}
 
 	async function handleCreatePlayer() {
-		try {
-			await createPlayerAndAddToTeam(teamId, {
-				firstName: firstName.trim(),
-				lastName: lastName.trim(),
-				status: true,
-			});
+		setError("");
+		const result = await createPlayerAndAddToTeam(teamId, {
+			firstName: firstName.trim(),
+			lastName: lastName.trim(),
+			status: true,
+		});
 
-			router.refresh();
-
-			setFirstName("");
-			setLastName("");
-			setMode("existing");
-			setOpen(false);
-		} catch (error) {
-			console.error("Failed to create player:", error);
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Player created and added to roster");
+		router.refresh();
+
+		setFirstName("");
+		setLastName("");
+		setMode("existing");
+		setOpen(false);
 	}
 
 	function handleOpenChange(value: boolean) {
@@ -83,6 +91,7 @@ export default function AddPlayerToTeamDialog({
 			setFirstName("");
 			setLastName("");
 			setMode("existing");
+			setError("");
 		}
 	}
 
@@ -165,6 +174,11 @@ export default function AddPlayerToTeamDialog({
 							</Button>
 						</div>
 					</div>
+				)}
+				{error && (
+					<p role="alert" className="text-sm text-destructive">
+						{error}
+					</p>
 				)}
 			</DialogContent>
 		</Dialog>

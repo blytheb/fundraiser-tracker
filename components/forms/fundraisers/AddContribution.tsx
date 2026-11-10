@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -45,34 +46,36 @@ export default function AddContribution({
 			return;
 		}
 
-		try {
-			setIsSubmitting(true);
+		setIsSubmitting(true);
 
-			await addContribution({
-				fundraiserId,
-				source,
-				amount: parsedAmount,
-				paymentMethod,
-				date,
-				description: description || "",
-			});
+		const result = await addContribution({
+			fundraiserId,
+			source,
+			amount: parsedAmount,
+			paymentMethod,
+			date,
+			description: description || "",
+		});
 
-			// Reset form
-			setAmount("");
-			setPaymentMethod("CASH");
-			setSource("EVENT_PROFIT");
+		setIsSubmitting(false);
 
-			setDescription("");
-			setDate(new Date().toISOString().split("T")[0]);
-
-			// Close dialog
-			setOpen(false);
-			router.refresh();
-		} catch (error) {
-			console.error("Failed to add fundraiser fund:", error);
-		} finally {
-			setIsSubmitting(false);
+		if (!result.ok) {
+			toast.error(result.error);
+			return;
 		}
+
+		// Reset form
+		setAmount("");
+		setPaymentMethod("CASH");
+		setSource("EVENT_PROFIT");
+
+		setDescription("");
+		setDate(new Date().toISOString().split("T")[0]);
+
+		// Close dialog
+		setOpen(false);
+		toast.success("Contribution added");
+		router.refresh();
 	}
 
 	return (

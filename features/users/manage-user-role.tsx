@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { UserRole } from "@prisma/client";
 import { updateUserRole } from "@/features/users/actions/update-user-role";
 
@@ -20,15 +21,14 @@ export function ManageUserRole({ userId, currentRole }: ManageUserRoleProps) {
 		setError("");
 
 		startTransition(async () => {
-			try {
-				await updateUserRole(userId, selectedRole);
-			} catch (error) {
-				setError(
-					error instanceof Error
-						? error.message
-						: "Unable to update user role.",
-				);
+			const result = await updateUserRole(userId, selectedRole);
+
+			if (!result.ok) {
+				setError(result.error);
+				return;
 			}
+
+			toast.success("Role updated");
 		});
 	}
 
@@ -52,7 +52,11 @@ export function ManageUserRole({ userId, currentRole }: ManageUserRoleProps) {
 				{isPending ? "Saving..." : "Save Role"}
 			</button>
 
-			{error && <p className="text-sm text-destructive">{error}</p>}
+			{error && (
+				<p role="alert" className="text-sm text-destructive">
+					{error}
+				</p>
+			)}
 		</div>
 	);
 }

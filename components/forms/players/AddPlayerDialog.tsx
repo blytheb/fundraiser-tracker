@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { createPlayer } from "@/features/players/actions/players";
 import {
@@ -21,25 +22,38 @@ export default function AddPlayerDialog() {
 	const [open, setOpen] = useState(false);
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
+	const [error, setError] = useState("");
+
+	function handleOpenChange(nextOpen: boolean) {
+		if (!nextOpen) {
+			setError("");
+		}
+
+		setOpen(nextOpen);
+	}
 
 	async function handleCreate() {
-		try {
-			await createPlayer({
-				firstName,
-				lastName,
-				status: true,
-			});
-			router.refresh();
-			setOpen(false);
-			setFirstName("");
-			setLastName("");
-		} catch (error) {
-			console.error("Failed to create player:", error);
+		setError("");
+		const result = await createPlayer({
+			firstName,
+			lastName,
+			status: true,
+		});
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Player created");
+		router.refresh();
+		handleOpenChange(false);
+		setFirstName("");
+		setLastName("");
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogTrigger
 				render={
 					<Button>
@@ -57,6 +71,12 @@ export default function AddPlayerDialog() {
 					onFirstNameChange={setFirstName}
 					onLastNameChange={setLastName}
 				/>
+
+				{error && (
+					<p role="alert" className="text-sm text-destructive">
+						{error}
+					</p>
+				)}
 				<DialogFooter>
 					<Button
 						type="button"

@@ -21,94 +21,13 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 import { asParent, expectRedirect } from "../../helpers/auth";
-import { addPlayerToFundraiser } from "@/features/fundraisers/actions/add-player-to-fundraiser";
-import { removePlayerFromFundraiser } from "@/features/fundraisers/actions/remove-player-from-fundraiser";
 import { saveFundraiserParticipants } from "@/features/fundraisers/actions/save-fundraiser-participants";
 
 beforeEach(() => {
 	vi.clearAllMocks();
 });
 
-describe("addPlayerToFundraiser", () => {
-	it("adds a player to a fundraiser", async () => {
-		const participant = {
-			id: "participant-1",
-			fundraiserId: "fundraiser-1",
-			playerId: "player-1",
-		};
 
-		prismaMock.fundraiserParticipant.create.mockResolvedValue(participant);
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
-
-		const result = await addPlayerToFundraiser("fundraiser-1", "player-1");
-
-		expect(prismaMock.fundraiserParticipant.create).toHaveBeenCalledWith({
-			data: {
-				fundraiserId: "fundraiser-1",
-				playerId: "player-1",
-				// every participant starts with a $0 allocation
-				allocations: {
-					create: { amount: 0, status: "ACTIVE" },
-				},
-			},
-		});
-		expect(result).toEqual({ ok: true, data: participant });
-	});
-	it("rejects adding a player to a completed fundraiser", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-		});
-
-		expect(await addPlayerToFundraiser("fundraiser-1", "player-1")).toEqual({
-			ok: false,
-			error: "Completed fundraisers cannot be edited.",
-		});
-
-		expect(prismaMock.fundraiserParticipant.create).not.toHaveBeenCalled();
-	});
-});
-
-describe("removePlayerFromFundraiser", () => {
-	it("removes a player from a fundraiser", async () => {
-		const participant = {
-			id: "participant-1",
-			fundraiserId: "fundraiser-1",
-			playerId: "player-1",
-		};
-
-		prismaMock.fundraiserParticipant.delete.mockResolvedValue(participant);
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
-
-		const result = await removePlayerFromFundraiser("fundraiser-1", "player-1");
-
-		expect(prismaMock.fundraiserParticipant.delete).toHaveBeenCalledWith({
-			where: {
-				fundraiserId_playerId: {
-					fundraiserId: "fundraiser-1",
-					playerId: "player-1",
-				},
-			},
-		});
-		expect(result).toEqual({ ok: true, data: participant });
-	});
-
-	it("rejects removing a player from a completed fundraiser", async () => {
-		prismaMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-		});
-
-		expect(await removePlayerFromFundraiser("fundraiser-1", "player-1")).toEqual({
-			ok: false,
-			error: "Completed fundraisers cannot be edited.",
-		});
-
-		expect(prismaMock.fundraiserParticipant.delete).not.toHaveBeenCalled();
-	});
-});
 
 describe("saveFundraiserParticipants", () => {
 	it("saves selected players and returns current participants", async () => {
@@ -281,10 +200,6 @@ describe("fundraiser participant action permissions", () => {
 	it("redirects parents and does not touch the database", async () => {
 		asParent();
 
-		await expectRedirect(() => addPlayerToFundraiser("fundraiser-1", "player-1"));
-		await expectRedirect(() =>
-			removePlayerFromFundraiser("fundraiser-1", "player-1"),
-		);
 		await expectRedirect(() =>
 			saveFundraiserParticipants("fundraiser-1", ["player-1"]),
 		);

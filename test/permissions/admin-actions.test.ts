@@ -25,7 +25,6 @@ import {
 } from "@/features/fundraisers/actions/contributions";
 import { addTeamToFundraiser } from "@/features/fundraisers/actions/add-team-to-fundraiser";
 import { publishFundraiser } from "@/features/fundraisers/actions/publish-fundraiser";
-import { addPlayerToFundraiser } from "@/features/fundraisers/actions/add-player-to-fundraiser";
 import {
 	createFundraiser,
 	updateFundraiser,
@@ -37,7 +36,6 @@ import { unpublishFundraiser } from "@/features/fundraisers/actions/unpublish-fu
 import { saveFundraiserParticipants } from "@/features/fundraisers/actions/save-fundraiser-participants";
 import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/remove-team-from-fundraiser";
 import { saveFundraiserTeams } from "@/features/fundraisers/actions/save-fundraiser-teams";
-import { removePlayerFromFundraiser } from "@/features/fundraisers/actions/remove-player-from-fundraiser";
 import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
 import { addPlayerToTeam } from "@/features/teams/actions/add-player-to-team";
 import { removePlayerFromTeam } from "@/features/teams/actions/remove-player-from-team";
@@ -87,8 +85,6 @@ const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
 	["deleteContribution", () => deleteContribution("c1")],
 	["addTeamToFundraiser", () => addTeamToFundraiser("f1", "t1")],
 	["removeTeamFromFundraiser", () => removeTeamFromFundraiser("f1", "t1")],
-	["addPlayerToFundraiser", () => addPlayerToFundraiser("f1", "p1")],
-	["removePlayerFromFundraiser", () => removePlayerFromFundraiser("f1", "p1")],
 	["createFundraiser", () => createFundraiser(fundraiserForm)],
 	["updateFundraiser", () => updateFundraiser("f1", fundraiserForm)],
 	["deleteFundraiser", () => deleteFundraiser("f1")],

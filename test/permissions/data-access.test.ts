@@ -36,7 +36,6 @@ import { getAvailablePlayersForTeam } from "@/features/teams/data/get-available-
 import {
 	getFundraisers,
 	getFundraiserById,
-	getPublishedFundraisersByPlayer,
 } from "@/features/fundraisers/data/fundraisers";
 import {
 	getFundraiserTeams,
@@ -47,7 +46,6 @@ import { getFundraiserFinancialSummary } from "@/features/fundraisers/data/get-f
 import { getActiveFundraiserAllocations } from "@/features/fundraisers/data/get-active-fundraiser-allocations";
 import { getFundraiserContributions } from "@/features/fundraisers/data/get-fundraiser-contributions";
 import { getFundraiserParticipants } from "@/features/fundraisers/data/get-fundraiser-participants";
-import { getParticipantFinancialSummary } from "@/features/fundraisers/data/get-participant-financial-summary";
 import { getAdminUsers } from "@/features/users/data/get-admin-users";
 import { getAvailablePlayers } from "@/features/users/data/get-available-players";
 import { getMyLinkedPlayers } from "@/features/users/data/get-users-linked-players";
@@ -101,10 +99,6 @@ const ADMIN_DATA: [string, () => Promise<unknown>][] = [
 	],
 	["getFundraiserContributions", () => getFundraiserContributions("f1")],
 	["getFundraiserParticipants", () => getFundraiserParticipants("f1")],
-	[
-		"getParticipantFinancialSummary",
-		() => getParticipantFinancialSummary("fp1"),
-	],
 	["getAdminUsers", () => getAdminUsers()],
 	["getAvailablePlayers", () => getAvailablePlayers()],
 	["getAdminDashboardSummary", () => getAdminDashboardSummary()],
@@ -143,10 +137,6 @@ describe.each(ADMIN_DATA)("admin data: %s", (_name, call) => {
 const PARENT_ONLY: [string, () => Promise<unknown>][] = [
 	["getMyAccessRequests", () => getMyAccessRequests()],
 	["getMyLinkedPlayers", () => getMyLinkedPlayers()],
-	[
-		"getPublishedFundraisersByPlayer",
-		() => getPublishedFundraisersByPlayer("p1"),
-	],
 	["requestPlayerAccess", () => requestPlayerAccess("p1")],
 	["cancelPlayerAccessRequest", () => cancelPlayerAccessRequest("r1")],
 ];

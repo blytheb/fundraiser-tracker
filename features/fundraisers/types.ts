@@ -18,25 +18,7 @@ export type FundraiserContributionListItem = {
 	updatedAt: Date;
 };
 
-export type FundraiserWithTeams = Prisma.FundraiserGetPayload<{
-	include: {
-		teams: {
-			include: {
-				team: true;
-			};
-		};
-	};
-}>;
 
-export type FundraiserWithParticipants = Prisma.FundraiserGetPayload<{
-	include: {
-		participants: {
-			include: {
-				player: true;
-			};
-		};
-	};
-}>;
 
 export type FundraiserParticipantWithPlayer =
 	Prisma.FundraiserParticipantGetPayload<{

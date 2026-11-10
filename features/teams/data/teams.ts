@@ -64,29 +64,3 @@ export async function getTeamById(id: string): Promise<Team | null> {
 		},
 	});
 }
-
-export async function getTeamWithPlayers(
-	id: string,
-): Promise<TeamWithPlayers | null> {
-	await requireAdmin();
-	const team = await prisma.team.findUnique({
-		where: {
-			id,
-		},
-		include: {
-			players: {
-				include: {
-					player: true,
-				},
-			},
-		},
-	});
-	if (!team) {
-		return null;
-	}
-
-	return {
-		...team,
-		players: team.players,
-	};
-}

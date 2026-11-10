@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, requireUser } from "@/lib/permissions";
+import { requireAdmin } from "@/lib/permissions";
 import type { Player } from "@prisma/client";
-import type { PlayerWithFundraisers, PlayerWithTeams } from "../types";
+import { requirePlayerAccess } from "@/features/players/lib/require-player-access";
 
 export async function getPlayers(search?: string): Promise<Player[]> {
 	await requireAdmin();
@@ -47,22 +47,7 @@ export async function getPlayerById(id: string): Promise<Player | null> {
 }
 
 export async function getPlayerTransactions(playerId: string) {
-	const user = await requireUser();
-
-	if (user.role === "PARENT") {
-		const link = await prisma.parentPlayerLink.findUnique({
-			where: {
-				userId_playerId: {
-					userId: user.id,
-					playerId,
-				},
-			},
-			select: { id: true },
-		});
-		if (!link) {
-			throw new Error("You do not have access to this player's finances");
-		}
-	}
+	await requirePlayerAccess(playerId, { allowAdmins: true });
 
 	return prisma.playerTransaction.findMany({
 		where: {

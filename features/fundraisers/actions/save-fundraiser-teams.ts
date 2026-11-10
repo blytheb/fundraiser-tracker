@@ -3,6 +3,7 @@
 import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
+import { assertDraft } from "@/features/fundraisers/lib/fundraiser-status";
 
 export async function saveFundraiserTeams(
 	fundraiserId: string,
@@ -12,18 +13,8 @@ export async function saveFundraiserTeams(
 		await requireAdmin();
 
 		await prisma.$transaction(async (tx) => {
-			const fundraiser = await tx.fundraiser.findUnique({
-				where: { id: fundraiserId },
-				select: { status: true },
-			});
+			await assertDraft(tx, fundraiserId);
 
-			if (!fundraiser) {
-				throw new Error("Fundraiser not found");
-			}
-
-			if (fundraiser.status !== "DRAFT") {
-				throw new Error("Completed fundraisers cannot be edited.");
-			}
 			// 1. Find all players who are eligible based on
 			//    the NEW set of selected teams.
 			const eligiblePlayers = await tx.teamPlayer.findMany({

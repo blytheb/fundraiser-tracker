@@ -5,6 +5,7 @@ import { runAction } from "@/lib/action-result";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
+import { claimStatus } from "@/features/fundraisers/lib/fundraiser-status";
 
 //draft to complete status: locks numbers and creates internal distributions
 export async function completeFundraiser(fundraiserId: string) {
@@ -13,23 +14,7 @@ export async function completeFundraiser(fundraiserId: string) {
 
 		return prisma.$transaction(async (tx) => {
 			//claim status change first. This locks the row so double click or retry cant create a second distribution
-			const claimed = await tx.fundraiser.updateMany({
-				where: { id: fundraiserId, status: "DRAFT" },
-				data: { status: "COMPLETED" },
-			});
-
-			if (claimed.count === 0) {
-				const exists = await tx.fundraiser.findUnique({
-					where: { id: fundraiserId },
-					select: { id: true, status: true },
-				});
-
-				throw new Error(
-					exists
-						? `Fundraiser is already ${exists.status.toLowerCase()}`
-						: "Fundraiser not found",
-				);
-			}
+			await claimStatus(tx, fundraiserId, { from: "DRAFT", to: "COMPLETED", action: "completed" });
 
 			//any error thrown below rolls the status back to DRAFT automatically
 			const participantsWithoutAllocation =

@@ -92,7 +92,7 @@ describe("completeFundraiser", () => {
 
 		expect(result.ok).toBe(true);
 		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1", status: "DRAFT" },
+			where: { id: "fundraiser-1", status: { in: ["DRAFT"] } },
 			data: { status: "COMPLETED" },
 		});
 	});
@@ -118,7 +118,8 @@ describe("completeFundraiser", () => {
 
 		expect(result).toEqual({
 			ok: false,
-			error: "Fundraiser is already completed",
+			error:
+				"Only draft fundraisers can be completed. This fundraiser is completed.",
 		});
 		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
 	});
@@ -360,7 +361,7 @@ describe("publishFundraiser", () => {
 
 		expect(result).toEqual({ ok: true, data: { success: true } });
 		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1", status: "COMPLETED" },
+			where: { id: "fundraiser-1", status: { in: ["COMPLETED"] } },
 			data: { status: "PUBLISHED" },
 		});
 		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
@@ -394,7 +395,8 @@ describe("publishFundraiser", () => {
 
 		expect(result).toEqual({
 			ok: false,
-			error: "Fundraiser is already published",
+			error:
+				"Only completed fundraisers can be published. This fundraiser is published.",
 		});
 		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});
@@ -411,7 +413,7 @@ describe("publishFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Fundraiser must be completed before it can be published. Current status: DRAFT",
+				"Only completed fundraisers can be published. This fundraiser is a draft.",
 		});
 	});
 
@@ -450,7 +452,7 @@ describe("unpublishFundraiser", () => {
 
 		expect(result).toEqual({ ok: true, data: { success: true } });
 		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1", status: "PUBLISHED" },
+			where: { id: "fundraiser-1", status: { in: ["PUBLISHED"] } },
 			data: { status: "COMPLETED" },
 		});
 		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
@@ -475,13 +477,14 @@ describe("unpublishFundraiser", () => {
 
 	it("returns an error when the fundraiser is not published", async () => {
 		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
-		txMock.fundraiser.findUnique.mockResolvedValue({ id: "fundraiser-1" });
+		txMock.fundraiser.findUnique.mockResolvedValue({ status: "COMPLETED" });
 
 		const result = await unpublishFundraiser("fundraiser-1");
 
 		expect(result).toEqual({
 			ok: false,
-			error: "Fundraiser is not in PUBLISHED status",
+			error:
+				"Only published fundraisers can be unpublished. This fundraiser is completed.",
 		});
 		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});
@@ -556,7 +559,8 @@ describe("reopenFundraiser", () => {
 
 		expect(result).toEqual({
 			ok: false,
-			error: "Fundraiser is already in draft mode",
+			error:
+				"Only completed or published fundraisers can be reopened. This fundraiser is a draft.",
 		});
 		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});

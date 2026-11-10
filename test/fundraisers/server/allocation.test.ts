@@ -5,6 +5,7 @@ import { asAdminParent, asParent, expectRedirect } from "@/test/helpers/auth";
 const { prismaMock, transactionMock } = vi.hoisted(() => {
 	const transactionMock = {
 		fundraiser: {
+			updateMany: vi.fn(),
 			findUnique: vi.fn(),
 		},
 		fundraiserParticipant: {
@@ -73,9 +74,8 @@ describe("setCustomDistribution", () => {
 			},
 		);
 
-		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
+		// assertDraft: the draft lock update matches
+		transactionMock.fundraiser.updateMany.mockResolvedValue({ count: 1 });
 
 		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([
 			{ id: "participant-1" },
@@ -103,6 +103,7 @@ describe("setCustomDistribution", () => {
 	});
 
 	it("returns an error for a completed fundraiser and changes nothing", async () => {
+		transactionMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
 		transactionMock.fundraiser.findUnique.mockResolvedValue({
 			status: "COMPLETED",
 		});
@@ -114,7 +115,8 @@ describe("setCustomDistribution", () => {
 
 		expect(result).toEqual({
 			ok: false,
-			error: "Completed fundraisers cannot be edited.",
+			error:
+				"Only draft fundraisers can be edited. This fundraiser is completed.",
 		});
 		expect(
 			transactionMock.fundraiserAllocation.findMany,
@@ -357,6 +359,7 @@ describe("setCustomDistribution", () => {
 	});
 
 	it("returns an error for a fundraiser that does not exist", async () => {
+		transactionMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
 		transactionMock.fundraiser.findUnique.mockResolvedValue(null);
 
 		const result = await setCustomDistribution("missing-fundraiser", [

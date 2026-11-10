@@ -1,25 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/permissions";
+import { requirePlayerAccess } from "@/features/players/lib/require-player-access";
 import { summarizeTransactions } from "@/features/players/lib/summarize-transactions";
 
 export async function getPlayerFinancialSummary(playerId: string) {
-	const user = await requireUser();
-
-	// Parent view: every user (including ADMIN_PARENT) must be linked to the player.
+	// Parent view: everyone (including ADMIN_PARENT) must be linked to the player.
 	// Admins view any player from the admin page instead.
-	const link = await prisma.parentPlayerLink.findUnique({
-		where: {
-			userId_playerId: {
-				userId: user.id,
-				playerId,
-			},
-		},
-		select: { id: true },
-	});
-
-	if (!link) {
-		throw new Error("You do not have access to this player");
-	}
+	await requirePlayerAccess(playerId, { allowAdmins: false });
 
 	const [player, teams, transactions] = await Promise.all([
 		prisma.player.findUnique({

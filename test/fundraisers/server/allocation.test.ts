@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Prisma } from "@prisma/client";
+import { asAdminParent, asParent, expectRedirect } from "@/test/helpers/auth";
 
 const { prismaMock, transactionMock } = vi.hoisted(() => {
 	const transactionMock = {
@@ -49,6 +51,19 @@ import { getActiveFundraiserAllocations } from "@/features/fundraisers/data/get-
 import { getParticipantFinancialSummary } from "@/features/fundraisers/data/get-participant-financial-summary";
 import { getFundraiserFinancialSummary } from "@/features/fundraisers/data/get-fundraiser-financial-summary";
 
+const dec = (value: string | number) => new Prisma.Decimal(value);
+
+// create() is called with a Decimal amount; compare by value
+function createdAllocations() {
+	return transactionMock.fundraiserAllocation.create.mock.calls.map(
+		([args]) => ({
+			participantId: args.data.fundraiserParticipantId,
+			amount: args.data.amount.toFixed(2),
+			status: args.data.status,
+		}),
+	);
+}
+
 describe("setCustomDistribution", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -69,123 +84,183 @@ describe("setCustomDistribution", () => {
 		]);
 
 		transactionMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
+			_sum: { amount: dec("100") },
 		});
 
 		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([]);
 	});
 
-	it("rejects allocations that do not equal the total raised", async () => {
-		await expect(
-			setCustomDistribution("fundraiser-1", [
-				{ participantId: "participant-1", amount: 40 },
-				{ participantId: "participant-2", amount: 50 },
-			]),
-		).rejects.toThrow(/does not match total raised/);
+	it("returns an error when allocations do not equal the total raised", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 40 },
+			{ participantId: "participant-2", amount: 50 },
+		]);
 
+		expect(result).toEqual({
+			ok: false,
+			error: "Total allocation of 90.00 does not match total raised of 100.00",
+		});
 		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
 	});
 
-	it("rejects changes to a completed fundraiser", async () => {
+	it("returns an error for a completed fundraiser and changes nothing", async () => {
 		transactionMock.fundraiser.findUnique.mockResolvedValue({
 			status: "COMPLETED",
 		});
 
-		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([
-			{
-				id: "allocation-1",
-				fundraiserParticipantId: "participant-1",
-				amount: 100,
-			},
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 50 },
+			{ participantId: "participant-2", amount: 50 },
 		]);
 
-		await expect(
-			setCustomDistribution("fundraiser-1", [
-				{ participantId: "participant-1", amount: 50 },
-				{ participantId: "participant-2", amount: 50 },
-			]),
-		).rejects.toThrow(/Completed fundraisers cannot be edited/);
-
+		expect(result).toEqual({
+			ok: false,
+			error: "Completed fundraisers cannot be edited.",
+		});
 		expect(
 			transactionMock.fundraiserAllocation.findMany,
 		).not.toHaveBeenCalled();
-
 		expect(
 			transactionMock.fundraiserAllocation.updateMany,
 		).not.toHaveBeenCalled();
-
 		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
 	});
 
-	it("rejects negative allocation amounts", async () => {
-		await expect(
-			setCustomDistribution("fundraiser-1", [
-				{ participantId: "participant-1", amount: 110 },
-				{ participantId: "participant-2", amount: -10 },
-			]),
-		).rejects.toThrow(/cannot be negative/);
+	it("returns an error for negative allocation amounts", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 110 },
+			{ participantId: "participant-2", amount: -10 },
+		]);
 
+		expect(result).toEqual({
+			ok: false,
+			error:
+				"Allocation amount for participant participant-2 cannot be negative",
+		});
 		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
 	});
 
-	it("rejects participants who do not belong to the fundraiser", async () => {
-		await expect(
-			setCustomDistribution("fundraiser-1", [
-				{ participantId: "participant-1", amount: 100 },
-				{ participantId: "wrong-participant", amount: 0 },
-			]),
-		).rejects.toThrow(/does not belong to fundraiser/);
+	it("returns an error for amounts that are not valid numbers", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: Number.NaN },
+			{ participantId: "participant-2", amount: 100 },
+		]);
 
+		expect(result).toEqual({
+			ok: false,
+			error:
+				"Allocation amount for participant participant-1 is not a valid number",
+		});
 		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
 	});
 
-	it("does not create an allocation when the amount is zero", async () => {
-		await setCustomDistribution("fundraiser-1", [
+	it("returns an error when a participant is submitted twice", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 50 },
+			{ participantId: "participant-1", amount: 50 },
+		]);
+
+		expect(result).toEqual({
+			ok: false,
+			error: "Participant participant-1 was submitted more than once",
+		});
+		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
+	});
+
+	it("returns an error for participants who do not belong to the fundraiser", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 100 },
+			{ participantId: "wrong-participant", amount: 0 },
+		]);
+
+		expect(result).toEqual({
+			ok: false,
+			error:
+				"Participant wrong-participant does not belong to fundraiser fundraiser-1",
+		});
+		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
+	});
+
+	it("creates a $0 allocation for a participant entered as zero", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
 			{ participantId: "participant-1", amount: 100 },
 			{ participantId: "participant-2", amount: 0 },
 		]);
 
-		expect(transactionMock.fundraiserAllocation.create).toHaveBeenCalledTimes(
-			1,
-		);
-
-		expect(transactionMock.fundraiserAllocation.create).toHaveBeenCalledWith({
-			data: {
-				fundraiserParticipantId: "participant-1",
-				amount: 100,
-				status: "ACTIVE",
-			},
-		});
-
-		expect(
-			transactionMock.fundraiserAllocation.create,
-		).not.toHaveBeenCalledWith({
-			data: {
-				fundraiserParticipantId: "participant-2",
-				amount: 0,
-				status: "ACTIVE",
-			},
-		});
+		expect(result.ok).toBe(true);
+		expect(createdAllocations()).toEqual([
+			{ participantId: "participant-1", amount: "100.00", status: "ACTIVE" },
+			{ participantId: "participant-2", amount: "0.00", status: "ACTIVE" },
+		]);
 	});
 
-	it("does not recreate an allocation when the amount is unchanged", async () => {
+	it("gives participants left out of the request a $0 allocation", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 100 },
+		]);
+
+		expect(result).toEqual({
+			ok: true,
+			data: [
+				{ participantId: "participant-1", amount: 100 },
+				{ participantId: "participant-2", amount: 0 },
+			],
+		});
+		expect(createdAllocations()).toEqual([
+			{ participantId: "participant-1", amount: "100.00", status: "ACTIVE" },
+			{ participantId: "participant-2", amount: "0.00", status: "ACTIVE" },
+		]);
+	});
+
+	it("rounds amounts to cents", async () => {
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 33.333 },
+			{ participantId: "participant-2", amount: 66.667 },
+		]);
+
+		expect(result.ok).toBe(true);
+		expect(createdAllocations()).toEqual([
+			{ participantId: "participant-1", amount: "33.33", status: "ACTIVE" },
+			{ participantId: "participant-2", amount: "66.67", status: "ACTIVE" },
+		]);
+	});
+
+	it("compares totals exactly (0.1 + 0.2 equals 0.3)", async () => {
+		transactionMock.fundraiserContribution.aggregate.mockResolvedValue({
+			_sum: { amount: dec("0.3") },
+		});
+
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 0.1 },
+			{ participantId: "participant-2", amount: 0.2 },
+		]);
+
+		expect(result.ok).toBe(true);
+	});
+
+	it("does not recreate allocations whose amount is unchanged", async () => {
 		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([
 			{
 				id: "allocation-1",
 				fundraiserParticipantId: "participant-1",
-				amount: 100,
+				amount: dec("100"),
+			},
+			{
+				id: "allocation-2",
+				fundraiserParticipantId: "participant-2",
+				amount: dec("0"),
 			},
 		]);
 
-		await setCustomDistribution("fundraiser-1", [
+		const result = await setCustomDistribution("fundraiser-1", [
 			{ participantId: "participant-1", amount: 100 },
 			{ participantId: "participant-2", amount: 0 },
 		]);
 
+		expect(result.ok).toBe(true);
 		expect(
 			transactionMock.fundraiserAllocation.updateMany,
 		).not.toHaveBeenCalled();
-
 		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
 	});
 
@@ -194,183 +269,171 @@ describe("setCustomDistribution", () => {
 			{
 				id: "allocation-1",
 				fundraiserParticipantId: "participant-1",
-				amount: 80,
+				amount: dec("80"),
+			},
+			{
+				id: "allocation-2",
+				fundraiserParticipantId: "participant-2",
+				amount: dec("0"),
 			},
 		]);
 
-		await setCustomDistribution("fundraiser-1", [
+		const result = await setCustomDistribution("fundraiser-1", [
 			{ participantId: "participant-1", amount: 100 },
 			{ participantId: "participant-2", amount: 0 },
 		]);
 
+		expect(result.ok).toBe(true);
+		expect(
+			transactionMock.fundraiserAllocation.updateMany,
+		).toHaveBeenCalledTimes(1);
 		expect(
 			transactionMock.fundraiserAllocation.updateMany,
 		).toHaveBeenCalledWith({
 			where: { id: { in: ["allocation-1"] } },
 			data: { status: "VOID" },
 		});
-
-		expect(transactionMock.fundraiserAllocation.create).toHaveBeenCalledWith({
-			data: {
-				fundraiserParticipantId: "participant-1",
-				amount: 100,
-				status: "ACTIVE",
-			},
-		});
+		expect(createdAllocations()).toEqual([
+			{ participantId: "participant-1", amount: "100.00", status: "ACTIVE" },
+		]);
 	});
 
-	it("rejects a fundraiser that does not exist", async () => {
+	it("replaces an allocation with a $0 allocation when set to zero", async () => {
+		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([
+			{
+				id: "allocation-1",
+				fundraiserParticipantId: "participant-1",
+				amount: dec("100"),
+			},
+		]);
+
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 0 },
+			{ participantId: "participant-2", amount: 100 },
+		]);
+
+		expect(result.ok).toBe(true);
+		expect(
+			transactionMock.fundraiserAllocation.updateMany,
+		).toHaveBeenCalledWith({
+			where: { id: { in: ["allocation-1"] } },
+			data: { status: "VOID" },
+		});
+		expect(createdAllocations()).toEqual([
+			{ participantId: "participant-1", amount: "0.00", status: "ACTIVE" },
+			{ participantId: "participant-2", amount: "100.00", status: "ACTIVE" },
+		]);
+	});
+
+	it("collapses duplicate active allocations into one", async () => {
+		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([
+			{
+				id: "allocation-1",
+				fundraiserParticipantId: "participant-1",
+				amount: dec("50"),
+			},
+			{
+				id: "allocation-2",
+				fundraiserParticipantId: "participant-1",
+				amount: dec("50"),
+			},
+		]);
+
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 100 },
+			{ participantId: "participant-2", amount: 0 },
+		]);
+
+		expect(result.ok).toBe(true);
+		expect(
+			transactionMock.fundraiserAllocation.updateMany,
+		).toHaveBeenCalledWith({
+			where: { id: { in: ["allocation-1", "allocation-2"] } },
+			data: { status: "VOID" },
+		});
+		expect(createdAllocations()).toEqual([
+			{ participantId: "participant-1", amount: "100.00", status: "ACTIVE" },
+			{ participantId: "participant-2", amount: "0.00", status: "ACTIVE" },
+		]);
+	});
+
+	it("returns an error for a fundraiser that does not exist", async () => {
 		transactionMock.fundraiser.findUnique.mockResolvedValue(null);
 
-		await expect(
-			setCustomDistribution("missing-fundraiser", [
-				{ participantId: "participant-1", amount: 100 },
-			]),
-		).rejects.toThrow(/Fundraiser not found/);
+		const result = await setCustomDistribution("missing-fundraiser", [
+			{ participantId: "participant-1", amount: 100 },
+		]);
 
+		expect(result).toEqual({ ok: false, error: "Fundraiser not found" });
 		expect(
 			transactionMock.fundraiserParticipant.findMany,
 		).not.toHaveBeenCalled();
 	});
 
-	it("rejects a fundraiser with no participants", async () => {
+	it("returns an error for a fundraiser with no participants", async () => {
 		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([]);
 
-		await expect(setCustomDistribution("fundraiser-1", [])).rejects.toThrow(
-			/No participants found/,
-		);
+		const result = await setCustomDistribution("fundraiser-1", []);
 
+		expect(result).toEqual({ ok: false, error: "No participants found" });
 		expect(
 			transactionMock.fundraiserContribution.aggregate,
 		).not.toHaveBeenCalled();
 	});
 
-	it("returns the requested distribution when it is valid", async () => {
+	it("returns the saved distribution when it is valid", async () => {
 		const allocations = [
 			{ participantId: "participant-1", amount: 60 },
 			{ participantId: "participant-2", amount: 40 },
 		];
 
-		await expect(
-			setCustomDistribution("fundraiser-1", allocations),
-		).resolves.toEqual(allocations);
+		const result = await setCustomDistribution("fundraiser-1", allocations);
+
+		expect(result).toEqual({ ok: true, data: allocations });
 	});
 
 	it("treats null total contributions as zero", async () => {
-		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
-
 		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([
 			{ id: "participant-1" },
 		]);
-
 		transactionMock.fundraiserContribution.aggregate.mockResolvedValue({
 			_sum: { amount: null },
 		});
 
-		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([]);
-
 		const result = await setCustomDistribution("fundraiser-1", [
-			{
-				participantId: "participant-1",
-				amount: 0,
-			},
-		]);
-
-		expect(result).toEqual([
-			{
-				participantId: "participant-1",
-				amount: 0,
-			},
-		]);
-
-		expect(transactionMock.fundraiserAllocation.create).not.toHaveBeenCalled();
-	});
-
-	it("creates an allocation when a participant has no existing allocation", async () => {
-		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
-
-		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([
-			{ id: "participant-1" },
-		]);
-
-		transactionMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
-		});
-
-		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([]);
-
-		const result = await setCustomDistribution("fundraiser-1", [
-			{
-				participantId: "participant-1",
-				amount: 100,
-			},
-		]);
-
-		expect(result).toEqual([
-			{
-				participantId: "participant-1",
-				amount: 100,
-			},
-		]);
-
-		expect(transactionMock.fundraiserAllocation.create).toHaveBeenCalledWith({
-			data: {
-				fundraiserParticipantId: "participant-1",
-				amount: 100,
-				status: "ACTIVE",
-			},
-		});
-	});
-
-	it("voids an existing allocation without creating a new zero allocation", async () => {
-		transactionMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
-
-		transactionMock.fundraiserParticipant.findMany.mockResolvedValue([
-			{ id: "participant-1" },
-			{ id: "participant-2" },
-		]);
-
-		transactionMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
-		});
-
-		transactionMock.fundraiserAllocation.findMany.mockResolvedValue([
-			{
-				id: "allocation-1",
-				fundraiserParticipantId: "participant-1",
-				amount: 100,
-			},
-		]);
-
-		await setCustomDistribution("fundraiser-1", [
 			{ participantId: "participant-1", amount: 0 },
-			{ participantId: "participant-2", amount: 100 },
 		]);
 
-		expect(
-			transactionMock.fundraiserAllocation.updateMany,
-		).toHaveBeenCalledWith({
-			where: { id: { in: ["allocation-1"] } },
-			data: { status: "VOID" },
+		expect(result).toEqual({
+			ok: true,
+			data: [{ participantId: "participant-1", amount: 0 }],
 		});
+		expect(createdAllocations()).toEqual([
+			{ participantId: "participant-1", amount: "0.00", status: "ACTIVE" },
+		]);
+	});
 
-		expect(transactionMock.fundraiserAllocation.create).toHaveBeenCalledTimes(
-			1,
+	it("redirects a PARENT without touching the database", async () => {
+		asParent();
+
+		await expectRedirect(() =>
+			setCustomDistribution("fundraiser-1", [
+				{ participantId: "participant-1", amount: 100 },
+			]),
 		);
 
-		expect(transactionMock.fundraiserAllocation.create).toHaveBeenCalledWith({
-			data: {
-				fundraiserParticipantId: "participant-2",
-				amount: 100,
-				status: "ACTIVE",
-			},
-		});
+		expect(prismaMock.$transaction).not.toHaveBeenCalled();
+	});
+
+	it("allows an ADMIN_PARENT", async () => {
+		asAdminParent();
+
+		const result = await setCustomDistribution("fundraiser-1", [
+			{ participantId: "participant-1", amount: 60 },
+			{ participantId: "participant-2", amount: 40 },
+		]);
+
+		expect(result.ok).toBe(true);
 	});
 });
 
@@ -384,7 +447,7 @@ describe("getActiveFundraiserAllocations", () => {
 			{
 				id: "allocation-1",
 				fundraiserParticipantId: "participant-1",
-				amount: "75.50",
+				amount: dec("75.50"),
 				status: "ACTIVE",
 			},
 		]);
@@ -422,21 +485,12 @@ describe("getActiveFundraiserAllocations", () => {
 		).resolves.toEqual([]);
 	});
 
-	it("queries only active allocations for the specified fundraiser", async () => {
-		prismaMock.fundraiserAllocation.findMany.mockResolvedValue([]);
+	it("redirects a PARENT without touching the database", async () => {
+		asParent();
 
-		await getActiveFundraiserAllocations("fundraiser-123");
+		await expectRedirect(() => getActiveFundraiserAllocations("fundraiser-1"));
 
-		expect(prismaMock.fundraiserAllocation.findMany).toHaveBeenCalledWith(
-			expect.objectContaining({
-				where: {
-					fundraiserParticipant: {
-						fundraiserId: "fundraiser-123",
-					},
-					status: "ACTIVE",
-				},
-			}),
-		);
+		expect(prismaMock.fundraiserAllocation.findMany).not.toHaveBeenCalled();
 	});
 });
 
@@ -445,7 +499,7 @@ describe("getParticipantFinancialSummary", () => {
 		vi.clearAllMocks();
 	});
 
-	it("ignores void distribution transactions when calculating distributed and remaining amounts", async () => {
+	it("counts only PUBLISHED distributions as distributed", async () => {
 		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue({
 			id: "participant-1",
 			player: { id: "player-1" },
@@ -454,8 +508,8 @@ describe("getParticipantFinancialSummary", () => {
 		prismaMock.fundraiserAllocation.findMany.mockResolvedValue([
 			{
 				id: "allocation-1",
-				amount: "100.00",
-				transactions: [{ amount: "30.00" }],
+				amount: dec("100.00"),
+				transactions: [{ amount: dec("30.00") }],
 			},
 		]);
 
@@ -476,11 +530,27 @@ describe("getParticipantFinancialSummary", () => {
 				transactions: {
 					where: {
 						type: "DISTRIBUTION",
-						status: "ACTIVE",
+						status: "PUBLISHED",
 					},
 					select: { amount: true },
 				},
 			},
+		});
+	});
+
+	it("returns zeros when the participant has no allocations", async () => {
+		prismaMock.fundraiserParticipant.findUnique.mockResolvedValue({
+			id: "participant-1",
+			player: { id: "player-1" },
+		});
+		prismaMock.fundraiserAllocation.findMany.mockResolvedValue([]);
+
+		await expect(
+			getParticipantFinancialSummary("participant-1"),
+		).resolves.toMatchObject({
+			allocationAmount: 0,
+			distributedAmount: 0,
+			remainingAmount: 0,
 		});
 	});
 
@@ -508,9 +578,7 @@ describe("getFundraiserFinancialSummary", () => {
 		).rejects.toThrow("Fundraiser not found");
 
 		expect(prismaMock.fundraiserContribution.aggregate).not.toHaveBeenCalled();
-
 		expect(prismaMock.fundraiserAllocation.aggregate).not.toHaveBeenCalled();
-
 		expect(prismaMock.fundraiserParticipant.count).not.toHaveBeenCalled();
 	});
 
@@ -518,15 +586,12 @@ describe("getFundraiserFinancialSummary", () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
 		});
-
 		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: "250.00" },
+			_sum: { amount: dec("250.00") },
 		});
-
 		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: "175.00" },
+			_sum: { amount: dec("175.00") },
 		});
-
 		prismaMock.fundraiserParticipant.count.mockResolvedValue(5);
 
 		await expect(
@@ -547,19 +612,33 @@ describe("getFundraiserFinancialSummary", () => {
 		});
 	});
 
+	it("never reports a negative amount available to allocate", async () => {
+		prismaMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
+		});
+		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
+			_sum: { amount: dec("100.00") },
+		});
+		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
+			_sum: { amount: dec("120.00") },
+		});
+		prismaMock.fundraiserParticipant.count.mockResolvedValue(2);
+
+		await expect(
+			getFundraiserFinancialSummary("fundraiser-1"),
+		).resolves.toMatchObject({ availableToAllocate: 0 });
+	});
+
 	it("treats null contribution and allocation totals as zero", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
 			id: "fundraiser-1",
 		});
-
 		prismaMock.fundraiserContribution.aggregate.mockResolvedValue({
 			_sum: { amount: null },
 		});
-
 		prismaMock.fundraiserAllocation.aggregate.mockResolvedValue({
 			_sum: { amount: null },
 		});
-
 		prismaMock.fundraiserParticipant.count.mockResolvedValue(0);
 
 		await expect(
@@ -570,5 +649,13 @@ describe("getFundraiserFinancialSummary", () => {
 			availableToAllocate: 0,
 			participantCount: 0,
 		});
+	});
+
+	it("redirects a PARENT without touching the database", async () => {
+		asParent();
+
+		await expectRedirect(() => getFundraiserFinancialSummary("fundraiser-1"));
+
+		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
 	});
 });

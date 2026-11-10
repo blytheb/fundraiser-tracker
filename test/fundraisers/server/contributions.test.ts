@@ -18,6 +18,7 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
+import { asParent, expectRedirect } from "../../helpers/auth";
 import {
 	addContribution,
 	updateContribution,
@@ -31,15 +32,16 @@ describe("addContribution", () => {
 	it("throws an error when the fundraiser does not exist", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue(null);
 
-		await expect(
-			addContribution({
+		expect(await addContribution({
 				fundraiserId: "missing-fundraiser",
 				amount: 100,
 				paymentMethod: "CASH",
 				source: "DONATION",
 				date: "2026-10-09",
-			}),
-		).rejects.toThrow("Fundraiser not found");
+			})).toEqual({
+			ok: false,
+			error: "Fundraiser not found",
+		});
 
 		expect(prismaMock.fundraiserContribution.create).not.toHaveBeenCalled();
 	});
@@ -49,15 +51,16 @@ describe("addContribution", () => {
 			status: "COMPLETED",
 		});
 
-		await expect(
-			addContribution({
+		expect(await addContribution({
 				fundraiserId: "fundraiser-1",
 				amount: 100,
 				paymentMethod: "CASH",
 				source: "DONATION",
 				date: "2026-10-09",
-			}),
-		).rejects.toThrow("Completed Fundraisers cannot be edited");
+			})).toEqual({
+			ok: false,
+			error: "Completed Fundraisers cannot be edited",
+		});
 
 		expect(prismaMock.fundraiserContribution.create).not.toHaveBeenCalled();
 	});
@@ -67,7 +70,7 @@ describe("addContribution", () => {
 			status: "DRAFT",
 		});
 
-		await addContribution({
+		const result = await addContribution({
 			fundraiserId: "fundraiser-1",
 			amount: 100,
 			paymentMethod: "CASH",
@@ -86,6 +89,8 @@ describe("addContribution", () => {
 				description: "Fundraiser donation",
 			},
 		});
+
+		expect(result).toEqual({ ok: true, data: undefined });
 	});
 });
 
@@ -93,14 +98,15 @@ describe("updateContribution", () => {
 	it("throws an error when the contribution does not exist", async () => {
 		prismaMock.fundraiserContribution.findUnique.mockResolvedValue(null);
 
-		await expect(
-			updateContribution("missing-contribution", {
+		expect(await updateContribution("missing-contribution", {
 				amount: 100,
 				paymentMethod: "CASH",
 				source: "DONATION",
 				date: "2026-10-09",
-			}),
-		).rejects.toThrow("Contribution not found");
+			})).toEqual({
+			ok: false,
+			error: "Contribution not found",
+		});
 
 		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
 		expect(prismaMock.fundraiserContribution.update).not.toHaveBeenCalled();
@@ -115,14 +121,15 @@ describe("updateContribution", () => {
 			status: "COMPLETED",
 		});
 
-		await expect(
-			updateContribution("contribution-1", {
+		expect(await updateContribution("contribution-1", {
 				amount: 100,
 				paymentMethod: "CASH",
 				source: "DONATION",
 				date: "2026-10-09",
-			}),
-		).rejects.toThrow("Completed Fundraisers cannot be edited");
+			})).toEqual({
+			ok: false,
+			error: "Completed Fundraisers cannot be edited",
+		});
 
 		expect(prismaMock.fundraiserContribution.update).not.toHaveBeenCalled();
 	});
@@ -134,14 +141,15 @@ describe("updateContribution", () => {
 
 		prismaMock.fundraiser.findUnique.mockResolvedValue(null);
 
-		await expect(
-			updateContribution("contribution-1", {
+		expect(await updateContribution("contribution-1", {
 				amount: 100,
 				paymentMethod: "CASH",
 				source: "DONATION",
 				date: "2026-10-09",
-			}),
-		).rejects.toThrow("Fundraiser not found");
+			})).toEqual({
+			ok: false,
+			error: "Fundraiser not found",
+		});
 
 		expect(prismaMock.fundraiserContribution.update).not.toHaveBeenCalled();
 	});
@@ -154,7 +162,7 @@ describe("updateContribution", () => {
 			status: "DRAFT",
 		});
 
-		await updateContribution("contribution-1", {
+		const result = await updateContribution("contribution-1", {
 			amount: 150,
 			paymentMethod: "CASH",
 			source: "DONATION",
@@ -172,6 +180,8 @@ describe("updateContribution", () => {
 				description: "Updated donation",
 			},
 		});
+
+		expect(result).toEqual({ ok: true, data: undefined });
 	});
 });
 
@@ -179,9 +189,10 @@ describe("deleteContribution", () => {
 	it("throws an error when the contribution does not exist", async () => {
 		prismaMock.fundraiserContribution.findUnique.mockResolvedValue(null);
 
-		await expect(deleteContribution("missing-contribution")).rejects.toThrow(
-			"Contribution not found",
-		);
+		expect(await deleteContribution("missing-contribution")).toEqual({
+			ok: false,
+			error: "Contribution not found",
+		});
 
 		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
 		expect(prismaMock.fundraiserContribution.delete).not.toHaveBeenCalled();
@@ -195,9 +206,10 @@ describe("deleteContribution", () => {
 			status: "COMPLETED",
 		});
 
-		await expect(deleteContribution("contribution-1")).rejects.toThrow(
-			"Completed Fundraisers cannot be edited",
-		);
+		expect(await deleteContribution("contribution-1")).toEqual({
+			ok: false,
+			error: "Completed Fundraisers cannot be edited",
+		});
 
 		expect(prismaMock.fundraiserContribution.delete).not.toHaveBeenCalled();
 	});
@@ -208,9 +220,10 @@ describe("deleteContribution", () => {
 		});
 		prismaMock.fundraiser.findUnique.mockResolvedValue(null);
 
-		await expect(deleteContribution("contribution-1")).rejects.toThrow(
-			"Fundraiser not found",
-		);
+		expect(await deleteContribution("contribution-1")).toEqual({
+			ok: false,
+			error: "Fundraiser not found",
+		});
 
 		expect(prismaMock.fundraiserContribution.delete).not.toHaveBeenCalled();
 	});
@@ -223,10 +236,36 @@ describe("deleteContribution", () => {
 			status: "DRAFT",
 		});
 
-		await deleteContribution("contribution-1");
+		const result = await deleteContribution("contribution-1");
+
+		expect(result).toEqual({ ok: true, data: undefined });
 
 		expect(prismaMock.fundraiserContribution.delete).toHaveBeenCalledWith({
 			where: { id: "contribution-1" },
 		});
+	});
+});
+
+describe("contribution action permissions", () => {
+	it("redirects parents and does not touch the database", async () => {
+		asParent();
+		const data = {
+			amount: 100,
+			paymentMethod: "CASH" as const,
+			source: "SALES" as const,
+			date: "2026-10-09",
+		};
+
+		await expectRedirect(() =>
+			addContribution({ fundraiserId: "fundraiser-1", ...data }),
+		);
+		await expectRedirect(() => updateContribution("contribution-1", data));
+		await expectRedirect(() => deleteContribution("contribution-1"));
+
+		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiserContribution.findUnique).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiserContribution.create).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiserContribution.update).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiserContribution.delete).not.toHaveBeenCalled();
 	});
 });

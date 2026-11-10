@@ -26,6 +26,7 @@ vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
+import { asParent, expectRedirect } from "../../helpers/auth";
 import { addTeamToFundraiser } from "@/features/fundraisers/actions/add-team-to-fundraiser";
 import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/remove-team-from-fundraiser";
 import { createFundraiserAndAddToTeam } from "@/features/fundraisers/actions/create-fundraiser-and-add-to-team";
@@ -55,16 +56,17 @@ describe("addTeamToFundraiser", () => {
 				teamId: "team-1",
 			},
 		});
-		expect(result).toEqual(fundraiserTeam);
+		expect(result).toEqual({ ok: true, data: fundraiserTeam });
 	});
 	it("rejects adding a team to a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
 			status: "COMPLETED",
 		});
 
-		await expect(addTeamToFundraiser("fundraiser-1", "team-1")).rejects.toThrow(
-			"Completed fundraisers cannot be edited.",
-		);
+		expect(await addTeamToFundraiser("fundraiser-1", "team-1")).toEqual({
+			ok: false,
+			error: "Completed fundraisers cannot be edited.",
+		});
 
 		expect(prismaMock.fundraiserTeam.create).not.toHaveBeenCalled();
 	});
@@ -93,16 +95,17 @@ describe("removeTeamFromFundraiser", () => {
 			},
 		});
 
-		expect(result).toEqual(fundraiserTeam);
+		expect(result).toEqual({ ok: true, data: fundraiserTeam });
 	});
 	it("rejects removing a team from a completed fundraiser", async () => {
 		prismaMock.fundraiser.findUnique.mockResolvedValue({
 			status: "COMPLETED",
 		});
 
-		await expect(
-			removeTeamFromFundraiser("fundraiser-1", "team-1"),
-		).rejects.toThrow("Completed fundraisers cannot be edited.");
+		expect(await removeTeamFromFundraiser("fundraiser-1", "team-1")).toEqual({
+			ok: false,
+			error: "Completed fundraisers cannot be edited.",
+		});
 
 		expect(prismaMock.fundraiserTeam.delete).not.toHaveBeenCalled();
 	});
@@ -152,7 +155,7 @@ describe("createFundraiserAndAddToTeam", () => {
 			},
 		});
 
-		expect(result).toEqual(fundraiser);
+		expect(result).toEqual({ ok: true, data: fundraiser });
 	});
 });
 
@@ -266,13 +269,34 @@ describe("saveFundraiserTeams", () => {
 			callback(txMock),
 		);
 
-		await expect(
-			saveFundraiserTeams("fundraiser-1", ["team-1"]),
-		).rejects.toThrow("Completed fundraisers cannot be edited.");
+		expect(await saveFundraiserTeams("fundraiser-1", ["team-1"])).toEqual({
+			ok: false,
+			error: "Completed fundraisers cannot be edited.",
+		});
 
 		expect(txMock.fundraiserTeam.deleteMany).not.toHaveBeenCalled();
 		expect(txMock.fundraiserTeam.createMany).not.toHaveBeenCalled();
 		expect(txMock.fundraiserParticipant.deleteMany).not.toHaveBeenCalled();
 		expect(txMock.teamPlayer.findMany).not.toHaveBeenCalled();
+	});
+});
+
+describe("fundraiser team action permissions", () => {
+	it("redirects parents and does not touch the database", async () => {
+		asParent();
+
+		await expectRedirect(() => addTeamToFundraiser("fundraiser-1", "team-1"));
+		await expectRedirect(() =>
+			removeTeamFromFundraiser("fundraiser-1", "team-1"),
+		);
+		await expectRedirect(() =>
+			createFundraiserAndAddToTeam("team-1", { name: "X" } as never),
+		);
+		await expectRedirect(() => saveFundraiserTeams("fundraiser-1", ["team-1"]));
+
+		expect(prismaMock.fundraiser.findUnique).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiserTeam.create).not.toHaveBeenCalled();
+		expect(prismaMock.fundraiserTeam.delete).not.toHaveBeenCalled();
+		expect(prismaMock.$transaction).not.toHaveBeenCalled();
 	});
 });

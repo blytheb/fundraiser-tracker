@@ -1,21 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Prisma } from "@prisma/client";
+import { asAdminParent, asParent, expectRedirect } from "@/test/helpers/auth";
 
 const { txMock, prismaMock } = vi.hoisted(() => {
 	const txMock = {
 		fundraiser: {
-			findUnique: vi.fn(),
-			update: vi.fn(),
-		},
-		playerTransaction: {
-			createMany: vi.fn(),
 			updateMany: vi.fn(),
+			findUnique: vi.fn(),
+			findUniqueOrThrow: vi.fn(),
+		},
+		fundraiserParticipant: {
+			findMany: vi.fn(),
+			count: vi.fn(),
+		},
+		fundraiserAllocation: {
+			createMany: vi.fn(),
 		},
 		fundraiserContribution: {
 			aggregate: vi.fn(),
 		},
-		fundraiserAllocation: {
-			aggregate: vi.fn(),
-			create: vi.fn(),
+		playerTransaction: {
+			createMany: vi.fn(),
 			updateMany: vi.fn(),
 		},
 	};
@@ -24,13 +29,6 @@ const { txMock, prismaMock } = vi.hoisted(() => {
 		txMock,
 		prismaMock: {
 			$transaction: vi.fn(),
-			fundraiser: {
-				findUnique: vi.fn(),
-				update: vi.fn(),
-			},
-			playerTransaction: {
-				createMany: vi.fn(),
-			},
 		},
 	};
 });
@@ -42,6 +40,28 @@ vi.mock("@/lib/prisma", () => ({
 import { publishFundraiser } from "@/features/fundraisers/actions/publish-fundraiser";
 import { completeFundraiser } from "@/features/fundraisers/actions/complete-fundraiser";
 import { reopenFundraiser } from "@/features/fundraisers/actions/reopen-fundraiser";
+import { unpublishFundraiser } from "@/features/fundraisers/actions/unpublish-fundraiser";
+
+const dec = (value: string | number) => new Prisma.Decimal(value);
+
+type TestParticipant = {
+	playerId: string;
+	allocations: { id: string; amount: Prisma.Decimal }[];
+};
+
+function mockFundraiser(participants: TestParticipant[]) {
+	txMock.fundraiser.findUniqueOrThrow.mockResolvedValue({
+		id: "fundraiser-1",
+		status: "COMPLETED",
+		participants,
+	});
+}
+
+function mockRaised(amount: Prisma.Decimal | null) {
+	txMock.fundraiserContribution.aggregate.mockResolvedValue({
+		_sum: { amount },
+	});
+}
 
 beforeEach(() => {
 	vi.clearAllMocks();
@@ -50,522 +70,510 @@ beforeEach(() => {
 		callback(txMock),
 	);
 
-	txMock.fundraiserContribution.aggregate.mockResolvedValue({
-		_sum: { amount: 100 },
-	});
-
-	txMock.fundraiserAllocation.aggregate.mockResolvedValue({
-		_sum: { amount: 100 },
-	});
-});
-
-describe("publishFundraiser", () => {
-	it("throws an error when the fundraiser does not exist", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue(null);
-
-		await expect(publishFundraiser("missing-fundraiser")).rejects.toThrow(
-			"Fundraiser not found",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("throws an error when the fundraiser is already published", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "PUBLISHED",
-			participants: [{ id: "participant-1" }],
-		});
-
-		await expect(publishFundraiser("fundraiser-1")).rejects.toThrow(
-			"Fundraiser is already published",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("throws an error when the fundraiser has no participants", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-			participants: [],
-		});
-
-		await expect(publishFundraiser("fundraiser-1")).rejects.toThrow(
-			"A fundraiser must have at least one participant",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("publishes a fundraiser with participants", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-			participants: [{ id: "participant-1" }],
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "PUBLISHED",
-		});
-
-		const result = await publishFundraiser("fundraiser-1");
-
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: { status: "PUBLISHED" },
-		});
-
-		expect(result).toEqual({ success: true });
-	});
-	it("throws an error when the fundraiser is incomplete", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-			participants: [{ id: "participant-1" }],
-		});
-
-		await expect(publishFundraiser("fundraiser-1")).rejects.toThrow(
-			"A fundraiser must be completed before it can be published",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-});
-
-describe("reopenFundraiser", () => {
-	it("throws an error when the fundraiser does not exist", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue(null);
-
-		await expect(reopenFundraiser("missing-fundraiser")).rejects.toThrow(
-			"Fundraiser not found",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-	it("throws an error when the fundraiser is already in draft mode", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-		});
-
-		await expect(reopenFundraiser("fundraiser-1")).rejects.toThrow(
-			"Fundraiser is already in draft mode",
-		);
-
-		expect(prismaMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("reopens a published fundraiser successfully", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "PUBLISHED",
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-		});
-
-		const result = await reopenFundraiser("fundraiser-1");
-
-		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
-			where: {
-				fundraiserId: "fundraiser-1",
-				status: "ACTIVE",
-				type: "DISTRIBUTION",
-			},
-			data: { status: "VOID" },
-		});
-
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: { status: "DRAFT" },
-		});
-
-		expect(result).toEqual({ success: true });
-	});
-	it("returns a published fundraiser to draft mode", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-		});
-
-		txMock.playerTransaction.updateMany.mockResolvedValue({
-			count: 2,
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-		});
-
-		const result = await reopenFundraiser("fundraiser-1");
-
-		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
-			where: {
-				fundraiserId: "fundraiser-1",
-				status: "ACTIVE",
-				type: "DISTRIBUTION",
-			},
-			data: {
-				status: "VOID",
-			},
-		});
-
-		expect(txMock.fundraiserAllocation.updateMany).not.toHaveBeenCalled();
-		expect(txMock.fundraiserAllocation.create).not.toHaveBeenCalled();
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: {
-				status: "DRAFT",
-			},
-		});
-
-		expect(result).toEqual({
-			success: true,
-		});
-	});
-
-	it("returns a published fundraiser to draft mode when no transactions exist", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-		});
-
-		txMock.playerTransaction.updateMany.mockResolvedValue({
-			count: 0,
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-		});
-
-		const result = await reopenFundraiser("fundraiser-1");
-
-		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
-			where: {
-				fundraiserId: "fundraiser-1",
-				status: "ACTIVE",
-				type: "DISTRIBUTION",
-			},
-			data: {
-				status: "VOID",
-			},
-		});
-
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: {
-				status: "DRAFT",
-			},
-		});
-
-		expect(result).toEqual({
-			success: true,
-		});
-	});
+	// defaults: the status claim succeeds, nobody is missing an allocation
+	txMock.fundraiser.updateMany.mockResolvedValue({ count: 1 });
+	txMock.fundraiserParticipant.findMany.mockResolvedValue([]);
+	txMock.fundraiserParticipant.count.mockResolvedValue(1);
+	txMock.playerTransaction.updateMany.mockResolvedValue({ count: 0 });
+	txMock.playerTransaction.createMany.mockResolvedValue({ count: 0 });
+	mockRaised(dec("100"));
 });
 
 describe("completeFundraiser", () => {
-	it("throws an error when the fundraiser does not exist", async () => {
+	it("claims the DRAFT -> COMPLETED status change first", async () => {
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("100") }],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
+		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1", status: "DRAFT" },
+			data: { status: "COMPLETED" },
+		});
+	});
+
+	it("returns an error when the fundraiser does not exist", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
 		txMock.fundraiser.findUnique.mockResolvedValue(null);
 
-		await expect(completeFundraiser("missing-fundraiser")).rejects.toThrow(
-			"Fundraiser not found",
-		);
-	});
-	it("throws an error when the fundraiser is already completed", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "COMPLETED",
-		});
+		const result = await completeFundraiser("missing-fundraiser");
 
-		await expect(completeFundraiser("fundraiser-1")).rejects.toThrow(
-			"Only draft fundraisers can be completed.",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("throws an error when funds remain unallocated", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			status: "DRAFT",
-			participants: [],
-		});
-
-		txMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: 75 },
-		});
-
-		await expect(completeFundraiser("fundraiser-1")).rejects.toThrow(
-			"All funds must be allocated before completing",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
-	});
-
-	it("completes a fundraiser successfully", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-			participants: [
-				{
-					playerId: "player-1",
-					allocations: [
-						{
-							id: "allocation-1",
-							amount: 100,
-						},
-					],
-				},
-				{
-					playerId: "player-2",
-					allocations: [],
-				},
-			],
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "COMPLETED",
-		});
-		const result = await completeFundraiser("fundraiser-1");
-
-		expect(txMock.playerTransaction.createMany).toHaveBeenCalledWith({
-			data: [
-				{
-					playerId: "player-1",
-					fundraiserId: "fundraiser-1",
-					allocationId: "allocation-1",
-					amount: 100,
-					type: "DISTRIBUTION",
-					description: "Fundraiser distribution",
-				},
-			],
-		});
-
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: { status: "COMPLETED" },
-		});
-
-		expect(result).toEqual({
-			id: "fundraiser-1",
-			status: "COMPLETED",
-		});
-	});
-
-	it("completes when a participant has no allocation and creates transactions only for allocated participants", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-			participants: [
-				{
-					playerId: "player-1",
-					allocations: [
-						{
-							id: "allocation-1",
-							amount: 100,
-						},
-					],
-				},
-				{
-					playerId: "player-2",
-					allocations: [],
-				},
-			],
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "COMPLETED",
-		});
-
-		await completeFundraiser("fundraiser-1");
-
-		expect(txMock.playerTransaction.createMany).toHaveBeenCalledWith({
-			data: [
-				{
-					playerId: "player-1",
-					fundraiserId: "fundraiser-1",
-					allocationId: "allocation-1",
-					amount: 100,
-					type: "DISTRIBUTION",
-					description: "Fundraiser distribution",
-				},
-			],
-		});
-	});
-	it("throws an error when allocations exceed funds raised", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-			participants: [],
-		});
-
-		txMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
-		});
-
-		txMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: 120 },
-		});
-
-		await expect(completeFundraiser("fundraiser-1")).rejects.toThrow(
-			"Allocated funds cannot exceed funds raised",
-		);
-
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
+		expect(result).toEqual({ ok: false, error: "Fundraiser not found" });
 		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
 	});
 
-	it("completes a fundraiser with zero funds and creates no transactions", async () => {
+	it("returns an error when the fundraiser is not a draft", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
 		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-			participants: [
-				{
-					playerId: "player-1",
-					allocations: [],
-				},
-			],
-		});
-
-		txMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 0 },
-		});
-
-		txMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: 0 },
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
 			id: "fundraiser-1",
 			status: "COMPLETED",
 		});
 
 		const result = await completeFundraiser("fundraiser-1");
 
-		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
-
-		expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-			where: { id: "fundraiser-1" },
-			data: { status: "COMPLETED" },
+		expect(result).toEqual({
+			ok: false,
+			error: "Fundraiser is already completed",
 		});
+		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
+	});
+
+	it("returns an error when the fundraiser has no participants", async () => {
+		mockFundraiser([]);
+
+		const result = await completeFundraiser("fundraiser-1");
 
 		expect(result).toEqual({
-			id: "fundraiser-1",
-			status: "COMPLETED",
+			ok: false,
+			error: "A fundraiser must have at least one participant",
 		});
 	});
-	it("creates a new distribution transaction when completing again after a previous distribution was voided", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-			participants: [
-				{
-					playerId: "player-1",
-					allocations: [
-						{
-							id: "allocation-1",
-							amount: 100,
-						},
-					],
-				},
-			],
+
+	it("gives participants with no allocation a $0 allocation", async () => {
+		txMock.fundraiserParticipant.findMany.mockResolvedValue([
+			{ id: "participant-2" },
+		]);
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("100") }],
+			},
+			{
+				playerId: "player-2",
+				allocations: [{ id: "allocation-2", amount: dec("0") }],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
+		expect(txMock.fundraiserParticipant.findMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				allocations: { none: { status: "ACTIVE" } },
+			},
+			select: { id: true },
 		});
 
-		txMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
+		const createManyArgs =
+			txMock.fundraiserAllocation.createMany.mock.calls[0][0];
+		expect(createManyArgs.data).toHaveLength(1);
+		expect(createManyArgs.data[0]).toMatchObject({
+			fundraiserParticipantId: "participant-2",
+			status: "ACTIVE",
 		});
+		expect(createManyArgs.data[0].amount.isZero()).toBe(true);
+	});
 
-		txMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
-		});
-
-		txMock.fundraiser.update.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "COMPLETED",
-		});
+	it("does not create $0 allocations when everyone already has one", async () => {
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("100") }],
+			},
+		]);
 
 		await completeFundraiser("fundraiser-1");
 
+		expect(txMock.fundraiserAllocation.createMany).not.toHaveBeenCalled();
+	});
+
+	it("returns an error when a participant has more than one active allocation", async () => {
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [
+					{ id: "allocation-1", amount: dec("50") },
+					{ id: "allocation-2", amount: dec("50") },
+				],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error:
+				"Each participant must have exactly one allocation before completing",
+		});
+		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
+	});
+
+	it("returns an error when funds remain unallocated", async () => {
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("75") }],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error:
+				"All funds must be allocated before completing. Allocated 75.00 of 100.00",
+		});
+		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
+	});
+
+	it("returns an error when allocations exceed funds raised", async () => {
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("120") }],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error:
+				"All funds must be allocated before completing. Allocated 120.00 of 100.00",
+		});
+		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
+	});
+
+	it("compares cents exactly (no floating point drift)", async () => {
+		mockRaised(dec("0.3"));
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("0.1") }],
+			},
+			{
+				playerId: "player-2",
+				allocations: [{ id: "allocation-2", amount: dec("0.2") }],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
+	});
+
+	it("creates INTERNAL distribution transactions for every participant", async () => {
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("100") }],
+			},
+			{
+				playerId: "player-2",
+				allocations: [{ id: "allocation-2", amount: dec("0") }],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
 		expect(txMock.playerTransaction.createMany).toHaveBeenCalledWith({
 			data: [
 				{
 					playerId: "player-1",
 					fundraiserId: "fundraiser-1",
 					allocationId: "allocation-1",
-					amount: 100,
+					amount: dec("100"),
 					type: "DISTRIBUTION",
+					status: "INTERNAL",
+					description: "Fundraiser distribution",
+				},
+				{
+					playerId: "player-2",
+					fundraiserId: "fundraiser-1",
+					allocationId: "allocation-2",
+					amount: dec("0"),
+					type: "DISTRIBUTION",
+					status: "INTERNAL",
 					description: "Fundraiser distribution",
 				},
 			],
 		});
 	});
 
-	it("does not mark the fundraiser completed when distribution creation fails", async () => {
-		txMock.fundraiser.findUnique.mockResolvedValue({
-			id: "fundraiser-1",
-			status: "DRAFT",
-			participants: [
-				{
-					playerId: "player-1",
-					allocations: [
-						{
-							id: "allocation-1",
-							amount: 100,
-						},
-					],
-				},
-			],
-		});
+	it("treats null total contributions as zero", async () => {
+		mockRaised(null);
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("0") }],
+			},
+		]);
 
-		txMock.fundraiserContribution.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
-		});
+		const result = await completeFundraiser("fundraiser-1");
 
-		txMock.fundraiserAllocation.aggregate.mockResolvedValue({
-			_sum: { amount: 100 },
-		});
+		expect(result.ok).toBe(true);
+	});
 
+	it("returns the error when creating distributions fails", async () => {
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("100") }],
+			},
+		]);
 		txMock.playerTransaction.createMany.mockRejectedValue(
 			new Error("Duplicate active distribution"),
 		);
 
-		await expect(completeFundraiser("fundraiser-1")).rejects.toThrow(
-			"Duplicate active distribution",
-		);
+		const result = await completeFundraiser("fundraiser-1");
 
-		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
+		// the error escapes the $transaction callback, so Prisma rolls the status back
+		expect(result).toEqual({
+			ok: false,
+			error: "Duplicate active distribution",
+		});
+	});
+
+	it("redirects a PARENT without touching the database", async () => {
+		asParent();
+
+		await expectRedirect(() => completeFundraiser("fundraiser-1"));
+
+		expect(prismaMock.$transaction).not.toHaveBeenCalled();
+	});
+
+	it("allows an ADMIN_PARENT", async () => {
+		asAdminParent();
+		mockFundraiser([
+			{
+				playerId: "player-1",
+				allocations: [{ id: "allocation-1", amount: dec("100") }],
+			},
+		]);
+
+		const result = await completeFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
 	});
 });
 
-it("reopens a completed but unpublished fundraiser", async () => {
-	txMock.fundraiser.findUnique.mockResolvedValue({
-		id: "fundraiser-1",
-		status: "COMPLETED",
+describe("publishFundraiser", () => {
+	it("publishes a completed fundraiser and its INTERNAL distributions", async () => {
+		const result = await publishFundraiser("fundraiser-1");
+
+		expect(result).toEqual({ ok: true, data: { success: true } });
+		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1", status: "COMPLETED" },
+			data: { status: "PUBLISHED" },
+		});
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				status: "INTERNAL",
+				type: "DISTRIBUTION",
+			},
+			data: { status: "PUBLISHED" },
+		});
 	});
 
-	txMock.playerTransaction.updateMany.mockResolvedValue({
-		count: 2,
+	it("returns an error when the fundraiser does not exist", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue(null);
+
+		const result = await publishFundraiser("missing-fundraiser");
+
+		expect(result).toEqual({ ok: false, error: "Fundraiser not found" });
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});
 
-	txMock.fundraiser.update.mockResolvedValue({
-		id: "fundraiser-1",
-		status: "DRAFT",
+	it("returns an error when the fundraiser is already published", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			status: "PUBLISHED",
+			_count: { participants: 1 },
+		});
+
+		const result = await publishFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error: "Fundraiser is already published",
+		});
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});
 
-	const result = await reopenFundraiser("fundraiser-1");
+	it("returns an error when the fundraiser is still a draft", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			status: "DRAFT",
+			_count: { participants: 1 },
+		});
 
-	expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
-		where: {
-			fundraiserId: "fundraiser-1",
-			status: "ACTIVE",
-			type: "DISTRIBUTION",
-		},
-		data: { status: "VOID" },
+		const result = await publishFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error:
+				"Fundraiser must be completed before it can be published. Current status: DRAFT",
+		});
 	});
 
-	expect(txMock.fundraiser.update).toHaveBeenCalledWith({
-		where: { id: "fundraiser-1" },
-		data: { status: "DRAFT" },
+	it("returns an error when the fundraiser has no participants", async () => {
+		txMock.fundraiserParticipant.count.mockResolvedValue(0);
+
+		const result = await publishFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error: "A fundraiser must have at least one participant",
+		});
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});
 
-	expect(result).toEqual({ success: true });
+	it("redirects a PARENT without touching the database", async () => {
+		asParent();
+
+		await expectRedirect(() => publishFundraiser("fundraiser-1"));
+
+		expect(prismaMock.$transaction).not.toHaveBeenCalled();
+	});
+
+	it("allows an ADMIN_PARENT", async () => {
+		asAdminParent();
+
+		const result = await publishFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
+	});
+});
+
+describe("unpublishFundraiser", () => {
+	it("moves a published fundraiser back to completed and hides its distributions", async () => {
+		const result = await unpublishFundraiser("fundraiser-1");
+
+		expect(result).toEqual({ ok: true, data: { success: true } });
+		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
+			where: { id: "fundraiser-1", status: "PUBLISHED" },
+			data: { status: "COMPLETED" },
+		});
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				status: "PUBLISHED",
+				type: "DISTRIBUTION",
+			},
+			data: { status: "INTERNAL" },
+		});
+	});
+
+	it("returns an error when the fundraiser does not exist", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue(null);
+
+		const result = await unpublishFundraiser("missing-fundraiser");
+
+		expect(result).toEqual({ ok: false, error: "Fundraiser not found" });
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("returns an error when the fundraiser is not published", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue({ id: "fundraiser-1" });
+
+		const result = await unpublishFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error: "Fundraiser is not in PUBLISHED status",
+		});
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("redirects a PARENT without touching the database", async () => {
+		asParent();
+
+		await expectRedirect(() => unpublishFundraiser("fundraiser-1"));
+
+		expect(prismaMock.$transaction).not.toHaveBeenCalled();
+	});
+
+	it("allows an ADMIN_PARENT", async () => {
+		asAdminParent();
+
+		const result = await unpublishFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
+	});
+});
+
+describe("reopenFundraiser", () => {
+	it("reopens a completed or published fundraiser and voids its distributions", async () => {
+		txMock.playerTransaction.updateMany.mockResolvedValue({ count: 2 });
+
+		const result = await reopenFundraiser("fundraiser-1");
+
+		expect(result).toEqual({ ok: true, data: { success: true } });
+		expect(txMock.fundraiser.updateMany).toHaveBeenCalledWith({
+			where: {
+				id: "fundraiser-1",
+				status: { in: ["COMPLETED", "PUBLISHED"] },
+			},
+			data: { status: "DRAFT" },
+		});
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+			where: {
+				fundraiserId: "fundraiser-1",
+				status: { in: ["INTERNAL", "PUBLISHED"] },
+				type: "DISTRIBUTION",
+			},
+			data: { status: "VOID" },
+		});
+	});
+
+	it("succeeds when there are no distributions to void", async () => {
+		txMock.playerTransaction.updateMany.mockResolvedValue({ count: 0 });
+
+		const result = await reopenFundraiser("fundraiser-1");
+
+		expect(result).toEqual({ ok: true, data: { success: true } });
+	});
+
+	it("returns an error when the fundraiser does not exist", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue(null);
+
+		const result = await reopenFundraiser("missing-fundraiser");
+
+		expect(result).toEqual({ ok: false, error: "Fundraiser not found" });
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("returns an error when the fundraiser is already a draft", async () => {
+		txMock.fundraiser.updateMany.mockResolvedValue({ count: 0 });
+		txMock.fundraiser.findUnique.mockResolvedValue({
+			id: "fundraiser-1",
+			status: "DRAFT",
+		});
+
+		const result = await reopenFundraiser("fundraiser-1");
+
+		expect(result).toEqual({
+			ok: false,
+			error: "Fundraiser is already in draft mode",
+		});
+		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("redirects a PARENT without touching the database", async () => {
+		asParent();
+
+		await expectRedirect(() => reopenFundraiser("fundraiser-1"));
+
+		expect(prismaMock.$transaction).not.toHaveBeenCalled();
+	});
+
+	it("allows an ADMIN_PARENT", async () => {
+		asAdminParent();
+
+		const result = await reopenFundraiser("fundraiser-1");
+
+		expect(result.ok).toBe(true);
+	});
 });

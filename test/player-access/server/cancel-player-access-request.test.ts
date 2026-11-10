@@ -1,41 +1,31 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { prismaMock, authorizationMock, revalidatePathMock } = vi.hoisted(
-	() => ({
-		prismaMock: {
-			playerAccessRequest: {
-				findFirst: vi.fn(),
-				update: vi.fn(),
-			},
+const { prismaMock } = vi.hoisted(() => ({
+	prismaMock: {
+		playerAccessRequest: {
+			findFirst: vi.fn(),
+			update: vi.fn(),
 		},
-		authorizationMock: {
-			requireUser: vi.fn(),
-		},
-		revalidatePathMock: vi.fn(),
-	}),
-);
+	},
+}));
 
 vi.mock("@/lib/prisma", () => ({
 	prisma: prismaMock,
 }));
 
-vi.mock("@/lib/permissions", () => ({
-	requireUser: authorizationMock.requireUser,
-}));
-
-vi.mock("next/cache", () => ({
-	revalidatePath: revalidatePathMock,
-}));
-
+import { revalidatePath } from "next/cache";
+import {
+	asAdmin,
+	asAdminParent,
+	asParent,
+	expectRedirect,
+} from "../../helpers/auth";
 import { cancelPlayerAccessRequest } from "@/features/player-access/actions/cancel-player-access-request";
 
 beforeEach(() => {
 	vi.clearAllMocks();
 
-	authorizationMock.requireUser.mockResolvedValue({
-		id: "parent-1",
-		role: "PARENT",
-	});
+	asParent("parent-1");
 
 	prismaMock.playerAccessRequest.findFirst.mockResolvedValue({
 		id: "request-1",
@@ -51,7 +41,8 @@ describe("cancelPlayerAccessRequest", () => {
 	it("cancels the parent's own pending request without deleting it", async () => {
 		const result = await cancelPlayerAccessRequest("request-1");
 
-		expect(result).toEqual({ success: true });
+		expect(result).toEqual({ ok: true, data: { success: true } });
+		expect(revalidatePath).toHaveBeenCalled();
 
 		expect(prismaMock.playerAccessRequest.findFirst).toHaveBeenCalledWith({
 			where: {
@@ -78,9 +69,10 @@ describe("cancelPlayerAccessRequest", () => {
 	it("does not cancel another parent's request", async () => {
 		prismaMock.playerAccessRequest.findFirst.mockResolvedValue(null);
 
-		await expect(cancelPlayerAccessRequest("request-1")).rejects.toThrow(
-			"Pending access request not found or you are not authorized to cancel it.",
-		);
+		expect(await cancelPlayerAccessRequest("request-1")).toEqual({
+			ok: false,
+			error: "Pending access request not found or you are not authorized to cancel it.",
+		});
 
 		expect(prismaMock.playerAccessRequest.findFirst).toHaveBeenCalledWith({
 			where: {
@@ -98,23 +90,32 @@ describe("cancelPlayerAccessRequest", () => {
 	it("does not cancel a request that is no longer pending", async () => {
 		prismaMock.playerAccessRequest.findFirst.mockResolvedValue(null);
 
-		await expect(cancelPlayerAccessRequest("request-1")).rejects.toThrow(
-			"Pending access request not found or you are not authorized to cancel it.",
-		);
+		expect(await cancelPlayerAccessRequest("request-1")).toEqual({
+			ok: false,
+			error: "Pending access request not found or you are not authorized to cancel it.",
+		});
 
 		expect(prismaMock.playerAccessRequest.update).not.toHaveBeenCalled();
 	});
-	it("rejects non-parent accounts", async () => {
-		authorizationMock.requireUser.mockResolvedValue({
-			id: "admin-1",
-			role: "ADMIN",
-		});
+	it("redirects accounts without parent access", async () => {
+		asAdmin();
 
-		await expect(cancelPlayerAccessRequest("request-1")).rejects.toThrow(
-			"Only parent accounts can cancel access requests.",
-		);
+		await expectRedirect(() => cancelPlayerAccessRequest("request-1"));
 
 		expect(prismaMock.playerAccessRequest.findFirst).not.toHaveBeenCalled();
 		expect(prismaMock.playerAccessRequest.update).not.toHaveBeenCalled();
+	});
+
+	it("allows admin-parent accounts to cancel their own request", async () => {
+		asAdminParent("admin-parent-1");
+
+		const result = await cancelPlayerAccessRequest("request-1");
+
+		expect(result.ok).toBe(true);
+		expect(prismaMock.playerAccessRequest.findFirst).toHaveBeenCalledWith(
+			expect.objectContaining({
+				where: expect.objectContaining({ userId: "admin-parent-1" }),
+			}),
+		);
 	});
 });

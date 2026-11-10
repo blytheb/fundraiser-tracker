@@ -110,7 +110,8 @@ export async function completeFundraiser(fundraiserId: string) {
 				});
 			}
 
-			return fundraiser;
+			//return only plain values: Prisma.Decimal amounts can't be sent to the client
+			return { id: fundraiser.id, status: "COMPLETED" as const };
 		});
 	});
 }

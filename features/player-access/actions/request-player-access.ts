@@ -1,70 +1,73 @@
 "use server";
 
+import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/permissions";
+import { requireParentAccess } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 
 export async function requestPlayerAccess(playerId: string) {
-	const user = await requireUser();
+	return runAction(async () => {
+		const user = await requireParentAccess();
 
-	if (!playerId?.trim()) {
-		throw new Error("A player must be selected");
-	}
-
-	const player = await prisma.player.findUnique({
-		where: { id: playerId },
-		select: { id: true, status: true },
-	});
-
-	if (!player || !player.status) {
-		throw new Error("Player not found or inactive");
-	}
-
-	const existingLink = await prisma.parentPlayerLink.findUnique({
-		where: {
-			userId_playerId: {
-				userId: user.id,
-				playerId,
-			},
-		},
-	});
-
-	if (existingLink) {
-		throw new Error("You already have access to this player.");
-	}
-
-	const existingRequest = await prisma.playerAccessRequest.findFirst({
-		where: {
-			userId: user.id,
-			playerId,
-			status: "PENDING",
-		},
-	});
-
-	if (existingRequest) {
-		throw new Error("You already have a pending request for this player");
-	}
-
-	try {
-		await prisma.playerAccessRequest.create({
-			data: {
-				userId: user.id,
-				playerId,
-			},
-		});
-	} catch (error) {
-		if (
-			error instanceof Prisma.PrismaClientKnownRequestError &&
-			error.code === "P2002"
-		) {
-			throw new Error("You already have a pending request for this player.");
+		if (!playerId?.trim()) {
+			throw new Error("A player must be selected");
 		}
 
-		throw error;
-	}
+		const player = await prisma.player.findUnique({
+			where: { id: playerId },
+			select: { id: true, status: true },
+		});
 
-	revalidatePath("/dashboard");
+		if (!player || !player.status) {
+			throw new Error("Player not found or inactive");
+		}
 
-	return { success: true };
+		const existingLink = await prisma.parentPlayerLink.findUnique({
+			where: {
+				userId_playerId: {
+					userId: user.id,
+					playerId,
+				},
+			},
+		});
+
+		if (existingLink) {
+			throw new Error("You already have access to this player.");
+		}
+
+		const existingRequest = await prisma.playerAccessRequest.findFirst({
+			where: {
+				userId: user.id,
+				playerId,
+				status: "PENDING",
+			},
+		});
+
+		if (existingRequest) {
+			throw new Error("You already have a pending request for this player");
+		}
+
+		try {
+			await prisma.playerAccessRequest.create({
+				data: {
+					userId: user.id,
+					playerId,
+				},
+			});
+		} catch (error) {
+			if (
+				error instanceof Prisma.PrismaClientKnownRequestError &&
+				error.code === "P2002"
+			) {
+				throw new Error("You already have a pending request for this player.");
+			}
+
+			throw error;
+		}
+
+		revalidatePath("/dashboard");
+
+		return { success: true };
+	});
 }

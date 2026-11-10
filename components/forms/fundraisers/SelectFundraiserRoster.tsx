@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ export default function SelectFundraiserRoster({
 	const router = useRouter();
 
 	const [open, setOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 	const [step, setStep] = useState<"teams" | "participants">("teams");
 
 	const [selectedTeamIdsState, setSelectedTeamIdsState] =
@@ -98,25 +100,41 @@ export default function SelectFundraiserRoster({
 	}
 
 	async function handleSave() {
-		try {
-			// Save the teams first.
-			// This also removes participants who are no longer
-			// eligible on the server.
-			await saveFundraiserTeams(fundraiserId, selectedTeamIdsState);
+		setIsSaving(true);
 
-			// Then save the participant selections.
-			await saveFundraiserParticipants(
-				fundraiserId,
-				selectedParticipantIdsState,
-			);
+		// Save the teams first.
+		// This also removes participants who are no longer
+		// eligible on the server.
+		const teamsResult = await saveFundraiserTeams(
+			fundraiserId,
+			selectedTeamIdsState,
+		);
 
-			setOpen(false);
-			setStep("teams");
-
-			router.refresh();
-		} catch (error) {
-			console.error("Error saving fundraiser:", error);
+		if (!teamsResult.ok) {
+			setIsSaving(false);
+			toast.error(teamsResult.error);
+			return;
 		}
+
+		// Then save the participant selections.
+		const participantsResult = await saveFundraiserParticipants(
+			fundraiserId,
+			selectedParticipantIdsState,
+		);
+
+		setIsSaving(false);
+
+		if (!participantsResult.ok) {
+			toast.error(participantsResult.error);
+			router.refresh(); // teams were saved, show the current state
+			return;
+		}
+
+		toast.success("Roster saved");
+		setOpen(false);
+		setStep("teams");
+
+		router.refresh();
 	}
 	function handleOpenChange(value: boolean) {
 		if (value) {
@@ -221,8 +239,8 @@ export default function SelectFundraiserRoster({
 								Back
 							</Button>
 
-							<Button type="button" onClick={handleSave}>
-								Save
+							<Button type="button" onClick={handleSave} disabled={isSaving}>
+								{isSaving ? "Saving..." : "Save"}
 							</Button>
 						</DialogFooter>
 					</>

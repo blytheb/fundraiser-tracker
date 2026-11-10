@@ -3,6 +3,7 @@
 import React from "react";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { createFundraiser } from "@/features/fundraisers/actions/fundraisers";
 import FundraiserForm from "@/components/forms/fundraisers/FundraiserForm";
 import { useState } from "react";
@@ -26,24 +27,32 @@ export default function AddFundraiserDialog() {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [startDate, setStartDate] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// const activeTeams = getActiveTeams();
 
 	async function handleCreate() {
-		try {
-			await createFundraiser({
-				name,
-				description,
-				startDate: new Date(startDate),
-			});
-			router.refresh();
-			setOpen(false);
-			setName("");
-			setDescription("");
-			setStartDate("");
-		} catch (error) {
-			console.error("Failed to create fundraiser:", error);
+		setIsSubmitting(true);
+
+		const result = await createFundraiser({
+			name,
+			description,
+			startDate: new Date(startDate),
+		});
+
+		setIsSubmitting(false);
+
+		if (!result.ok) {
+			toast.error(result.error);
+			return;
 		}
+
+		toast.success("Fundraiser created");
+		router.refresh();
+		setOpen(false);
+		setName("");
+		setDescription("");
+		setStartDate("");
 	}
 
 	return (
@@ -76,8 +85,8 @@ export default function AddFundraiserDialog() {
 					<Button
 						type="button"
 						onClick={handleCreate}
-						disabled={!name.trim() || !startDate}>
-						Create Fundraiser
+						disabled={isSubmitting || !name.trim() || !startDate}>
+						{isSubmitting ? "Creating..." : "Create Fundraiser"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

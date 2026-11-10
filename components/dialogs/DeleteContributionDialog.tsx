@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { deleteContribution } from "@/features/fundraisers/actions/contributions";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 
@@ -26,16 +27,17 @@ export default function DeleteContributionDialog({
 		setError("");
 		setIsPending(true);
 
-		try {
-			await deleteContribution(contribution.id);
-			router.refresh();
-			handleOpenChange(false);
-		} catch (error) {
-			console.error("Failed to delete contribution:", error);
-			setError("Unable to delete this contribution. Please try again.");
-		} finally {
-			setIsPending(false);
+		const result = await deleteContribution(contribution.id);
+		setIsPending(false);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Contribution deleted");
+		router.refresh();
+		handleOpenChange(false);
 	}
 	function handleOpenChange(nextOpen: boolean) {
 		if (!nextOpen) {

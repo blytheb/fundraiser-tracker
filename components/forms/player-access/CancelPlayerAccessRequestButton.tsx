@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { cancelPlayerAccessRequest } from "@/features/player-access/actions/cancel-player-access-request";
 
 export function CancelPlayerAccessRequestButton({
@@ -23,14 +24,15 @@ export function CancelPlayerAccessRequestButton({
 		setError("");
 
 		startTransition(async () => {
-			try {
-				await cancelPlayerAccessRequest(requestId);
-				router.refresh();
-			} catch (error) {
-				setError(
-					error instanceof Error ? error.message : "Unable to cancel request.",
-				);
+			const result = await cancelPlayerAccessRequest(requestId);
+
+			if (!result.ok) {
+				setError(result.error);
+				return;
 			}
+
+			toast.success("Access request canceled");
+			router.refresh();
 		});
 	}
 

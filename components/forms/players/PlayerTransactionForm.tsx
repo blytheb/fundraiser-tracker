@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { addPlayerPayment } from "@/features/players/actions/add-player-payment";
 import { addPlayerExpense } from "@/features/players/actions/add-player-expense";
 import PlayerTransactionFields from "@/components/forms/players/PlayerTransactionFields";
@@ -43,31 +44,30 @@ export default function PlayerTransactionForm({
 		}
 
 		startTransition(async () => {
-			try {
-				const data = {
-					playerId,
-					amount: Math.round(numericAmount * 100) / 100,
-					description: description.trim() || undefined,
-					date,
-				};
+			const data = {
+				playerId,
+				amount: Math.round(numericAmount * 100) / 100,
+				description: description.trim() || undefined,
+				date,
+			};
 
-				if (type === "PAYMENT") {
-					await addPlayerPayment(data);
-				} else {
-					await addPlayerExpense(data);
-				}
+			const result =
+				type === "PAYMENT"
+					? await addPlayerPayment(data)
+					: await addPlayerExpense(data);
 
-				setAmount("");
-				setDescription("");
-				setError("");
-				router.refresh();
-			} catch (err) {
-				setError(
-					err instanceof Error
-						? err.message
-						: "Unable to save the transaction. Please try again.",
-				);
+			if (!result.ok) {
+				setError(result.error);
+				return;
 			}
+
+			toast.success(
+				type === "PAYMENT" ? "Deposit recorded" : "Expense recorded",
+			);
+			setAmount("");
+			setDescription("");
+			setError("");
+			router.refresh();
 		});
 	}
 

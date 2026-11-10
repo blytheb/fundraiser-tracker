@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { updatePlayer } from "@/features/players/actions/players";
 
 import {
@@ -29,27 +30,6 @@ export default function EditPlayerDialog({
 	open,
 	onOpenChange,
 }: EditPlayerDialogProps) {
-	const router = useRouter();
-	const [firstName, setFirstName] = useState(player.firstName);
-	const [lastName, setLastName] = useState(player.lastName);
-
-	async function handleEdit() {
-		try {
-			await updatePlayer(player.id, {
-				firstName,
-				lastName,
-				status: player.status,
-				imageUrl: player.imageUrl ?? "",
-			});
-			router.refresh();
-			onOpenChange(false);
-			setFirstName("");
-			setLastName("");
-		} catch (error) {
-			console.error("Failed to edit player:", error);
-		}
-	}
-
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
@@ -57,17 +37,80 @@ export default function EditPlayerDialog({
 					<DialogTitle>Edit this Player</DialogTitle>
 				</DialogHeader>
 
-				<PlayerForm
-					firstName={firstName}
-					lastName={lastName}
-					onFirstNameChange={setFirstName}
-					onLastNameChange={setLastName}
-				/>
-
-				<DialogFooter>
-					<Button onClick={handleEdit}>Save Changes</Button>
-				</DialogFooter>
+				{/* only mounted while open, so the form starts from the current player every time */}
+				{open && (
+					<EditPlayerForm player={player} onDone={() => onOpenChange(false)} />
+				)}
 			</DialogContent>
 		</Dialog>
+	);
+}
+
+function EditPlayerForm({
+	player,
+	onDone,
+}: {
+	player: Player;
+	onDone: () => void;
+}) {
+	const router = useRouter();
+	const [firstName, setFirstName] = useState(player.firstName);
+	const [lastName, setLastName] = useState(player.lastName);
+	const [error, setError] = useState("");
+	const [isSaving, setIsSaving] = useState(false);
+
+	const trimmedFirst = firstName.trim();
+	const trimmedLast = lastName.trim();
+	const hasChanges =
+		trimmedFirst !== player.firstName || trimmedLast !== player.lastName;
+
+	async function handleEdit() {
+		setError("");
+		setIsSaving(true);
+
+		const result = await updatePlayer(player.id, {
+			firstName: trimmedFirst,
+			lastName: trimmedLast,
+			status: player.status,
+			// undefined (not "") so a player without a photo keeps imageUrl = null
+			imageUrl: player.imageUrl ?? undefined,
+		});
+
+		setIsSaving(false);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
+		}
+
+		toast.success("Player updated");
+		router.refresh();
+		onDone();
+	}
+
+	return (
+		<>
+			<PlayerForm
+				firstName={firstName}
+				lastName={lastName}
+				onFirstNameChange={setFirstName}
+				onLastNameChange={setLastName}
+			/>
+
+			{error && (
+				<p role="alert" className="text-sm text-destructive">
+					{error}
+				</p>
+			)}
+
+			<DialogFooter>
+				<Button
+					type="button"
+					onClick={handleEdit}
+					disabled={isSaving || !trimmedFirst || !trimmedLast || !hasChanges}>
+					{isSaving ? "Saving..." : "Save Changes"}
+				</Button>
+			</DialogFooter>
+		</>
 	);
 }

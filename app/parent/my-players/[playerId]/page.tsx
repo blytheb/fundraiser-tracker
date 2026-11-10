@@ -42,6 +42,8 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 							src={playerSummary.player.imageUrl}
 							alt={`${playerSummary.initials}`}
 							className="size-20 rounded-full border object-cover"
+							width={80}
+							height={80}
 						/>
 					) : (
 						<div className="flex size-20 items-center justify-center rounded-full bg-muted text-xl font-semibold">

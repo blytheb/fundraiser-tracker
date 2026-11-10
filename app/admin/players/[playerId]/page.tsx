@@ -38,20 +38,13 @@ function formatDate(date: Date) {
 export default async function PlayerPage({ params }: PlayerPageProps) {
 	const { playerId } = await params;
 
-	let player;
-
-	try {
-		player = await getPlayerById(playerId);
-	} catch {
-		notFound();
-	}
-
-	if (!player) notFound();
-
-	const [teams, transactions] = await Promise.all([
+	const [player, teams, transactions] = await Promise.all([
+		getPlayerById(playerId),
 		getPlayerTeams(playerId),
 		getPlayerTransactions(playerId),
 	]);
+
+	if (!player) notFound();
 
 	// Only published transactions affect the player's balance.
 	const publishedTransactions = transactions.filter(

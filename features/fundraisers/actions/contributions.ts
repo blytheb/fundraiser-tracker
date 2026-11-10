@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import type { ContributionType, PaymentMethod } from "@prisma/client";
@@ -14,33 +15,35 @@ type ContributionData = {
 };
 
 export async function addContribution(data: ContributionData) {
-	await requireAdmin();
+	return runAction(async () => {
+		await requireAdmin();
 
-	const fundraiser = await prisma.fundraiser.findUnique({
-		where: {
-			id: data.fundraiserId,
-		},
-		select: {
-			status: true,
-		},
-	});
+		const fundraiser = await prisma.fundraiser.findUnique({
+			where: {
+				id: data.fundraiserId,
+			},
+			select: {
+				status: true,
+			},
+		});
 
-	if (!fundraiser) {
-		throw new Error("Fundraiser not found");
-	}
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
 
-	if (fundraiser.status !== "DRAFT") {
-		throw new Error("Completed Fundraisers cannot be edited");
-	}
-	await prisma.fundraiserContribution.create({
-		data: {
-			fundraiserId: data.fundraiserId,
-			amount: data.amount,
-			paymentMethod: data.paymentMethod,
-			source: data.source,
-			date: new Date(data.date),
-			description: data.description,
-		},
+		if (fundraiser.status !== "DRAFT") {
+			throw new Error("Completed Fundraisers cannot be edited");
+		}
+		await prisma.fundraiserContribution.create({
+			data: {
+				fundraiserId: data.fundraiserId,
+				amount: data.amount,
+				paymentMethod: data.paymentMethod,
+				source: data.source,
+				date: new Date(data.date),
+				description: data.description,
+			},
+		});
 	});
 }
 
@@ -48,88 +51,92 @@ export async function updateContribution(
 	id: string,
 	data: Omit<ContributionData, "fundraiserId">,
 ) {
-	await requireAdmin();
+	return runAction(async () => {
+		await requireAdmin();
 
-	const contribution = await prisma.fundraiserContribution.findUnique({
-		where: {
-			id,
-		},
-		select: {
-			fundraiserId: true,
-		},
-	});
+		const contribution = await prisma.fundraiserContribution.findUnique({
+			where: {
+				id,
+			},
+			select: {
+				fundraiserId: true,
+			},
+		});
 
-	if (!contribution) {
-		throw new Error("Contribution not found");
-	}
+		if (!contribution) {
+			throw new Error("Contribution not found");
+		}
 
-	const fundraiser = await prisma.fundraiser.findUnique({
-		where: {
-			id: contribution.fundraiserId,
-		},
-		select: {
-			status: true,
-		},
-	});
+		const fundraiser = await prisma.fundraiser.findUnique({
+			where: {
+				id: contribution.fundraiserId,
+			},
+			select: {
+				status: true,
+			},
+		});
 
-	if (!fundraiser) {
-		throw new Error("Fundraiser not found");
-	}
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
 
-	if (fundraiser.status !== "DRAFT") {
-		throw new Error("Completed Fundraisers cannot be edited");
-	}
+		if (fundraiser.status !== "DRAFT") {
+			throw new Error("Completed Fundraisers cannot be edited");
+		}
 
-	await prisma.fundraiserContribution.update({
-		where: {
-			id,
-		},
-		data: {
-			amount: data.amount,
-			paymentMethod: data.paymentMethod,
-			source: data.source,
-			date: new Date(data.date),
-			description: data.description,
-		},
+		await prisma.fundraiserContribution.update({
+			where: {
+				id,
+			},
+			data: {
+				amount: data.amount,
+				paymentMethod: data.paymentMethod,
+				source: data.source,
+				date: new Date(data.date),
+				description: data.description,
+			},
+		});
 	});
 }
 
 export async function deleteContribution(id: string) {
-	await requireAdmin();
+	return runAction(async () => {
+		await requireAdmin();
 
-	const contribution = await prisma.fundraiserContribution.findUnique({
-		where: {
-			id,
-		},
-		select: {
-			fundraiserId: true,
-		},
-	});
+		const contribution = await prisma.fundraiserContribution.findUnique({
+			where: {
+				id,
+			},
+			select: {
+				fundraiserId: true,
+			},
+		});
 
-	if (!contribution) {
-		throw new Error("Contribution not found");
-	}
+		if (!contribution) {
+			throw new Error("Contribution not found");
+		}
 
-	const fundraiser = await prisma.fundraiser.findUnique({
-		where: {
-			id: contribution.fundraiserId,
-		},
-		select: {
-			status: true,
-		},
-	});
+		const fundraiser = await prisma.fundraiser.findUnique({
+			where: {
+				id: contribution.fundraiserId,
+			},
+			select: {
+				status: true,
+			},
+		});
 
-	if (!fundraiser) {
-		throw new Error("Fundraiser not found");
-	}
+		if (!fundraiser) {
+			throw new Error("Fundraiser not found");
+		}
 
-	if (fundraiser.status !== "DRAFT") {
-		throw new Error("Completed Fundraisers cannot be edited");
-	}
+		if (fundraiser.status !== "DRAFT") {
+			throw new Error("Completed Fundraisers cannot be edited");
+		}
 
-	await prisma.fundraiserContribution.delete({
-		where: {
-			id,
-		},
+		await prisma.fundraiserContribution.delete({
+			where: {
+				id,
+			},
+		});
 	});
 }

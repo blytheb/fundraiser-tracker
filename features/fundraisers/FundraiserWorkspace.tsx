@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import type { Fundraiser, Team, AllocationStatus } from "@prisma/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -99,12 +100,15 @@ export default function FundraiserWorkspace({
 				amount: Number(amounts[participant.id] || 0),
 			}));
 
-			try {
-				await setCustomDistribution(fundraiser.id, allocations);
-				router.refresh();
-			} catch (error) {
-				console.error(error);
+			const result = await setCustomDistribution(fundraiser.id, allocations);
+
+			if (!result.ok) {
+				toast.error(result.error);
+				return;
 			}
+
+			toast.success("Allocations saved");
+			router.refresh();
 		});
 	}
 

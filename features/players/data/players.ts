@@ -1,9 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import {
-	requireParentAccess,
-	requireAdmin,
-	requireUser,
-} from "@/lib/permissions";
+import { requireAdmin, requireUser } from "@/lib/permissions";
 import type { Player } from "@prisma/client";
 import type { PlayerWithFundraisers, PlayerWithTeams } from "../types";
 
@@ -39,92 +35,13 @@ export async function getPlayers(search?: string): Promise<Player[]> {
 	});
 }
 
+//admin only: admins can view any player. Parent pages use getPlayerWithTeams, which checks the parent link.
 export async function getPlayerById(id: string): Promise<Player | null> {
-	const user = await requireParentAccess();
-
-	const link = await prisma.parentPlayerLink.findUnique({
-		where: {
-			userId_playerId: {
-				userId: user.id,
-				playerId: id,
-			},
-		},
-		select: { id: true },
-	});
-
-	if (!link) {
-		throw new Error("You do not have access to this player.");
-	}
+	await requireAdmin();
 
 	return prisma.player.findUnique({
 		where: {
 			id,
-		},
-	});
-}
-
-export async function getPlayerWithTeams(
-	id: string,
-): Promise<PlayerWithTeams | null> {
-	const user = await requireUser();
-
-	if (user.role === "PARENT") {
-		const link = await prisma.parentPlayerLink.findUnique({
-			where: {
-				userId_playerId: {
-					userId: user.id,
-					playerId: id,
-				},
-			},
-			select: { id: true },
-		});
-
-		if (!link) {
-			throw new Error("You do not have access to this player's teams.");
-		}
-	}
-
-	return prisma.player.findUnique({
-		where: { id },
-		include: {
-			teams: {
-				include: {
-					team: true,
-				},
-			},
-		},
-	});
-}
-
-export async function getPlayerWithFundraisers(
-	id: string,
-): Promise<PlayerWithFundraisers | null> {
-	const user = await requireUser();
-
-	if (user.role === "PARENT") {
-		const link = await prisma.parentPlayerLink.findUnique({
-			where: {
-				userId_playerId: {
-					userId: user.id,
-					playerId: id,
-				},
-			},
-			select: { id: true },
-		});
-
-		if (!link) {
-			throw new Error("You do not have access to this player's fundraisers.");
-		}
-	}
-
-	return prisma.player.findUnique({
-		where: { id },
-		include: {
-			fundraiserParticipants: {
-				include: {
-					fundraiser: true,
-				},
-			},
 		},
 	});
 }

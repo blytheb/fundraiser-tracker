@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { deletePlayer } from "@/features/players/actions/players";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import type { Player } from "@prisma/client";
@@ -25,16 +26,17 @@ export default function DeletePlayerDialog({
 		setError("");
 		setIsPending(true);
 
-		try {
-			await deletePlayer(player.id);
-			router.refresh();
-			handleOpenChange(false);
-		} catch (error) {
-			console.error("Failed to delete player:", error);
-			setError("Unable to delete this player. Please try again.");
-		} finally {
-			setIsPending(false);
+		const result = await deletePlayer(player.id);
+		setIsPending(false);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Player deleted");
+		router.refresh();
+		handleOpenChange(false);
 	}
 
 	function handleOpenChange(nextOpen: boolean) {

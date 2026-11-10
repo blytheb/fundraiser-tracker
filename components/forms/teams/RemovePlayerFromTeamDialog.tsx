@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { removePlayerFromTeam } from "@/features/teams/actions/remove-player-from-team";
 
 import type { Player } from "@prisma/client";
@@ -35,16 +36,17 @@ export default function RemovePlayerFromTeamDialog({
 		setError("");
 		setIsPending(true);
 
-		try {
-			await removePlayerFromTeam(teamId, player.id);
-			router.refresh();
-			handleOpenChange(false);
-		} catch (error) {
-			console.error("Failed to remove player from team:", error);
-			setError("Unable to remove this player from the team. Please try again.");
-		} finally {
-			setIsPending(false);
+		const result = await removePlayerFromTeam(teamId, player.id);
+		setIsPending(false);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Player removed from team");
+		router.refresh();
+		handleOpenChange(false);
 	}
 
 	return (

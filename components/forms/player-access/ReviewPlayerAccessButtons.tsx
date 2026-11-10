@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { reviewPlayerAccess } from "@/features/player-access/actions/review-player-access";
 
 type Props = {
@@ -17,16 +18,19 @@ export default function ReviewPlayerAccessButtons({ requestId }: Props) {
 		setError(null);
 
 		startTransition(async () => {
-			try {
-				await reviewPlayerAccess(requestId, decision);
-				router.refresh();
-			} catch (err) {
-				setError(
-					err instanceof Error
-						? err.message
-						: "Something went wrong. Please try again.",
-				);
+			const result = await reviewPlayerAccess(requestId, decision);
+
+			if (!result.ok) {
+				setError(result.error);
+				return;
 			}
+
+			toast.success(
+				decision === "APPROVED"
+					? "Access request approved"
+					: "Access request rejected",
+			);
+			router.refresh();
 		});
 	}
 

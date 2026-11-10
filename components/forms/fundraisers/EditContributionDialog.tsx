@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import type { PaymentMethod, ContributionType } from "@prisma/client";
 import { updateContribution } from "@/features/fundraisers/actions/contributions";
 
@@ -43,21 +44,29 @@ export default function EditContributionDialog({
 	const [description, setDescription] = useState(
 		contribution.description ?? "",
 	);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	async function handleEdit() {
-		try {
-			await updateContribution(contribution.id, {
-				amount: Number(amount),
-				paymentMethod,
-				source,
-				date,
-				description,
-			});
-			router.refresh();
-			onOpenChange(false);
-		} catch (error) {
-			console.error("Failed to edit contribution:", error);
+		setIsSubmitting(true);
+
+		const result = await updateContribution(contribution.id, {
+			amount: Number(amount),
+			paymentMethod,
+			source,
+			date,
+			description,
+		});
+
+		setIsSubmitting(false);
+
+		if (!result.ok) {
+			toast.error(result.error);
+			return;
 		}
+
+		toast.success("Contribution updated");
+		router.refresh();
+		onOpenChange(false);
 	}
 
 	return (
@@ -81,7 +90,9 @@ export default function EditContributionDialog({
 				/>
 
 				<DialogFooter>
-					<Button onClick={handleEdit}>Save Changes</Button>
+					<Button onClick={handleEdit} disabled={isSubmitting}>
+						{isSubmitting ? "Saving..." : "Save Changes"}
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

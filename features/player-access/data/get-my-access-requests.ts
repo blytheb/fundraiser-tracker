@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/permissions";
+import { requireParentAccess } from "@/lib/permissions";
 
 export async function getMyAccessRequests() {
-	const user = await requireUser();
+	const user = await requireParentAccess();
 
 	return prisma.playerAccessRequest.findMany({
 		where: {

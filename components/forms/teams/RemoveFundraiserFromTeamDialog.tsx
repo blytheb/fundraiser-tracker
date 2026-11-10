@@ -3,6 +3,7 @@ import { useState } from "react";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/remove-team-from-fundraiser";
 
 import type { Fundraiser } from "@prisma/client";
@@ -35,18 +36,17 @@ export default function RemoveFundraiserFromTeamDialog({
 		setError("");
 		setIsPending(true);
 
-		try {
-			await removeTeamFromFundraiser(fundraiser.id, teamId);
-			router.refresh();
-			handleOpenChange(false);
-		} catch (error) {
-			console.error("Failed to remove fundraiser from team:", error);
-			setError(
-				"Unable to remove this fundraiser from the team. Please try again.",
-			);
-		} finally {
-			setIsPending(false);
+		const result = await removeTeamFromFundraiser(fundraiser.id, teamId);
+		setIsPending(false);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Fundraiser removed from team");
+		router.refresh();
+		handleOpenChange(false);
 	}
 	return (
 		<ConfirmDeleteDialog

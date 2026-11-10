@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 
@@ -13,22 +14,24 @@ type PlayerTransactionData = {
 };
 
 export async function addPlayerExpense(data: PlayerTransactionData) {
-	await requireAdmin();
-	const transaction = await prisma.playerTransaction.create({
-		data: {
-			playerId: data.playerId,
-			fundraiserId: data.fundraiserId,
-			allocationId: data.allocationId,
-			amount: data.amount,
-			type: "EXPENSE",
-			status: "PUBLISHED",
-			description: data.description,
-			date: new Date(data.date),
-		},
-	});
+	return runAction(async () => {
+		await requireAdmin();
+		const transaction = await prisma.playerTransaction.create({
+			data: {
+				playerId: data.playerId,
+				fundraiserId: data.fundraiserId,
+				allocationId: data.allocationId,
+				amount: data.amount,
+				type: "EXPENSE",
+				status: "PUBLISHED",
+				description: data.description,
+				date: new Date(data.date),
+			},
+		});
 
-	return {
-		...transaction,
-		amount: Number(transaction.amount),
-	};
+		return {
+			...transaction,
+			amount: Number(transaction.amount),
+		};
+	});
 }

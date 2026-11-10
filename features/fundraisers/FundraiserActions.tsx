@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import type { ActionResult } from "@/lib/action-result";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -30,32 +32,48 @@ export default function FundraiserActions({
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const router = useRouter();
 
-	async function handleComplete() {
-		try {
-			await completeFundraiser(fundraiser.id);
-			router.refresh();
-		} catch (error) {
-			console.error(error);
+	const [isPending, setIsPending] = useState(false);
+
+	async function runStatusChange(
+		action: (id: string) => Promise<ActionResult<unknown>>,
+		messages: { loading: string; success: string },
+	) {
+		setIsPending(true);
+		const toastId = toast.loading(messages.loading);
+
+		const result = await action(fundraiser.id);
+		setIsPending(false);
+
+		if (!result.ok) {
+			toast.error(result.error, { id: toastId });
+			return;
 		}
+
+		toast.success(messages.success, { id: toastId });
+		router.refresh();
 	}
 
-	async function handlePublish() {
-		try {
-			await publishFundraiser(fundraiser.id);
-			router.refresh();
-		} catch (error) {
-			console.error(error);
-		}
+	function handleComplete() {
+		return runStatusChange(completeFundraiser, {
+			loading: "Completing fundraiser...",
+			success: "Fundraiser completed",
+		});
 	}
 
-	async function handleReopen() {
-		try {
-			await reopenFundraiser(fundraiser.id);
-			router.refresh();
-		} catch (error) {
-			console.error(error);
-		}
+	function handlePublish() {
+		return runStatusChange(publishFundraiser, {
+			loading: "Publishing fundraiser...",
+			success: "Fundraiser published",
+		});
 	}
+
+	function handleReopen() {
+		return runStatusChange(reopenFundraiser, {
+			loading: "Reopening fundraiser...",
+			success: "Fundraiser reopened to draft",
+		});
+	}
+
 	return (
 		<>
 			{/* Smaller Screens Collapsed Actions */}
@@ -67,18 +85,18 @@ export default function FundraiserActions({
 
 					<DropdownMenuContent align="end">
 						{fundraiser.status === "DRAFT" ? (
-							<DropdownMenuItem onClick={handleComplete}>
+							<DropdownMenuItem onClick={handleComplete} disabled={isPending}>
 								Complete Fundraiser
 							</DropdownMenuItem>
 						) : (
 							<>
 								{fundraiser.status === "COMPLETED" && (
-									<DropdownMenuItem onClick={handlePublish}>
+									<DropdownMenuItem onClick={handlePublish} disabled={isPending}>
 										Publish Fundraiser
 									</DropdownMenuItem>
 								)}
 
-								<DropdownMenuItem onClick={handleReopen}>
+								<DropdownMenuItem onClick={handleReopen} disabled={isPending}>
 									Reopen to Draft
 								</DropdownMenuItem>
 							</>
@@ -87,7 +105,6 @@ export default function FundraiserActions({
 						<DropdownMenuItem
 							onClick={(e) => {
 								e.preventDefault();
-								console.log("Edit Clicked");
 								setEditOpen(true);
 							}}>
 							Edit Fundraiser
@@ -95,7 +112,6 @@ export default function FundraiserActions({
 						<DropdownMenuItem
 							onClick={(e) => {
 								e.preventDefault();
-								console.log("delete clicked");
 								setDeleteOpen(true);
 							}}
 							className="text-destructive">

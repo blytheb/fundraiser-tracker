@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { deleteTeam } from "@/features/teams/actions/teams";
 import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import type { Team } from "@prisma/client";
@@ -32,16 +33,17 @@ export default function DeleteTeamDialog({
 		setError("");
 		setIsPending(true);
 
-		try {
-			await deleteTeam(team.id);
-			router.refresh();
-			handleOpenChange(false);
-		} catch (error) {
-			console.error("Failed to delete team:", error);
-			setError("Unable to delete this team. Please try again.");
-		} finally {
-			setIsPending(false);
+		const result = await deleteTeam(team.id);
+		setIsPending(false);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
 		}
+
+		toast.success("Team deleted");
+		router.refresh();
+		handleOpenChange(false);
 	}
 	return (
 		<ConfirmDeleteDialog

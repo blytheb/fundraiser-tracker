@@ -1,102 +1,93 @@
 import { Prisma } from "@prisma/client";
-import type { PlayerTransactionType } from "@prisma/client";
+import type { TransactionDirection } from "@prisma/client";
 
 // The fields the summary needs. Callers pass already-filtered transactions
 // (only PUBLISHED ones count toward the balance).
 export type SummaryTransaction = {
 	id: string;
-	amount: Prisma.Decimal | number;
-	type: PlayerTransactionType;
+	amount: Prisma.Decimal | number; // stored positive; direction gives the sign
+	direction: TransactionDirection;
 	description: string | null;
 	date: Date;
+	// set when the row is a player's share of a team transaction
+	teamTransaction?: { name: string } | null;
+	// v1 fundraiser link, kept while fundraisers move to team transactions
 	fundraiser?: { name: string } | null;
 };
 
-const DEFAULT_TITLES: Record<PlayerTransactionType, string> = {
-	DISTRIBUTION: "Fundraiser Distribution",
-	PAYMENT: "Player Deposit",
-	EXPENSE: "Player Expense",
-	ADJUSTMENT: "Balance Adjustment",
+export type HistoryKind =
+	| "INDIVIDUAL_INCOME"
+	| "INDIVIDUAL_EXPENSE"
+	| "TEAM_INCOME"
+	| "TEAM_EXPENSE";
+
+const DEFAULT_TITLES: Record<HistoryKind, string> = {
+	INDIVIDUAL_INCOME: "Player Deposit",
+	INDIVIDUAL_EXPENSE: "Player Expense",
+	TEAM_INCOME: "Team Income",
+	TEAM_EXPENSE: "Team Expense",
 };
 
-const DEFAULT_DESCRIPTIONS: Record<PlayerTransactionType, string> = {
-	DISTRIBUTION: "Fundraiser distribution",
-	PAYMENT: "Individual deposit",
-	EXPENSE: "Individual expense",
-	ADJUSTMENT: "Balance adjustment",
+const DEFAULT_DESCRIPTIONS: Record<HistoryKind, string> = {
+	INDIVIDUAL_INCOME: "Individual deposit",
+	INDIVIDUAL_EXPENSE: "Individual expense",
+	TEAM_INCOME: "Share of team income",
+	TEAM_EXPENSE: "Share of team expense",
 };
 
-// Sign of each transaction in the player's balance:
-// payments and distributions add, expenses subtract, adjustments keep their own sign.
-function signedAmount(type: PlayerTransactionType, amount: Prisma.Decimal) {
-	switch (type) {
-		case "EXPENSE":
-			return amount.abs().negated();
-		case "ADJUSTMENT":
-			return amount;
-		default:
-			return amount.abs();
+function kindOf(transaction: SummaryTransaction): HistoryKind {
+	const isTeam = Boolean(transaction.teamTransaction || transaction.fundraiser);
+	if (transaction.direction === "INCOME") {
+		return isTeam ? "TEAM_INCOME" : "INDIVIDUAL_INCOME";
 	}
+	return isTeam ? "TEAM_EXPENSE" : "INDIVIDUAL_EXPENSE";
 }
 
-// Pure function: no database, no auth. Math is done in Decimal and converted
-// to numbers only in the result, so the result can be passed to client components.
+// Pure function: no database, no auth. Income adds, expense subtracts.
+// Math is done in Decimal and converted to numbers only in the result,
+// so the result can be passed to client components.
 export function summarizeTransactions(transactions: SummaryTransaction[]) {
 	const zero = new Prisma.Decimal(0);
-	let totalDeposits = zero;
-	let totalDistributions = zero;
-	let totalExpenses = zero;
-	let positiveAdjustments = zero;
-	let negativeAdjustments = zero; // stored as a positive amount
+	const totals: Record<HistoryKind, Prisma.Decimal> = {
+		INDIVIDUAL_INCOME: zero,
+		INDIVIDUAL_EXPENSE: zero,
+		TEAM_INCOME: zero,
+		TEAM_EXPENSE: zero,
+	};
 
 	const history = transactions.map((transaction) => {
-		const amount = new Prisma.Decimal(transaction.amount);
-		const signed = signedAmount(transaction.type, amount);
-
-		switch (transaction.type) {
-			case "PAYMENT":
-				totalDeposits = totalDeposits.plus(signed);
-				break;
-			case "DISTRIBUTION":
-				totalDistributions = totalDistributions.plus(signed);
-				break;
-			case "EXPENSE":
-				totalExpenses = totalExpenses.plus(signed.abs());
-				break;
-			case "ADJUSTMENT":
-				if (signed.isPositive()) {
-					positiveAdjustments = positiveAdjustments.plus(signed);
-				} else {
-					negativeAdjustments = negativeAdjustments.plus(signed.abs());
-				}
-				break;
-		}
+		const kind = kindOf(transaction);
+		// abs() so a legacy row stored with a negative amount still counts once, in its direction
+		const amount = new Prisma.Decimal(transaction.amount).abs();
+		totals[kind] = totals[kind].plus(amount);
 
 		return {
 			id: transaction.id,
+			kind,
+			direction: transaction.direction,
 			title:
-				transaction.type === "DISTRIBUTION" && transaction.fundraiser
-					? transaction.fundraiser.name
-					: DEFAULT_TITLES[transaction.type],
-			description:
-				transaction.description ?? DEFAULT_DESCRIPTIONS[transaction.type],
+				transaction.teamTransaction?.name ??
+				transaction.fundraiser?.name ??
+				DEFAULT_TITLES[kind],
+			description: transaction.description ?? DEFAULT_DESCRIPTIONS[kind],
 			date: transaction.date,
-			type: transaction.type,
-			amount: signed.toNumber(),
+			amount: (transaction.direction === "INCOME"
+				? amount
+				: amount.negated()
+			).toNumber(),
 		};
 	});
 
 	history.sort((a, b) => b.date.getTime() - a.date.getTime());
 
-	const totalMoneyIn = totalDeposits
-		.plus(totalDistributions)
-		.plus(positiveAdjustments);
-	const totalMoneyOut = totalExpenses.plus(negativeAdjustments);
+	const totalMoneyIn = totals.INDIVIDUAL_INCOME.plus(totals.TEAM_INCOME);
+	const totalMoneyOut = totals.INDIVIDUAL_EXPENSE.plus(totals.TEAM_EXPENSE);
 
 	return {
-		totalDeposits: totalDeposits.toNumber(),
-		totalDistributions: totalDistributions.toNumber(),
-		totalExpenses: totalExpenses.toNumber(),
+		individualIncome: totals.INDIVIDUAL_INCOME.toNumber(),
+		individualExpenses: totals.INDIVIDUAL_EXPENSE.toNumber(),
+		teamIncome: totals.TEAM_INCOME.toNumber(),
+		teamExpenses: totals.TEAM_EXPENSE.toNumber(),
 		totalMoneyIn: totalMoneyIn.toNumber(),
 		totalMoneyOut: totalMoneyOut.toNumber(),
 		currentBalance: totalMoneyIn.minus(totalMoneyOut).toNumber(),

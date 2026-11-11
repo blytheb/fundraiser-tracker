@@ -291,8 +291,8 @@ describe("getPlayerFinancialSummary (parent player page)", () => {
 		asParent();
 		linkParent();
 		db.playerTransaction.findMany.mockResolvedValue([
-			{ id: "1", type: "PAYMENT", amount: 50, description: null, date: new Date("2026-01-10"), fundraiser: null },
-			{ id: "2", type: "EXPENSE", amount: 30, description: null, date: new Date("2026-01-11"), fundraiser: null },
+			{ id: "1", direction: "INCOME", amount: 50, description: null, date: new Date("2026-01-10"), fundraiser: null },
+			{ id: "2", direction: "EXPENSE", amount: 30, description: null, date: new Date("2026-01-11"), fundraiser: null },
 		]);
 
 		const { summary } = await getPlayerFinancialSummary("p1");

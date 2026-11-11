@@ -8,17 +8,27 @@ import {
 const date = (day: number) => new Date(`2026-01-${String(day).padStart(2, "0")}`);
 
 function tx(
-	overrides: Partial<SummaryTransaction> & Pick<SummaryTransaction, "id" | "type" | "amount">,
+	overrides: Partial<SummaryTransaction> &
+		Pick<SummaryTransaction, "id" | "direction" | "amount">,
 ): SummaryTransaction {
-	return { description: null, date: date(1), fundraiser: null, ...overrides };
+	return {
+		description: null,
+		date: date(1),
+		teamTransaction: null,
+		fundraiser: null,
+		...overrides,
+	};
 }
+
+const team = (name: string) => ({ teamTransaction: { name } });
 
 describe("summarizeTransactions", () => {
 	it("returns zeros and an empty history for no transactions", () => {
 		expect(summarizeTransactions([])).toEqual({
-			totalDeposits: 0,
-			totalDistributions: 0,
-			totalExpenses: 0,
+			individualIncome: 0,
+			individualExpenses: 0,
+			teamIncome: 0,
+			teamExpenses: 0,
 			totalMoneyIn: 0,
 			totalMoneyOut: 0,
 			currentBalance: 0,
@@ -26,87 +36,96 @@ describe("summarizeTransactions", () => {
 		});
 	});
 
-	it("calculates money in, money out and balance", () => {
+	it("adds income and subtracts expenses", () => {
 		const summary = summarizeTransactions([
-			tx({ id: "1", type: "PAYMENT", amount: 50, date: date(10) }),
-			tx({ id: "2", type: "DISTRIBUTION", amount: 100, date: date(11) }),
-			tx({ id: "3", type: "EXPENSE", amount: 30, date: date(12) }),
-			tx({ id: "4", type: "ADJUSTMENT", amount: 20, date: date(13) }),
-			tx({ id: "5", type: "ADJUSTMENT", amount: -5, date: date(14) }),
+			tx({ id: "1", direction: "INCOME", amount: 50 }), // individual income
+			tx({ id: "2", direction: "INCOME", amount: 100, ...team("Car wash") }), // team income
+			tx({ id: "3", direction: "EXPENSE", amount: 30 }), // individual expense
+			tx({ id: "4", direction: "EXPENSE", amount: 40, ...team("Tournament fee") }), // team expense
 		]);
 
-		expect(summary.totalDeposits).toBe(50);
-		expect(summary.totalDistributions).toBe(100);
-		expect(summary.totalExpenses).toBe(30);
-		expect(summary.totalMoneyIn).toBe(170); // 50 + 100 + 20
-		expect(summary.totalMoneyOut).toBe(35); // 30 + |-5|
-		expect(summary.currentBalance).toBe(135);
+		expect(summary.individualIncome).toBe(50);
+		expect(summary.teamIncome).toBe(100);
+		expect(summary.individualExpenses).toBe(30);
+		expect(summary.teamExpenses).toBe(40);
+		expect(summary.totalMoneyIn).toBe(150);
+		expect(summary.totalMoneyOut).toBe(70);
+		expect(summary.currentBalance).toBe(80);
 	});
 
-	it("can go negative when expenses exceed money in", () => {
+	it("counts v1 fundraiser rows as team income", () => {
 		const summary = summarizeTransactions([
-			tx({ id: "1", type: "PAYMENT", amount: 10 }),
-			tx({ id: "2", type: "EXPENSE", amount: 25 }),
+			tx({ id: "1", direction: "INCOME", amount: 100, fundraiser: { name: "Car wash" } }),
+		]);
+
+		expect(summary.teamIncome).toBe(100);
+		expect(summary.individualIncome).toBe(0);
+		expect(summary.history[0]).toMatchObject({ kind: "TEAM_INCOME", title: "Car wash" });
+	});
+
+	it("can go negative when expenses exceed income", () => {
+		const summary = summarizeTransactions([
+			tx({ id: "1", direction: "INCOME", amount: 10 }),
+			tx({ id: "2", direction: "EXPENSE", amount: 25 }),
 		]);
 
 		expect(summary.currentBalance).toBe(-15);
 	});
 
-	it("treats expense amounts as money out even if stored as negative", () => {
+	it("uses direction for the sign even if a legacy amount is stored negative", () => {
 		const summary = summarizeTransactions([
-			tx({ id: "1", type: "EXPENSE", amount: -30 }),
-			tx({ id: "2", type: "PAYMENT", amount: -50 }),
+			tx({ id: "1", direction: "EXPENSE", amount: -30 }), // old negative adjustment
+			tx({ id: "2", direction: "INCOME", amount: 50 }),
 		]);
 
-		expect(summary.totalExpenses).toBe(30);
-		expect(summary.totalDeposits).toBe(50);
+		expect(summary.individualExpenses).toBe(30);
 		expect(summary.currentBalance).toBe(20);
+		expect(summary.history.find((entry) => entry.id === "1")?.amount).toBe(-30);
 	});
 
 	it("accepts Prisma.Decimal amounts and adds cents exactly", () => {
 		const summary = summarizeTransactions([
-			tx({ id: "1", type: "PAYMENT", amount: new Prisma.Decimal("0.1") }),
-			tx({ id: "2", type: "PAYMENT", amount: new Prisma.Decimal("0.2") }),
-			tx({ id: "3", type: "EXPENSE", amount: new Prisma.Decimal("0.3") }),
+			tx({ id: "1", direction: "INCOME", amount: new Prisma.Decimal("0.1") }),
+			tx({ id: "2", direction: "INCOME", amount: new Prisma.Decimal("0.2") }),
+			tx({ id: "3", direction: "EXPENSE", amount: new Prisma.Decimal("0.3") }),
 		]);
 
 		// with plain numbers 0.1 + 0.2 - 0.3 = 5.55e-17
-		expect(summary.totalDeposits).toBe(0.3);
+		expect(summary.individualIncome).toBe(0.3);
 		expect(summary.currentBalance).toBe(0);
 	});
 
-	it("sorts history newest first with signed amounts", () => {
+	it("sorts history newest first with signed amounts and a kind", () => {
 		const { history } = summarizeTransactions([
-			tx({ id: "old", type: "PAYMENT", amount: 50, date: date(1) }),
-			tx({ id: "new", type: "EXPENSE", amount: 30, date: date(20) }),
-			tx({ id: "mid", type: "ADJUSTMENT", amount: -5, date: date(10) }),
+			tx({ id: "old", direction: "INCOME", amount: 50, date: date(1) }),
+			tx({ id: "new", direction: "EXPENSE", amount: 30, date: date(20), ...team("Fee") }),
+			tx({ id: "mid", direction: "EXPENSE", amount: 5, date: date(10) }),
 		]);
 
 		expect(history.map((entry) => entry.id)).toEqual(["new", "mid", "old"]);
 		expect(history.map((entry) => entry.amount)).toEqual([-30, -5, 50]);
+		expect(history.map((entry) => entry.kind)).toEqual([
+			"TEAM_EXPENSE",
+			"INDIVIDUAL_EXPENSE",
+			"INDIVIDUAL_INCOME",
+		]);
 	});
 
-	it("uses the fundraiser name as the title for distributions", () => {
+	it("titles team rows with the team transaction name", () => {
 		const { history } = summarizeTransactions([
-			tx({
-				id: "1",
-				type: "DISTRIBUTION",
-				amount: 100,
-				fundraiser: { name: "Car wash" },
-			}),
-			tx({ id: "2", type: "DISTRIBUTION", amount: 50, fundraiser: null }),
+			tx({ id: "1", direction: "EXPENSE", amount: 40, ...team("Tournament fee") }),
 		]);
 
-		expect(history.find((entry) => entry.id === "1")?.title).toBe("Car wash");
-		expect(history.find((entry) => entry.id === "2")?.title).toBe(
-			"Fundraiser Distribution",
-		);
+		expect(history[0]).toMatchObject({
+			title: "Tournament fee",
+			description: "Share of team expense",
+		});
 	});
 
-	it("uses the saved description, or a default for the type", () => {
+	it("uses the saved description, or a default for the kind", () => {
 		const { history } = summarizeTransactions([
-			tx({ id: "1", type: "EXPENSE", amount: 30, description: "Shoes" }),
-			tx({ id: "2", type: "PAYMENT", amount: 50 }),
+			tx({ id: "1", direction: "EXPENSE", amount: 30, description: "Shoes" }),
+			tx({ id: "2", direction: "INCOME", amount: 50 }),
 		]);
 
 		expect(history.find((entry) => entry.id === "1")?.description).toBe("Shoes");

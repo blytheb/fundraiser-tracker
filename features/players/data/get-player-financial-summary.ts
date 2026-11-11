@@ -47,9 +47,12 @@ export async function getPlayerFinancialSummary(playerId: string) {
 			select: {
 				id: true,
 				amount: true,
-				type: true,
+				direction: true,
 				description: true,
 				date: true,
+				teamTransaction: {
+					select: { name: true },
+				},
 				fundraiser: {
 					select: { name: true },
 				},

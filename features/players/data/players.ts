@@ -73,6 +73,12 @@ export async function getPlayerTransactions(playerId: string) {
 			date: "desc",
 		},
 		include: {
+			teamTransaction: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
 			fundraiser: {
 				select: {
 					id: true,

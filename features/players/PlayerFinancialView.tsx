@@ -5,13 +5,16 @@ import {
 	CalendarDays,
 	CircleDollarSign,
 	History,
+	Receipt,
 	Wallet,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type { PlayerFinancialSummary } from "@/features/players/lib/summarize-transactions";
-import type { PlayerTransactionType } from "@prisma/client";
+import type {
+	HistoryKind,
+	PlayerFinancialSummary,
+} from "@/features/players/lib/summarize-transactions";
 
 type PlayerFinancialViewProps = {
 	player: {
@@ -26,11 +29,11 @@ type PlayerFinancialViewProps = {
 	children?: ReactNode;
 };
 
-const ENTRY_ICONS: Record<PlayerTransactionType, ReactNode> = {
-	EXPENSE: <ArrowUpRight className="size-5 text-destructive" />,
-	DISTRIBUTION: <CircleDollarSign className="size-5 text-green-600" />,
-	PAYMENT: <ArrowDownLeft className="size-5 text-green-600" />,
-	ADJUSTMENT: <Wallet className="size-5 text-muted-foreground" />,
+const ENTRY_ICONS: Record<HistoryKind, ReactNode> = {
+	INDIVIDUAL_INCOME: <ArrowDownLeft className="size-5 text-green-600" />,
+	INDIVIDUAL_EXPENSE: <ArrowUpRight className="size-5 text-destructive" />,
+	TEAM_INCOME: <CircleDollarSign className="size-5 text-green-600" />,
+	TEAM_EXPENSE: <Receipt className="size-5 text-destructive" />,
 };
 
 // Shared by the admin and parent player pages. Each page loads the data with
@@ -114,19 +117,19 @@ export default function PlayerFinancialView({
 						icon={<ArrowDownLeft className="size-4 text-green-600" />}
 						label="Money In"
 						value={summary.totalMoneyIn}
-						hint="Deposits and fundraiser distributions"
+						hint="Deposits and team income"
 					/>
 					<StatCard
 						icon={<ArrowUpRight className="size-4 text-destructive" />}
 						label="Money Out"
 						value={summary.totalMoneyOut}
-						hint="Expenses and negative adjustments"
+						hint="Individual and team expenses"
 					/>
 					<StatCard
 						icon={<CircleDollarSign className="size-4" />}
-						label="Fundraiser Earnings"
-						value={summary.totalDistributions}
-						hint="Finalized distributions only"
+						label="Team Income"
+						value={summary.teamIncome}
+						hint="Fundraisers and other team income"
 					/>
 				</div>
 			</section>
@@ -169,7 +172,7 @@ export default function PlayerFinancialView({
 									className="flex flex-col gap-3 px-4 py-4 sm:grid sm:grid-cols-[minmax(0,1fr)_140px_140px] sm:items-center sm:gap-4 sm:px-5">
 									<div className="flex min-w-0 items-center gap-3">
 										<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted">
-											{ENTRY_ICONS[entry.type]}
+											{ENTRY_ICONS[entry.kind]}
 										</div>
 
 										<div className="min-w-0">

@@ -1,4 +1,4 @@
-import type { FundraiserStatus } from "@prisma/client";
+import type { FundraiserStatus, TeamTransactionStatus } from "@prisma/client";
 import { FUNDRAISER_STATUS_LABELS } from "@/lib/labels";
 
 const STATUS_STYLES: Record<FundraiserStatus, string> = {
@@ -10,10 +10,11 @@ const STATUS_STYLES: Record<FundraiserStatus, string> = {
 		"border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300",
 };
 
+// also used for team transactions, which have the same three statuses
 export default function FundraiserStatusBadge({
 	status,
 }: {
-	status: FundraiserStatus;
+	status: FundraiserStatus | TeamTransactionStatus;
 }) {
 	return (
 		<span

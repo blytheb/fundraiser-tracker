@@ -42,6 +42,8 @@ export async function getPlayerFinancialSummary(playerId: string) {
 							},
 						},
 					},
+					// shares of team transactions: PUBLISHED only once the team transaction is published
+					{ teamTransactionId: { not: null } },
 				],
 			},
 			select: {

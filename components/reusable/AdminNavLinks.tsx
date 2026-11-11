@@ -48,6 +48,13 @@ export default function AdminNavLinks({ isAdmin }: AdminNavLinksProps) {
 			<NavigationMenuItem>
 				<NavigationMenuLink
 					className={navLinkClassName}
+					render={<Link href="/admin/transactions" />}>
+					Transactions
+				</NavigationMenuLink>
+			</NavigationMenuItem>
+			<NavigationMenuItem>
+				<NavigationMenuLink
+					className={navLinkClassName}
 					render={<Link href="/admin/users" />}>
 					Users
 				</NavigationMenuLink>

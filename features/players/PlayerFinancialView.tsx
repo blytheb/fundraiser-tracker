@@ -5,16 +5,13 @@ import {
 	CalendarDays,
 	CircleDollarSign,
 	History,
-	Receipt,
 	Wallet,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type {
-	HistoryKind,
-	PlayerFinancialSummary,
-} from "@/features/players/lib/summarize-transactions";
+import TransactionKindIcon from "@/components/reusable/TransactionKindIcon";
+import type { PlayerFinancialSummary } from "@/features/players/lib/summarize-transactions";
 
 type PlayerFinancialViewProps = {
 	player: {
@@ -27,13 +24,6 @@ type PlayerFinancialViewProps = {
 	summary: PlayerFinancialSummary;
 	// extra content between the balance and the history, e.g. the admin transaction form
 	children?: ReactNode;
-};
-
-const ENTRY_ICONS: Record<HistoryKind, ReactNode> = {
-	INDIVIDUAL_INCOME: <ArrowDownLeft className="size-5 text-green-600" />,
-	INDIVIDUAL_EXPENSE: <ArrowUpRight className="size-5 text-destructive" />,
-	TEAM_INCOME: <CircleDollarSign className="size-5 text-green-600" />,
-	TEAM_EXPENSE: <Receipt className="size-5 text-destructive" />,
 };
 
 // Shared by the admin and parent player pages. Each page loads the data with
@@ -171,9 +161,7 @@ export default function PlayerFinancialView({
 									key={entry.id}
 									className="flex flex-col gap-3 px-4 py-4 sm:grid sm:grid-cols-[minmax(0,1fr)_140px_140px] sm:items-center sm:gap-4 sm:px-5">
 									<div className="flex min-w-0 items-center gap-3">
-										<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted">
-											{ENTRY_ICONS[entry.kind]}
-										</div>
+										<TransactionKindIcon kind={entry.kind} />
 
 										<div className="min-w-0">
 											<p className="truncate font-medium">{entry.title}</p>

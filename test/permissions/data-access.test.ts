@@ -58,6 +58,10 @@ import { getUnlinkedPlayers } from "@/features/player-access/data/get-unlinked-p
 import { requestPlayerAccess } from "@/features/player-access/actions/request-player-access";
 import { cancelPlayerAccessRequest } from "@/features/player-access/actions/cancel-player-access-request";
 
+import { getTransactionFeed } from "@/features/transactions/data/get-transaction-feed";
+import { getTeamTransaction } from "@/features/transactions/data/get-team-transaction";
+import { getTeamOptions } from "@/features/transactions/data/get-team-options";
+
 const db = prismaMock.client;
 
 // Runs fn and fails only if it redirected. Other errors (e.g. "not found"
@@ -75,6 +79,9 @@ beforeEach(() => {
 });
 
 const ADMIN_DATA: [string, () => Promise<unknown>][] = [
+	["getTransactionFeed", () => getTransactionFeed()],
+	["getTeamTransaction", () => getTeamTransaction("tt1")],
+	["getTeamOptions", () => getTeamOptions()],
 	["getPlayers", () => getPlayers()],
 	["getPlayerById", () => getPlayerById("p1")],
 	["getPlayerTeams", () => getPlayerTeams("p1")],

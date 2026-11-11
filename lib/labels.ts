@@ -6,6 +6,8 @@ import type {
 	FundraiserStatus,
 	PaymentMethod,
 	TeamStatus,
+	TeamTransactionStatus,
+	TransactionDirection,
 } from "@prisma/client";
 
 export const FUNDRAISER_STATUS_LABELS = {
@@ -32,3 +34,28 @@ export const TEAM_STATUS_LABELS = {
 	IN_SEASON: "In season",
 	SEASON_ENDED: "Season ended",
 } as const satisfies Record<TeamStatus, string>;
+
+export const TEAM_TRANSACTION_STATUS_LABELS = {
+	DRAFT: "Draft",
+	COMPLETED: "Completed",
+	PUBLISHED: "Published",
+} as const satisfies Record<TeamTransactionStatus, string>;
+
+export const DIRECTION_LABELS = {
+	INCOME: "Income",
+	EXPENSE: "Expense",
+} as const satisfies Record<TransactionDirection, string>;
+
+// The four kinds shown in the transactions list
+export type TransactionKind =
+	| "INDIVIDUAL_INCOME"
+	| "INDIVIDUAL_EXPENSE"
+	| "TEAM_INCOME"
+	| "TEAM_EXPENSE";
+
+export const TRANSACTION_KIND_LABELS = {
+	INDIVIDUAL_INCOME: "Individual income",
+	INDIVIDUAL_EXPENSE: "Individual expense",
+	TEAM_INCOME: "Team income",
+	TEAM_EXPENSE: "Team expense",
+} as const satisfies Record<TransactionKind, string>;

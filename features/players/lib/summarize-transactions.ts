@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import type { TransactionDirection } from "@prisma/client";
+import type { TransactionKind } from "@/lib/labels";
 
 // The fields the summary needs. Callers pass already-filtered transactions
 // (only PUBLISHED ones count toward the balance).
@@ -15,11 +16,8 @@ export type SummaryTransaction = {
 	fundraiser?: { name: string } | null;
 };
 
-export type HistoryKind =
-	| "INDIVIDUAL_INCOME"
-	| "INDIVIDUAL_EXPENSE"
-	| "TEAM_INCOME"
-	| "TEAM_EXPENSE";
+// same four kinds as the admin transactions list
+export type HistoryKind = TransactionKind;
 
 const DEFAULT_TITLES: Record<HistoryKind, string> = {
 	INDIVIDUAL_INCOME: "Player Deposit",

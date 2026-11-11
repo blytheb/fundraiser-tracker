@@ -17,6 +17,16 @@ vi.mock("@/lib/prisma", async () => {
 
 import { prismaMock } from "../helpers/prisma-mock";
 
+import { createIndividualTransaction } from "@/features/transactions/actions/create-individual-transaction";
+import { saveTeamTransaction } from "@/features/transactions/actions/save-team-transaction";
+import {
+	completeTeamTransaction,
+	publishTeamTransaction,
+	unpublishTeamTransaction,
+	reopenTeamTransaction,
+	deleteTeamTransaction,
+} from "@/features/transactions/actions/team-transaction-status";
+
 import { completeFundraiser } from "@/features/fundraisers/actions/complete-fundraiser";
 import {
 	addContribution,
@@ -72,6 +82,35 @@ const playerForm = { firstName: "Jane", lastName: "Doe", status: true };
 const transaction = { playerId: "p1", amount: 5, date: "2026-01-01" };
 
 const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
+	[
+		"createIndividualTransaction",
+		() =>
+			createIndividualTransaction({
+				playerId: "p1",
+				direction: "INCOME",
+				amount: 5,
+				date: "2026-01-01",
+			}),
+	],
+	[
+		"saveTeamTransaction",
+		() =>
+			saveTeamTransaction({
+				name: "Fee",
+				date: "2026-01-01",
+				direction: "EXPENSE",
+				paymentMethod: "CASH",
+				total: 10,
+				teamIds: [],
+				shares: [{ playerId: "p1", amount: 10 }],
+				complete: false,
+			}),
+	],
+	["completeTeamTransaction", () => completeTeamTransaction("tt1")],
+	["publishTeamTransaction", () => publishTeamTransaction("tt1")],
+	["unpublishTeamTransaction", () => unpublishTeamTransaction("tt1")],
+	["reopenTeamTransaction", () => reopenTeamTransaction("tt1")],
+	["deleteTeamTransaction", () => deleteTeamTransaction("tt1")],
 	// fundraisers
 	["completeFundraiser", () => completeFundraiser("f1")],
 	["publishFundraiser", () => publishFundraiser("f1")],

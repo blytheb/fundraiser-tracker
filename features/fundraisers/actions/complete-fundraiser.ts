@@ -85,6 +85,7 @@ export async function completeFundraiser(fundraiserId: string) {
 				allocationId: participant.allocations[0].id,
 				amount: participant.allocations[0].amount,
 				type: "DISTRIBUTION" as const,
+				direction: "INCOME" as const,
 				status: "INTERNAL" as const, //admin only until published
 				description: "Fundraiser distribution",
 			}));

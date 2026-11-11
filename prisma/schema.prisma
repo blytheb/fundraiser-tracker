@@ -111,6 +111,7 @@ model Player {
   fundraiserParticipants FundraiserParticipant[] // fundraisers this player has participated in
   transactions           PlayerTransaction[] //financial transactions belonging to this player
   teams                  TeamPlayer[] //teams this player belongs to
+  teamTransactionParticipants TeamTransactionParticipant[] //team transactions this player is participating in
 
   accessRequests PlayerAccessRequest[]
   parentLinks    ParentPlayerLink[]
@@ -133,6 +134,7 @@ model Team {
 
   fundraiserTeams FundraiserTeam[] // fundraisers that includes this team
   players         TeamPlayer[] //players currently assiciated with team (aka roster)
+  teamTransactionTeams TeamTransactionTeam[] //team transactions this team is participating in
 }
 
 // ------------------------------------------------------------
@@ -329,7 +331,9 @@ model FundraiserAllocation {
 model PlayerTransaction {
   id       String @id @default(cuid())
   playerId String
-
+  direction TransactionDirection
+  teamTransactionId String? //optional since not all transactions are associated with a team transaction
+  shareId String? //optional since not all transactions are associated with a team transaction share
   fundraiserId String? //optional since some transactions may not be associated with a fundraiser
   allocationId String? //optional because not every transaction comes from an allocation
 
@@ -342,13 +346,17 @@ model PlayerTransaction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  player     Player                @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  fundraiser Fundraiser?           @relation(fields: [fundraiserId], references: [id], onDelete: SetNull)
+  player     Player                @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  teamTransaction TeamTransaction?    @relation(fields: [teamTransactionId], references: [id], onDelete: Restrict)
+  share           TeamTransactionShare? @relation(fields: [shareId], references: [id], onDelete: SetNull)
+  fundraiser Fundraiser?          @relation(fields: [fundraiserId], references: [id], onDelete: SetNull)
   allocation FundraiserAllocation? @relation(fields: [allocationId], references: [id], onDelete: SetNull)
 
-  @@index([playerId])
+  @@index([playerId, status])
   @@index([fundraiserId])
   @@index([allocationId])
+  @@index([teamTransactionId])
+  @@index([shareId])
 }
 
 // ============================================================
@@ -404,9 +412,7 @@ enum PaymentMethod {
   OTHER
 }
 
-// ------------------------------------------------------------
-// PlayerTransactionType
-// ------------------------------------------------------------
+
 // EXPENSE:
 //   Money spent for/on behalf of a player.
 //
@@ -427,24 +433,11 @@ enum PlayerTransactionType {
   DISTRIBUTION
 }
 
-// ------------------------------------------------------------
-// TransactionStatus
-// ------------------------------------------------------------
-// INTERNAL:
-//   Visible to admins only. Distributions start here when a
-//   fundraiser is completed, and return here when it is unpublished.
-//
-// PUBLISHED:
-//   Visible to parents and counted in player balances.
-//
-// VOID:
-//   No longer valid but kept for history.
-//   Distributions are voided when a fundraiser is reopened.
 
 enum TransactionStatus {
-  INTERNAL
-  PUBLISHED
-  VOID
+  INTERNAL        //visible to admins only
+  PUBLISHED       //visible to parents and counted in player balances
+  VOID            //no longer valid but kept for history
 }
 
 model PlayerAccessRequest {
@@ -487,4 +480,99 @@ enum AccessRequestStatus {
   APPROVED
   REJECTED
   CANCELLED
+}
+
+// ------------------------------------------------------------
+// TEAM TRANSACTIONS
+// ------------------------------------------------------------
+
+enum TransactionDirection {
+  INCOME
+  EXPENSE
+}
+
+enum TeamTransactionStatus {
+  DRAFT
+  COMPLETED
+  PUBLISHED
+}
+
+model TeamTransaction {
+  id          String                @id @default(cuid())
+  name        String
+  description String?
+  date        DateTime
+  direction   TransactionDirection
+  status      TeamTransactionStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teams              TeamTransactionTeam[]
+  participants       TeamTransactionParticipant[]
+  items              TeamTransactionItem[]
+  playerTransactions PlayerTransaction[] // created on completion
+}
+
+model TeamTransactionTeam {
+  id                String   @id @default(cuid())
+  teamTransactionId String
+  teamId            String
+  createdAt         DateTime @default(now())
+
+  teamTransaction TeamTransaction @relation(fields: [teamTransactionId], references: [id], onDelete: Cascade)
+  team            Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamTransactionId, teamId]) // a team can only be added once
+  @@index([teamId])
+}
+
+model TeamTransactionParticipant {
+  id                String   @id @default(cuid())
+  teamTransactionId String
+  playerId          String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+
+  teamTransaction TeamTransaction        @relation(fields: [teamTransactionId], references: [id], onDelete: Cascade)
+  player          Player                 @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  shares          TeamTransactionShare[]
+
+  @@unique([teamTransactionId, playerId]) // a player can only be added once
+  @@index([playerId])
+}
+
+enum ShareStatus {
+  ACTIVE
+  VOID
+}
+
+model TeamTransactionShare {
+  id            String      @id @default(cuid())
+  participantId String
+  amount        Decimal     @db.Decimal(10, 2) // always positive; direction comes from the team transaction
+  status        ShareStatus @default(ACTIVE)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+
+  participant        TeamTransactionParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  playerTransactions PlayerTransaction[]        // ledger rows created from this share
+
+  @@index([participantId])
+}
+
+model TeamTransactionItem {
+  id                String        @id @default(cuid())
+  teamTransactionId String
+  name              String
+  amount            Decimal       @db.Decimal(10, 2) // always positive
+  date              DateTime      // when the money hit or left the bank
+  paymentMethod     PaymentMethod
+  description       String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  teamTransaction TeamTransaction @relation(fields: [teamTransactionId], references: [id], onDelete: Cascade)
+
+  @@index([teamTransactionId])
 }

@@ -23,6 +23,7 @@ export async function addPlayerExpense(data: PlayerTransactionData) {
 				allocationId: data.allocationId,
 				amount: data.amount,
 				type: "EXPENSE",
+				direction: "EXPENSE",
 				status: "PUBLISHED",
 				description: data.description,
 				date: new Date(data.date),

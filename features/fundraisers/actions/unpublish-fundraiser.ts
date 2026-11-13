@@ -11,7 +11,7 @@ export async function unpublishFundraiser(fundraiserId: string) {
 		await requireAdmin();
 
 		return prisma.$transaction(async (tx) => {
-			await claimStatus(tx, fundraiserId, { from: "PUBLISHED", to: "COMPLETED", action: "unpublished" });
+			await claimStatus(tx, fundraiserId, { from: "PUBLISHED", to: "COMPLETED", action: "hidden from parents" });
 
 			await tx.playerTransaction.updateMany({
 				where: {

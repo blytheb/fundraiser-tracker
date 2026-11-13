@@ -42,8 +42,8 @@ describe("assertDraft", () => {
 	});
 
 	it.each([
-		["COMPLETED", "completed"],
-		["PUBLISHED", "published"],
+		["COMPLETED", "final"],
+		["PUBLISHED", "shared with parents"],
 	] as const)("explains why a %s fundraiser can't be edited", async (status, phrase) => {
 		tx.fundraiser.updateMany.mockResolvedValue({ count: 0 });
 		tx.fundraiser.findUnique.mockResolvedValue({ status });
@@ -58,7 +58,7 @@ describe("assertDraft", () => {
 		tx.fundraiser.findUnique.mockResolvedValue({ status: "COMPLETED" });
 
 		await expect(assertDraft(asTx, "f1", "deleted")).rejects.toThrow(
-			"Only draft fundraisers can be deleted. This fundraiser is completed.",
+			"Only draft fundraisers can be deleted. This fundraiser is final.",
 		);
 	});
 });
@@ -119,7 +119,7 @@ describe("claimStatus", () => {
 				action: "published",
 			}),
 		).rejects.toThrow(
-			"Only completed fundraisers can be published. This fundraiser is a draft.",
+			"Only final fundraisers can be published. This fundraiser is a draft.",
 		);
 	});
 
@@ -134,7 +134,7 @@ describe("claimStatus", () => {
 				action: "reopened",
 			}),
 		).rejects.toThrow(
-			"Only completed or published fundraisers can be reopened. This fundraiser is a draft.",
+			"Only final or shared fundraisers can be reopened. This fundraiser is a draft.",
 		);
 	});
 });

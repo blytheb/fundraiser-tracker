@@ -35,8 +35,9 @@ export default function DeletePlayerDialog({
 		}
 
 		toast.success("Player deleted");
-		router.refresh();
 		handleOpenChange(false);
+		router.push("/admin/players");
+		router.refresh();
 	}
 
 	function handleOpenChange(nextOpen: boolean) {

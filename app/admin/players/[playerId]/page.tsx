@@ -8,6 +8,7 @@ import { getPlayerTeams } from "@/features/players/data/get-player-teams";
 import { summarizeTransactions } from "@/features/players/lib/summarize-transactions";
 import PlayerFinancialView from "@/features/players/PlayerFinancialView";
 import PlayerTransactionForm from "@/components/forms/players/PlayerTransactionForm";
+import PlayerHeaderActions from "@/features/players/PlayerHeaderActions";
 
 type PlayerPageProps = {
 	params: Promise<{
@@ -31,7 +32,8 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
 		<PlayerFinancialView
 			player={player}
 			teams={teams}
-			summary={summarizeTransactions(transactions)}>
+			summary={summarizeTransactions(transactions)}
+			actions={<PlayerHeaderActions player={player} />}>
 			<PlayerTransactionForm playerId={playerId} />
 		</PlayerFinancialView>
 	);

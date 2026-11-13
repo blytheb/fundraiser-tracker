@@ -55,22 +55,22 @@ export default function FundraiserActions({
 
 	function handleComplete() {
 		return runStatusChange(completeFundraiser, {
-			loading: "Completing fundraiser...",
-			success: "Fundraiser completed",
+			loading: "Finalizing fundraiser...",
+			success: "Finalized: counted in balances",
 		});
 	}
 
 	function handlePublish() {
 		return runStatusChange(publishFundraiser, {
-			loading: "Publishing fundraiser...",
-			success: "Fundraiser published",
+			loading: "Sharing with parents...",
+			success: "Shared with parents",
 		});
 	}
 
 	function handleReopen() {
 		return runStatusChange(reopenFundraiser, {
 			loading: "Reopening fundraiser...",
-			success: "Fundraiser reopened to draft",
+			success: "Reopened as a draft",
 		});
 	}
 
@@ -86,18 +86,18 @@ export default function FundraiserActions({
 					<DropdownMenuContent align="end">
 						{fundraiser.status === "DRAFT" ? (
 							<DropdownMenuItem onClick={handleComplete} disabled={isPending}>
-								Complete Fundraiser
+								Finalize
 							</DropdownMenuItem>
 						) : (
 							<>
 								{fundraiser.status === "COMPLETED" && (
 									<DropdownMenuItem onClick={handlePublish} disabled={isPending}>
-										Publish Fundraiser
+										Share with parents
 									</DropdownMenuItem>
 								)}
 
 								<DropdownMenuItem onClick={handleReopen} disabled={isPending}>
-									Reopen to Draft
+									Reopen as draft
 								</DropdownMenuItem>
 							</>
 						)}

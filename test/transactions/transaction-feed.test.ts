@@ -68,21 +68,36 @@ describe("getTransactionFeed", () => {
 		expect(rows.map((r) => [r.kind, r.name, r.amount, r.status])).toEqual([
 			["TEAM_EXPENSE", "Tournament fee", -1000, "DRAFT"],
 			["TEAM_INCOME", "Car wash", 840, "PUBLISHED"],
-			["INDIVIDUAL_EXPENSE", "Uniform", -45, "POSTED"],
-			["INDIVIDUAL_INCOME", "Deposit", 100, "POSTED"],
+			["INDIVIDUAL_EXPENSE", "Uniform", -45, "PUBLISHED"],
+			["INDIVIDUAL_INCOME", "Deposit", 100, "PUBLISHED"],
 		]);
 		expect(rows[0].who).toBe("U12 Boys, U12 Girls · 20 players");
 		expect(rows[3].who).toBe("John Smith");
 	});
 
-	it("links each row to its page", async () => {
+	it("links team rows to their page; individual rows open the edit dialog", async () => {
 		const { rows } = await getTransactionFeed();
 		expect(rows.map((r) => r.href)).toEqual([
 			"/admin/transactions/team/tt1",
 			"/admin/fundraisers/f1",
-			"/admin/players/p2",
-			"/admin/players/p1",
+			null,
+			null,
 		]);
+		expect(rows[2].individual).toEqual({
+			id: "pt2",
+			playerId: "p2",
+			direction: "EXPENSE",
+			amount: 45,
+			date: "2026-11-05",
+			description: "Uniform",
+		});
+	});
+
+	it("hides deleted team transactions", async () => {
+		await getTransactionFeed();
+		expect(prismaMock.teamTransaction.findMany).toHaveBeenCalledWith(
+			expect.objectContaining({ where: { status: { not: "VOIDED" } } }),
+		);
 	});
 
 	it("only loads individual rows that aren't part of a team transaction or fundraiser", async () => {

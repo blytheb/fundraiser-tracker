@@ -102,7 +102,7 @@ describe("updateFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 		expect(txMock.fundraiser.update).not.toHaveBeenCalled();
 	});
@@ -141,7 +141,7 @@ describe("deleteFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be deleted. This fundraiser is published.",
+				"Only draft fundraisers can be deleted. This fundraiser is shared with parents.",
 		});
 		expect(txMock.fundraiser.delete).not.toHaveBeenCalled();
 	});

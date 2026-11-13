@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 import type { Player } from "@prisma/client";
 import PlayerForm from "@/components/forms/players/PlayerForm";
@@ -56,13 +58,16 @@ function EditPlayerForm({
 	const router = useRouter();
 	const [firstName, setFirstName] = useState(player.firstName);
 	const [lastName, setLastName] = useState(player.lastName);
+	const [active, setActive] = useState(player.status);
 	const [error, setError] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
 
 	const trimmedFirst = firstName.trim();
 	const trimmedLast = lastName.trim();
 	const hasChanges =
-		trimmedFirst !== player.firstName || trimmedLast !== player.lastName;
+		trimmedFirst !== player.firstName ||
+		trimmedLast !== player.lastName ||
+		active !== player.status;
 
 	async function handleEdit() {
 		setError("");
@@ -71,7 +76,7 @@ function EditPlayerForm({
 		const result = await updatePlayer(player.id, {
 			firstName: trimmedFirst,
 			lastName: trimmedLast,
-			status: player.status,
+			status: active,
 			// undefined (not "") so a player without a photo keeps imageUrl = null
 			imageUrl: player.imageUrl ?? undefined,
 		});
@@ -96,6 +101,16 @@ function EditPlayerForm({
 				onFirstNameChange={setFirstName}
 				onLastNameChange={setLastName}
 			/>
+
+			<div className="flex items-start justify-between gap-4 rounded-lg border p-3">
+				<div>
+					<Label htmlFor="player-active">Active player</Label>
+					<p className="mt-1 text-xs text-muted-foreground">
+						Inactive players keep their history but are hidden from new transactions.
+					</p>
+				</div>
+				<Switch id="player-active" checked={active} onCheckedChange={setActive} />
+			</div>
 
 			{error && (
 				<p role="alert" className="text-sm text-destructive">

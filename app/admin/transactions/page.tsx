@@ -66,7 +66,7 @@ export default async function TransactionsPage({ searchParams }: PageProps) {
 				<span>Totals exclude drafts</span>
 			</div>
 
-			<TransactionFeed rows={rows} />
+			<TransactionFeed rows={rows} players={playerOptions} />
 		</main>
 	);
 }

@@ -163,7 +163,7 @@ export default function TeamTransactionForm({ teams, defaultDirection, initial }
 		if (totalCents <= 0) return setError("Enter a total greater than $0.");
 		if (included.length === 0) return setError("Choose at least one player.");
 		if (complete && !isBalanced) {
-			return setError("Player shares must add up to the total before completing.");
+			return setError("Player shares must add up to the total before finalizing.");
 		}
 
 		setSaving(complete ? "complete" : "draft");
@@ -190,7 +190,7 @@ export default function TeamTransactionForm({ teams, defaultDirection, initial }
 			return;
 		}
 
-		toast.success(complete ? "Team transaction completed" : "Draft saved");
+		toast.success(complete ? "Finalized: counted in balances" : "Draft saved");
 		router.push(`/admin/transactions/team/${result.data.id}`);
 		router.refresh();
 	}
@@ -427,7 +427,7 @@ export default function TeamTransactionForm({ teams, defaultDirection, initial }
 							{saving === "draft" ? "Saving..." : "Save draft"}
 						</Button>
 						<Button type="submit" disabled={saving !== null || !isBalanced}>
-							{saving === "complete" ? "Completing..." : "Save & complete"}
+							{saving === "complete" ? "Finalizing..." : "Save & finalize"}
 						</Button>
 					</div>
 				</div>

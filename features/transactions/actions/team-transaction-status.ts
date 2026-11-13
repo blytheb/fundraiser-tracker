@@ -18,7 +18,7 @@ export async function completeTeamTransaction(id: string) {
 			await claimTeamStatus(tx, id, {
 				from: "DRAFT",
 				to: "COMPLETED",
-				action: "completed",
+				action: "finalized",
 			});
 			await writeTeamLedgerRows(tx, id); // throwing here rolls back to DRAFT
 			return { id };
@@ -35,7 +35,7 @@ export async function publishTeamTransaction(id: string) {
 			await claimTeamStatus(tx, id, {
 				from: "COMPLETED",
 				to: "PUBLISHED",
-				action: "published",
+				action: "shared",
 			});
 			await tx.playerTransaction.updateMany({
 				where: { teamTransactionId: id, status: "INTERNAL" },
@@ -55,7 +55,7 @@ export async function unpublishTeamTransaction(id: string) {
 			await claimTeamStatus(tx, id, {
 				from: "PUBLISHED",
 				to: "COMPLETED",
-				action: "unpublished",
+				action: "hidden from parents",
 			});
 			await tx.playerTransaction.updateMany({
 				where: { teamTransactionId: id, status: "PUBLISHED" },
@@ -86,25 +86,43 @@ export async function reopenTeamTransaction(id: string) {
 	});
 }
 
-// Deletes a draft that has never been completed. One with voided history is kept.
+// Delete. A draft that never counted is removed for real. Anything that has
+// counted (now or before) is marked VOIDED and its ledger rows voided: it
+// disappears from lists and balances but stays in the database for history.
 export async function deleteTeamTransaction(id: string) {
 	return runAction(async () => {
 		await requireAdmin();
 
 		return prisma.$transaction(async (tx) => {
-			await assertTeamDraft(tx, id, "deleted");
-
-			const history = await tx.playerTransaction.count({
-				where: { teamTransactionId: id },
+			const current = await tx.teamTransaction.findUnique({
+				where: { id },
+				select: { status: true, _count: { select: { playerTransactions: true } } },
 			});
-			if (history > 0) {
-				throw new Error(
-					"This team transaction was completed before, so its history is kept. Edit it instead of deleting it.",
-				);
+
+			if (!current) {
+				throw new Error("Team transaction not found");
 			}
 
-			await tx.teamTransaction.delete({ where: { id } });
-			return { id };
+			if (current.status === "VOIDED") {
+				throw new Error("This team transaction was already deleted.");
+			}
+
+			if (current.status === "DRAFT" && current._count.playerTransactions === 0) {
+				await assertTeamDraft(tx, id, "deleted"); // locks it; fails if it changed meanwhile
+				await tx.teamTransaction.delete({ where: { id } });
+				return { id, removed: true };
+			}
+
+			await claimTeamStatus(tx, id, {
+				from: ["DRAFT", "COMPLETED", "PUBLISHED"],
+				to: "VOIDED",
+				action: "deleted",
+			});
+			await tx.playerTransaction.updateMany({
+				where: { teamTransactionId: id, status: { in: ["INTERNAL", "PUBLISHED"] } },
+				data: { status: "VOID" },
+			});
+			return { id, removed: false };
 		});
 	});
 }

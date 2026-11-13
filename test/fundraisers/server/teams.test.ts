@@ -71,7 +71,7 @@ describe("addTeamToFundraiser", () => {
 		expect(await addTeamToFundraiser("fundraiser-1", "team-1")).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 		expect(teamTx.fundraiserTeam.create).not.toHaveBeenCalled();
 	});
@@ -100,7 +100,7 @@ describe("removeTeamFromFundraiser", () => {
 		expect(await removeTeamFromFundraiser("fundraiser-1", "team-1")).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is published.",
+				"Only draft fundraisers can be edited. This fundraiser is shared with parents.",
 		});
 		expect(teamTx.fundraiserTeam.delete).not.toHaveBeenCalled();
 	});
@@ -270,7 +270,7 @@ describe("saveFundraiserTeams", () => {
 		expect(await saveFundraiserTeams("fundraiser-1", ["team-1"])).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 
 		expect(txMock.fundraiserTeam.deleteMany).not.toHaveBeenCalled();

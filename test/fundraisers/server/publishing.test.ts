@@ -119,7 +119,7 @@ describe("completeFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be completed. This fundraiser is completed.",
+				"Only draft fundraisers can be finalized. This fundraiser is final.",
 		});
 		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
 	});
@@ -200,7 +200,7 @@ describe("completeFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Each participant must have exactly one allocation before completing",
+				"Each participant must have exactly one allocation before finalizing",
 		});
 		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
 	});
@@ -218,7 +218,7 @@ describe("completeFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"All funds must be allocated before completing. Allocated 75.00 of 100.00",
+				"All funds must be allocated before finalizing. Allocated 75.00 of 100.00",
 		});
 		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
 	});
@@ -236,7 +236,7 @@ describe("completeFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"All funds must be allocated before completing. Allocated 120.00 of 100.00",
+				"All funds must be allocated before finalizing. Allocated 120.00 of 100.00",
 		});
 		expect(txMock.playerTransaction.createMany).not.toHaveBeenCalled();
 	});
@@ -398,7 +398,7 @@ describe("publishFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only completed fundraisers can be published. This fundraiser is published.",
+				"Only final fundraisers can be shared. This fundraiser is shared with parents.",
 		});
 		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});
@@ -415,7 +415,7 @@ describe("publishFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only completed fundraisers can be published. This fundraiser is a draft.",
+				"Only final fundraisers can be shared. This fundraiser is a draft.",
 		});
 	});
 
@@ -486,7 +486,7 @@ describe("unpublishFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only published fundraisers can be unpublished. This fundraiser is completed.",
+				"Only shared fundraisers can be hidden from parents. This fundraiser is final.",
 		});
 		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});
@@ -562,7 +562,7 @@ describe("reopenFundraiser", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only completed or published fundraisers can be reopened. This fundraiser is a draft.",
+				"Only final or shared fundraisers can be reopened. This fundraiser is a draft.",
 		});
 		expect(txMock.playerTransaction.updateMany).not.toHaveBeenCalled();
 	});

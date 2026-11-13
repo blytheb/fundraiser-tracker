@@ -127,7 +127,7 @@ export async function saveTeamTransaction(input: TeamTransactionInput) {
 				await claimTeamStatus(tx, id, {
 					from: "DRAFT",
 					to: "COMPLETED",
-					action: "completed",
+					action: "finalized",
 				});
 				await writeTeamLedgerRows(tx, id);
 			}

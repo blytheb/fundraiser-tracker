@@ -22,6 +22,8 @@ type PlayerFinancialViewProps = {
 	};
 	teams: { id: string; name: string }[];
 	summary: PlayerFinancialSummary;
+	// buttons in the header, e.g. Edit / Delete on the admin page
+	actions?: ReactNode;
 	// extra content between the balance and the history, e.g. the admin transaction form
 	children?: ReactNode;
 };
@@ -32,6 +34,7 @@ export default function PlayerFinancialView({
 	player,
 	teams,
 	summary,
+	actions,
 	children,
 }: PlayerFinancialViewProps) {
 	const fullName = `${player.firstName} ${player.lastName}`;
@@ -72,14 +75,17 @@ export default function PlayerFinancialView({
 					</div>
 				</div>
 
-				<span
-					className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${
-						player.status
-							? "bg-green-100 text-green-800"
-							: "bg-muted text-muted-foreground"
-					}`}>
-					{player.status ? "Active Player" : "Inactive Player"}
-				</span>
+				<div className="flex flex-wrap items-center gap-2 sm:justify-end">
+					<span
+						className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${
+							player.status
+								? "bg-green-100 text-green-800"
+								: "bg-muted text-muted-foreground"
+						}`}>
+						{player.status ? "Active Player" : "Inactive Player"}
+					</span>
+					{actions}
+				</div>
 			</section>
 
 			{/* Financial overview */}

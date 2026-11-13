@@ -492,9 +492,10 @@ enum TransactionDirection {
 }
 
 enum TeamTransactionStatus {
-  DRAFT
-  COMPLETED
-  PUBLISHED
+  DRAFT     // editable, not counted (UI: "Draft")
+  COMPLETED // counted, hidden from parents (UI: "Final")
+  PUBLISHED // counted, parents can see it (UI: "Shared")
+  VOIDED    // deleted after it had counted; kept for history (UI: "Deleted")
 }
 
 model TeamTransaction {

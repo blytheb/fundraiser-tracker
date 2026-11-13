@@ -14,7 +14,7 @@ export async function completeFundraiser(fundraiserId: string) {
 
 		return prisma.$transaction(async (tx) => {
 			//claim status change first. This locks the row so double click or retry cant create a second distribution
-			await claimStatus(tx, fundraiserId, { from: "DRAFT", to: "COMPLETED", action: "completed" });
+			await claimStatus(tx, fundraiserId, { from: "DRAFT", to: "COMPLETED", action: "finalized" });
 
 			//any error thrown below rolls the status back to DRAFT automatically
 			const participantsWithoutAllocation =
@@ -58,7 +58,7 @@ export async function completeFundraiser(fundraiserId: string) {
 
 			if (fundraiser.participants.some((p) => p.allocations.length !== 1)) {
 				throw new Error(
-					"Each participant must have exactly one allocation before completing",
+					"Each participant must have exactly one allocation before finalizing",
 				);
 			}
 
@@ -75,7 +75,7 @@ export async function completeFundraiser(fundraiserId: string) {
 
 			if (!allocated.equals(totalRaised)) {
 				throw new Error(
-					`All funds must be allocated before completing. Allocated ${allocated.toFixed(2)} of ${totalRaised.toFixed(2)}`,
+					`All funds must be allocated before finalizing. Allocated ${allocated.toFixed(2)} of ${totalRaised.toFixed(2)}`,
 				);
 			}
 

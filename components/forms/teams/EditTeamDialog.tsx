@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 import type { Team } from "@prisma/client";
 
@@ -47,11 +49,13 @@ export default function EditTeamDialog({
 function EditTeamForm({ team, onDone }: { team: Team; onDone: () => void }) {
 	const router = useRouter();
 	const [name, setName] = useState(team.name);
+	const [inSeason, setInSeason] = useState(team.status === "IN_SEASON");
 	const [error, setError] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
 
 	const trimmedName = name.trim();
-	const hasChanges = trimmedName !== team.name;
+	const status = inSeason ? "IN_SEASON" : "SEASON_ENDED";
+	const hasChanges = trimmedName !== team.name || status !== team.status;
 
 	async function handleEdit() {
 		setError("");
@@ -59,7 +63,7 @@ function EditTeamForm({ team, onDone }: { team: Team; onDone: () => void }) {
 
 		const result = await updateTeam(team.id, {
 			name: trimmedName,
-			status: team.status,
+			status,
 			imageUrl: team.imageUrl,
 		});
 
@@ -78,6 +82,17 @@ function EditTeamForm({ team, onDone }: { team: Team; onDone: () => void }) {
 	return (
 		<>
 			<TeamForm name={name} onNameChange={setName} />
+
+			<div className="flex items-start justify-between gap-4 rounded-lg border p-3">
+				<div>
+					<Label htmlFor="team-in-season">In season</Label>
+					<p className="mt-1 text-xs text-muted-foreground">
+						Teams whose season ended keep their history but aren&apos;t offered for new
+						team transactions.
+					</p>
+				</div>
+				<Switch id="team-in-season" checked={inSeason} onCheckedChange={setInSeason} />
+			</div>
 
 			{error && (
 				<p role="alert" className="text-sm text-destructive">

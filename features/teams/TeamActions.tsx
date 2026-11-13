@@ -1,71 +1,41 @@
 "use client";
 
 import { useState } from "react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Pencil, Trash2 } from "lucide-react";
+import type { Team } from "@prisma/client";
 
-import { MoreVertical } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
 import EditTeamDialog from "@/components/forms/teams/EditTeamDialog";
 import DeleteTeamDialog from "@/components/dialogs/DeleteTeamDialog";
-
-import type { Team } from "@prisma/client";
 
 type TeamActionsProps = {
 	team: Team;
 };
 
+// Visible Edit / Delete buttons for the team page (replaces the hidden ⋮ menu).
 export default function TeamActions({ team }: TeamActionsProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
 	return (
 		<>
-			<DropdownMenu>
-				<DropdownMenuTrigger>
-					<MoreVertical />
-				</DropdownMenuTrigger>
-
-				<DropdownMenuContent align="end">
-					<DropdownMenuItem
-						onClick={(e) => {
-							e.preventDefault();
-							console.log("Edit Clicked");
-							setEditOpen(true);
-						}}>
-						Edit Team
-					</DropdownMenuItem>
-					{/* <DropdownMenuItem
-						onClick={(e) => {
-							e.preventDefault();
-							console.log("Edit Clicked");
-							setEditOpen(true);
-						}}>
-						Change Status
-					</DropdownMenuItem> */}
-					<DropdownMenuItem
-						onClick={(e) => {
-							e.preventDefault();
-							console.log("delete clicked");
-							setDeleteOpen(true);
-						}}
-						className="text-destructive">
-						Delete Team
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
+			<div className="flex items-center gap-1">
+				<Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+					<Pencil />
+					Edit
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					className="text-destructive"
+					onClick={() => setDeleteOpen(true)}>
+					<Trash2 />
+					<span className="sr-only sm:not-sr-only">Delete</span>
+				</Button>
+			</div>
 
 			<EditTeamDialog team={team} open={editOpen} onOpenChange={setEditOpen} />
-
-			<DeleteTeamDialog
-				team={team}
-				open={deleteOpen}
-				onOpenChange={setDeleteOpen}
-			/>
+			<DeleteTeamDialog team={team} open={deleteOpen} onOpenChange={setDeleteOpen} />
 		</>
 	);
 }

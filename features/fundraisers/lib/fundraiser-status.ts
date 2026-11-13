@@ -9,14 +9,14 @@ type Tx = Prisma.TransactionClient;
 // "This fundraiser is a draft." / "...is completed." / "...is published."
 const STATUS_PHRASES: Record<FundraiserStatus, string> = {
 	DRAFT: "a draft",
-	COMPLETED: "completed",
-	PUBLISHED: "published",
+	COMPLETED: "final",
+	PUBLISHED: "shared with parents",
 };
 
 const STATUS_ADJECTIVES: Record<FundraiserStatus, string> = {
 	DRAFT: "draft",
-	COMPLETED: "completed",
-	PUBLISHED: "published",
+	COMPLETED: "final",
+	PUBLISHED: "shared",
 };
 
 // Called after a conditional update matched nothing: work out why and throw.
@@ -35,7 +35,10 @@ async function throwStatusError(
 		throw new Error("Fundraiser not found");
 	}
 
-	const allowedList = allowed.map((s) => STATUS_ADJECTIVES[s]).join(" or ");
+	const words = allowed.map((s) => STATUS_ADJECTIVES[s]);
+	// "final", "final or shared", "draft, final or shared"
+	const allowedList =
+		words.length > 1 ? `${words.slice(0, -1).join(", ")} or ${words.at(-1)}` : words[0];
 	throw new Error(
 		`Only ${allowedList} fundraisers can be ${action}. This fundraiser is ${STATUS_PHRASES[fundraiser.status]}.`,
 	);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import type { TeamTransactionStatus } from "@prisma/client";
 
 import FundraiserStatusBadge from "@/components/reusable/FundraiserStatusBadge";
 import TransactionKindIcon from "@/components/reusable/TransactionKindIcon";
@@ -13,11 +14,12 @@ type PageProps = {
 	params: Promise<{ id: string }>;
 };
 
-const STATUS_HELP = {
-	DRAFT: "Not counted yet. Complete it when the split is final.",
-	COMPLETED: "Counted in balances and reports. Parents can't see it until it's published.",
-	PUBLISHED: "Visible to parents on each player's page.",
-} as const;
+const STATUS_HELP: Record<TeamTransactionStatus, string> = {
+	DRAFT: "Draft: not counted yet. Finalize it when the split is right.",
+	COMPLETED: "Final: counted in balances and reports. Parents can't see it until you share it.",
+	PUBLISHED: "Shared: counted, and parents can see each player's share.",
+	VOIDED: "Deleted: removed from balances and the transactions list. Kept here for history.",
+};
 
 export default async function TeamTransactionPage({ params }: PageProps) {
 	const { id } = await params;
@@ -60,7 +62,12 @@ export default async function TeamTransactionPage({ params }: PageProps) {
 					</div>
 				</div>
 
-				<p className="rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+				<p
+					className={`rounded-lg px-3 py-2 text-sm ${
+						t.status === "VOIDED"
+							? "bg-destructive/10 text-destructive"
+							: "bg-muted/50 text-muted-foreground"
+					}`}>
 					{STATUS_HELP[t.status]}
 				</p>
 

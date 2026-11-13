@@ -25,37 +25,50 @@ import {
 } from "@/components/ui/select";
 import DirectionToggle from "@/components/forms/transactions/DirectionToggle";
 import { createIndividualTransaction } from "@/features/transactions/actions/create-individual-transaction";
+import {
+	deleteIndividualTransaction,
+	updateIndividualTransaction,
+} from "@/features/transactions/actions/individual-transactions";
 import { todayInputValue } from "@/features/transactions/lib/dates";
+import type { IndividualEditData } from "@/features/transactions/data/get-transaction-feed";
 
 type PlayerOption = { id: string; name: string };
 
 type Props = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	initialDirection: TransactionDirection;
 	players: PlayerOption[];
+	initialDirection?: TransactionDirection; // new transaction
+	transaction?: IndividualEditData; // editing an existing one
 };
 
 export default function IndividualTransactionDialog({
 	open,
 	onOpenChange,
-	initialDirection,
 	players,
+	initialDirection = "INCOME",
+	transaction,
 }: Props) {
+	const isEdit = Boolean(transaction);
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>New individual transaction</DialogTitle>
+					<DialogTitle>
+						{isEdit ? "Edit individual transaction" : "New individual transaction"}
+					</DialogTitle>
 					<DialogDescription>
-						Money in or out for one player. It&apos;s posted to their balance right away.
+						Money in or out for one player. Parents see it on the player&apos;s page right away.
 					</DialogDescription>
 				</DialogHeader>
 
-				{/* mounted only while open, so every opening starts with a fresh form */}
+				{/* mounted only while open, so every opening starts from the saved values */}
 				{open && (
 					<IndividualTransactionForm
-						initialDirection={initialDirection}
+						key={transaction?.id ?? "new"}
+						initialDirection={transaction?.direction ?? initialDirection}
+						transaction={transaction}
 						players={players}
 						onDone={() => onOpenChange(false)}
 					/>
@@ -67,23 +80,31 @@ export default function IndividualTransactionDialog({
 
 function IndividualTransactionForm({
 	initialDirection,
+	transaction,
 	players,
 	onDone,
 }: {
 	initialDirection: TransactionDirection;
+	transaction?: IndividualEditData;
 	players: PlayerOption[];
 	onDone: () => void;
 }) {
 	const router = useRouter();
 	const [direction, setDirection] = useState(initialDirection);
-	const [playerId, setPlayerId] = useState("");
-	const [amount, setAmount] = useState("");
-	const [date, setDate] = useState(todayInputValue);
-	const [description, setDescription] = useState("");
+	const [playerId, setPlayerId] = useState(transaction?.playerId ?? "");
+	const [amount, setAmount] = useState(transaction ? transaction.amount.toFixed(2) : "");
+	const [date, setDate] = useState(transaction?.date ?? todayInputValue());
+	const [description, setDescription] = useState(transaction?.description ?? "");
 	const [error, setError] = useState("");
-	const [isSaving, setIsSaving] = useState(false);
+	const [busy, setBusy] = useState<"save" | "delete" | null>(null);
+	const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-	const playerItems = Object.fromEntries(players.map((p) => [p.id, p.name]));
+	// an inactive player on an existing transaction still needs to appear in the list
+	const options =
+		transaction && !players.some((p) => p.id === transaction.playerId)
+			? [...players, { id: transaction.playerId, name: "Inactive player" }]
+			: players;
+	const playerItems = Object.fromEntries(options.map((p) => [p.id, p.name]));
 
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -94,15 +115,13 @@ function IndividualTransactionForm({
 			return;
 		}
 
-		setIsSaving(true);
-		const result = await createIndividualTransaction({
-			playerId,
-			direction,
-			amount: Number(amount),
-			date,
-			description,
-		});
-		setIsSaving(false);
+		const input = { playerId, direction, amount: Number(amount), date, description };
+
+		setBusy("save");
+		const result = transaction
+			? await updateIndividualTransaction(transaction.id, input)
+			: await createIndividualTransaction(input);
+		setBusy(null);
 
 		if (!result.ok) {
 			setError(result.error);
@@ -110,8 +129,29 @@ function IndividualTransactionForm({
 		}
 
 		toast.success(
-			direction === "INCOME" ? "Income recorded" : "Expense recorded",
+			transaction
+				? "Transaction updated"
+				: direction === "INCOME"
+					? "Income recorded"
+					: "Expense recorded",
 		);
+		router.refresh();
+		onDone();
+	}
+
+	async function handleDelete() {
+		if (!transaction) return;
+		setError("");
+		setBusy("delete");
+		const result = await deleteIndividualTransaction(transaction.id);
+		setBusy(null);
+
+		if (!result.ok) {
+			setError(result.error);
+			return;
+		}
+
+		toast.success("Transaction deleted");
 		router.refresh();
 		onDone();
 	}
@@ -130,7 +170,7 @@ function IndividualTransactionForm({
 						<SelectValue placeholder="Choose a player" />
 					</SelectTrigger>
 					<SelectContent>
-						{players.map((player) => (
+						{options.map((player) => (
 							<SelectItem key={player.id} value={player.id}>
 								{player.name}
 							</SelectItem>
@@ -183,15 +223,54 @@ function IndividualTransactionForm({
 				</p>
 			)}
 
-			<DialogFooter>
-				<Button type="submit" disabled={isSaving} className="w-full sm:w-auto">
-					{isSaving
-						? "Saving..."
-						: direction === "INCOME"
-							? "Record income"
-							: "Record expense"}
-				</Button>
-			</DialogFooter>
+			{confirmingDelete ? (
+				<div className="space-y-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+					<p className="text-sm">
+						Delete this transaction? It&apos;s removed from the list and the player&apos;s
+						balance. A record is kept for history.
+					</p>
+					<div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setConfirmingDelete(false)}
+							disabled={busy !== null}>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							variant="destructive"
+							onClick={handleDelete}
+							disabled={busy !== null}>
+							{busy === "delete" ? "Deleting..." : "Delete"}
+						</Button>
+					</div>
+				</div>
+			) : (
+				<DialogFooter className="gap-2 sm:justify-between">
+					{transaction ? (
+						<Button
+							type="button"
+							variant="ghost"
+							className="text-destructive"
+							onClick={() => setConfirmingDelete(true)}
+							disabled={busy !== null}>
+							Delete
+						</Button>
+					) : (
+						<span className="hidden sm:block" />
+					)}
+					<Button type="submit" disabled={busy !== null} className="w-full sm:w-auto">
+						{busy === "save"
+							? "Saving..."
+							: transaction
+								? "Save changes"
+								: direction === "INCOME"
+									? "Record income"
+									: "Record expense"}
+					</Button>
+				</DialogFooter>
+			)}
 		</form>
 	);
 }

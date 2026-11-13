@@ -187,7 +187,7 @@ describe("saveFundraiserParticipants", () => {
 		expect(await saveFundraiserParticipants("fundraiser-1", ["player-1"])).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 
 		expect(txMock.fundraiserParticipant.deleteMany).not.toHaveBeenCalled();

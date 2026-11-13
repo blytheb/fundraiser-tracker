@@ -116,7 +116,7 @@ describe("setCustomDistribution", () => {
 		expect(result).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 		expect(
 			transactionMock.fundraiserAllocation.findMany,

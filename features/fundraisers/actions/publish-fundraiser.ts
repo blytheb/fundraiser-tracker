@@ -12,7 +12,7 @@ export async function publishFundraiser(fundraiserId: string) {
 		await requireAdmin();
 
 		return prisma.$transaction(async (tx) => {
-			await claimStatus(tx, fundraiserId, { from: "COMPLETED", to: "PUBLISHED", action: "published" });
+			await claimStatus(tx, fundraiserId, { from: "COMPLETED", to: "PUBLISHED", action: "shared" });
 
 			//any error throw below rolls the status back to completed
 			const participantCount = await tx.fundraiserParticipant.count({

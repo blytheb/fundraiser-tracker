@@ -68,7 +68,7 @@ describe("addContribution", () => {
 			})).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 
 		expect(prismaMock.fundraiserContribution.create).not.toHaveBeenCalled();
@@ -135,7 +135,7 @@ describe("updateContribution", () => {
 			})).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 
 		expect(prismaMock.fundraiserContribution.update).not.toHaveBeenCalled();
@@ -214,7 +214,7 @@ describe("deleteContribution", () => {
 		expect(await deleteContribution("contribution-1")).toEqual({
 			ok: false,
 			error:
-				"Only draft fundraisers can be edited. This fundraiser is completed.",
+				"Only draft fundraisers can be edited. This fundraiser is final.",
 		});
 
 		expect(prismaMock.fundraiserContribution.delete).not.toHaveBeenCalled();

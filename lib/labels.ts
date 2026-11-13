@@ -10,10 +10,11 @@ import type {
 	TransactionDirection,
 } from "@prisma/client";
 
+// Draft = not counted · Final = counted, hidden from parents · Shared = parents can see it
 export const FUNDRAISER_STATUS_LABELS = {
 	DRAFT: "Draft",
-	COMPLETED: "Completed",
-	PUBLISHED: "Published",
+	COMPLETED: "Final",
+	PUBLISHED: "Shared",
 } as const satisfies Record<FundraiserStatus, string>;
 
 export const CONTRIBUTION_SOURCE_LABELS = {
@@ -37,8 +38,9 @@ export const TEAM_STATUS_LABELS = {
 
 export const TEAM_TRANSACTION_STATUS_LABELS = {
 	DRAFT: "Draft",
-	COMPLETED: "Completed",
-	PUBLISHED: "Published",
+	COMPLETED: "Final",
+	PUBLISHED: "Shared",
+	VOIDED: "Deleted",
 } as const satisfies Record<TeamTransactionStatus, string>;
 
 export const DIRECTION_LABELS = {

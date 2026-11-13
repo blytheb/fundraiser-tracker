@@ -61,7 +61,7 @@ describe("assertTeamDraft / claimTeamStatus", () => {
 		tx.teamTransaction.updateMany.mockResolvedValue({ count: 0 });
 		tx.teamTransaction.findUnique.mockResolvedValue({ status: "COMPLETED" });
 		await expect(assertTeamDraft(asTx, "tt1")).rejects.toThrow(
-			"Only draft team transactions can be edited. This one is completed.",
+			"Only draft team transactions can be edited. This one is final.",
 		);
 	});
 
@@ -83,7 +83,7 @@ describe("assertTeamDraft / claimTeamStatus", () => {
 				action: "reopened",
 			}),
 		).rejects.toThrow(
-			"Only completed or published team transactions can be reopened. This one is a draft.",
+			"Only final or shared team transactions can be reopened. This one is a draft.",
 		);
 	});
 });
@@ -179,6 +179,6 @@ describe("writeTeamLedgerRows", () => {
 			items: [],
 			participants: [{ playerId: "p1", shares: [{ id: "s1", amount: dec("0") }] }],
 		});
-		await expect(writeTeamLedgerRows(asTx, "tt1")).rejects.toThrow("Add an amount before completing.");
+		await expect(writeTeamLedgerRows(asTx, "tt1")).rejects.toThrow("Add an amount before finalizing.");
 	});
 });

@@ -20,6 +20,10 @@ import { prismaMock } from "../helpers/prisma-mock";
 import { createIndividualTransaction } from "@/features/transactions/actions/create-individual-transaction";
 import { saveTeamTransaction } from "@/features/transactions/actions/save-team-transaction";
 import {
+	updateIndividualTransaction,
+	deleteIndividualTransaction,
+} from "@/features/transactions/actions/individual-transactions";
+import {
 	completeTeamTransaction,
 	publishTeamTransaction,
 	unpublishTeamTransaction,
@@ -106,6 +110,17 @@ const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
 				complete: false,
 			}),
 	],
+	[
+		"updateIndividualTransaction",
+		() =>
+			updateIndividualTransaction("pt1", {
+				playerId: "p1",
+				direction: "EXPENSE",
+				amount: 5,
+				date: "2026-01-01",
+			}),
+	],
+	["deleteIndividualTransaction", () => deleteIndividualTransaction("pt1")],
 	["completeTeamTransaction", () => completeTeamTransaction("tt1")],
 	["publishTeamTransaction", () => publishTeamTransaction("tt1")],
 	["unpublishTeamTransaction", () => unpublishTeamTransaction("tt1")],

@@ -9,14 +9,16 @@ type Tx = Prisma.TransactionClient;
 
 const STATUS_PHRASES: Record<TeamTransactionStatus, string> = {
 	DRAFT: "a draft",
-	COMPLETED: "completed",
-	PUBLISHED: "published",
+	COMPLETED: "final",
+	PUBLISHED: "shared with parents",
+	VOIDED: "deleted",
 };
 
 const STATUS_ADJECTIVES: Record<TeamTransactionStatus, string> = {
 	DRAFT: "draft",
-	COMPLETED: "completed",
-	PUBLISHED: "published",
+	COMPLETED: "final",
+	PUBLISHED: "shared",
+	VOIDED: "deleted",
 };
 
 async function throwStatusError(
@@ -34,7 +36,10 @@ async function throwStatusError(
 		throw new Error("Team transaction not found");
 	}
 
-	const allowedList = allowed.map((s) => STATUS_ADJECTIVES[s]).join(" or ");
+	const words = allowed.map((s) => STATUS_ADJECTIVES[s]);
+	// "final", "final or shared", "draft, final or shared"
+	const allowedList =
+		words.length > 1 ? `${words.slice(0, -1).join(", ")} or ${words.at(-1)}` : words[0];
 	throw new Error(
 		`Only ${allowedList} team transactions can be ${action}. This one is ${STATUS_PHRASES[current.status]}.`,
 	);
@@ -127,7 +132,7 @@ export async function writeTeamLedgerRows(tx: Tx, id: string) {
 	}
 
 	if (teamTransaction.participants.some((p) => p.shares.length !== 1)) {
-		throw new Error("Each player must have exactly one share before completing.");
+		throw new Error("Each player must have exactly one share before finalizing.");
 	}
 
 	const zero = new Prisma.Decimal(0);
@@ -138,7 +143,7 @@ export async function writeTeamLedgerRows(tx: Tx, id: string) {
 	);
 
 	if (total.isZero()) {
-		throw new Error("Add an amount before completing.");
+		throw new Error("Add an amount before finalizing.");
 	}
 
 	if (!shared.equals(total)) {

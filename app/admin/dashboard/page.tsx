@@ -111,8 +111,8 @@ export default async function AdminPage() {
 						</p>
 						<div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
 							<span>{summary.draftFundraiserCount} draft</span>
-							<span>{summary.completedFundraiserCount} completed</span>
-							<span>{summary.publishedFundraiserCount} published</span>
+							<span>{summary.completedFundraiserCount} final</span>
+							<span>{summary.publishedFundraiserCount} shared</span>
 						</div>
 					</div>
 
@@ -168,12 +168,12 @@ export default async function AdminPage() {
 
 						<div className="w-full sm:max-w-48">
 							<div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
-								<span>Published</span>
+								<span>Shared with parents</span>
 								<span>{publishedPercentage}%</span>
 							</div>
 							<div
 								role="progressbar"
-								aria-label="Published fundraisers"
+								aria-label="Fundraisers shared with parents"
 								aria-valuemin={0}
 								aria-valuemax={100}
 								aria-valuenow={publishedPercentage}

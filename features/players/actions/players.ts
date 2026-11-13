@@ -42,6 +42,15 @@ export async function updatePlayer(
 export async function deletePlayer(id: string) {
 	return runAction(async () => {
 		await requireAdmin();
+
+		const transactionCount = await prisma.playerTransaction.count({
+			where: { playerId: id },
+		});
+		if (transactionCount > 0) {
+			throw new Error(
+				"This player has transactions, so they can't be deleted. Edit the player and turn off \"Active player\" instead.",
+			);
+		}
 		return prisma.player.delete({
 			where: {
 				id,

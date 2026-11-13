@@ -42,8 +42,9 @@ export default function DeleteTeamDialog({
 		}
 
 		toast.success("Team deleted");
-		router.refresh();
 		handleOpenChange(false);
+		router.push("/admin/teams");
+		router.refresh();
 	}
 	return (
 		<ConfirmDeleteDialog

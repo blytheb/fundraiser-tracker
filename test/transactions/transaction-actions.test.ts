@@ -15,7 +15,14 @@ const { prismaMock, txMock } = vi.hoisted(() => {
 		teamTransactionTeam: { createMany: vi.fn(), deleteMany: vi.fn() },
 		teamTransactionParticipant: { createMany: vi.fn(), deleteMany: vi.fn(), findMany: vi.fn() },
 		teamTransactionShare: { createMany: vi.fn() },
-		playerTransaction: { createMany: vi.fn(), updateMany: vi.fn(), count: vi.fn() },
+		playerTransaction: {
+			createMany: vi.fn(),
+			updateMany: vi.fn(),
+			count: vi.fn(),
+			findFirst: vi.fn(),
+			update: vi.fn(),
+		},
+		player: { findUnique: vi.fn() },
 	};
 	return {
 		txMock,
@@ -31,6 +38,10 @@ vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 
 import { createIndividualTransaction } from "@/features/transactions/actions/create-individual-transaction";
 import { saveTeamTransaction, type TeamTransactionInput } from "@/features/transactions/actions/save-team-transaction";
+import {
+	deleteIndividualTransaction,
+	updateIndividualTransaction,
+} from "@/features/transactions/actions/individual-transactions";
 import {
 	deleteTeamTransaction,
 	publishTeamTransaction,
@@ -174,7 +185,7 @@ describe("saveTeamTransaction", () => {
 
 		expect(await saveTeamTransaction({ ...input, id: "tt1" })).toEqual({
 			ok: false,
-			error: "Only draft team transactions can be edited. This one is published.",
+			error: "Only draft team transactions can be edited. This one is shared with parents.",
 		});
 	});
 
@@ -245,16 +256,119 @@ describe("team transaction status actions", () => {
 		});
 	});
 
-	it("deletes a draft with no history", async () => {
-		txMock.playerTransaction.count.mockResolvedValue(0);
-		expect(await deleteTeamTransaction("tt1")).toEqual({ ok: true, data: { id: "tt1" } });
+	it("removes a draft that never counted", async () => {
+		txMock.teamTransaction.findUnique.mockResolvedValue({
+			status: "DRAFT",
+			_count: { playerTransactions: 0 },
+		});
+		expect(await deleteTeamTransaction("tt1")).toEqual({
+			ok: true,
+			data: { id: "tt1", removed: true },
+		});
 		expect(txMock.teamTransaction.delete).toHaveBeenCalledWith({ where: { id: "tt1" } });
 	});
 
-	it("keeps a draft that was completed before", async () => {
-		txMock.playerTransaction.count.mockResolvedValue(2);
-		const result = await deleteTeamTransaction("tt1");
-		expect(result.ok).toBe(false);
+	it.each([
+		["a Final one", "COMPLETED", 2],
+		["a Shared one", "PUBLISHED", 2],
+		["a draft that counted before", "DRAFT", 2],
+	])("marks %s as deleted and voids its shares (kept for history)", async (_label, status, history) => {
+		txMock.teamTransaction.findUnique.mockResolvedValue({
+			status,
+			_count: { playerTransactions: history },
+		});
+
+		expect(await deleteTeamTransaction("tt1")).toEqual({
+			ok: true,
+			data: { id: "tt1", removed: false },
+		});
+		expect(txMock.teamTransaction.updateMany).toHaveBeenCalledWith({
+			where: { id: "tt1", status: { in: ["DRAFT", "COMPLETED", "PUBLISHED"] } },
+			data: { status: "VOIDED" },
+		});
+		expect(txMock.playerTransaction.updateMany).toHaveBeenCalledWith({
+			where: { teamTransactionId: "tt1", status: { in: ["INTERNAL", "PUBLISHED"] } },
+			data: { status: "VOID" },
+		});
 		expect(txMock.teamTransaction.delete).not.toHaveBeenCalled();
+	});
+
+	it("reports one that was already deleted", async () => {
+		txMock.teamTransaction.findUnique.mockResolvedValue({
+			status: "VOIDED",
+			_count: { playerTransactions: 2 },
+		});
+
+		expect(await deleteTeamTransaction("tt1")).toEqual({
+			ok: false,
+			error: "This team transaction was already deleted.",
+		});
+		expect(txMock.teamTransaction.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("reports a missing one", async () => {
+		txMock.teamTransaction.findUnique.mockResolvedValue(null);
+		expect(await deleteTeamTransaction("missing")).toEqual({
+			ok: false,
+			error: "Team transaction not found",
+		});
+	});
+});
+
+describe("editing and deleting individual transactions", () => {
+	const input = {
+		playerId: "p2",
+		direction: "INCOME" as const,
+		amount: 30,
+		date: "2026-11-09",
+		description: "Fixed note",
+	};
+
+	it("updates an individual transaction", async () => {
+		txMock.playerTransaction.findFirst.mockResolvedValue({ id: "pt1", status: "PUBLISHED" });
+		txMock.player.findUnique.mockResolvedValue({ id: "p2" });
+
+		expect(await updateIndividualTransaction("pt1", input)).toEqual({ ok: true, data: { id: "pt1" } });
+		expect(txMock.playerTransaction.findFirst).toHaveBeenCalledWith({
+			where: { id: "pt1", teamTransactionId: null, fundraiserId: null },
+			select: { id: true, status: true },
+		});
+		expect(txMock.playerTransaction.update).toHaveBeenCalledWith({
+			where: { id: "pt1" },
+			data: {
+				playerId: "p2",
+				direction: "INCOME",
+				type: "PAYMENT",
+				amount: new Prisma.Decimal("30"),
+				date: new Date("2026-11-09T00:00:00.000Z"),
+				description: "Fixed note",
+			},
+		});
+	});
+
+	it("won't edit a team share or a fundraiser row through this action", async () => {
+		txMock.playerTransaction.findFirst.mockResolvedValue(null);
+		expect(await updateIndividualTransaction("share-row", input)).toEqual({
+			ok: false,
+			error: "Transaction not found",
+		});
+		expect(txMock.playerTransaction.update).not.toHaveBeenCalled();
+	});
+
+	it("won't edit one that was deleted", async () => {
+		txMock.playerTransaction.findFirst.mockResolvedValue({ id: "pt1", status: "VOID" });
+		expect(await updateIndividualTransaction("pt1", input)).toEqual({
+			ok: false,
+			error: "This transaction was deleted.",
+		});
+	});
+
+	it("deletes by marking it VOID (kept for history)", async () => {
+		txMock.playerTransaction.findFirst.mockResolvedValue({ id: "pt1", status: "PUBLISHED" });
+		expect(await deleteIndividualTransaction("pt1")).toEqual({ ok: true, data: { id: "pt1" } });
+		expect(txMock.playerTransaction.update).toHaveBeenCalledWith({
+			where: { id: "pt1" },
+			data: { status: "VOID" },
+		});
 	});
 });

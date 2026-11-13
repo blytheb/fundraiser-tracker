@@ -1,10 +1,21 @@
 import { Prisma } from "@prisma/client";
-import type { TeamTransactionStatus } from "@prisma/client";
+import type { TeamTransactionStatus, TransactionDirection } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import type { TransactionKind } from "@/lib/labels";
 
-export type FeedStatus = "POSTED" | TeamTransactionStatus;
+// Draft / Final / Shared. Individual transactions are always Shared (parents see them right away).
+export type FeedStatus = Exclude<TeamTransactionStatus, "VOIDED">;
+
+// what the edit dialog needs for an individual transaction
+export type IndividualEditData = {
+	id: string;
+	playerId: string;
+	direction: TransactionDirection;
+	amount: number; // positive
+	date: string; // YYYY-MM-DD
+	description: string | null;
+};
 
 export type FeedRow = {
 	key: string;
@@ -14,7 +25,8 @@ export type FeedRow = {
 	date: Date;
 	amount: number; // signed: income +, expense −
 	status: FeedStatus;
-	href: string | null;
+	href: string | null; // team transactions and fundraisers open their page
+	individual?: IndividualEditData; // individual transactions open the edit dialog instead
 };
 
 export type FeedFilters = {
@@ -54,6 +66,7 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 			},
 		}),
 		prisma.teamTransaction.findMany({
+			where: { status: { not: "VOIDED" } }, // deleted ones are kept for history but hidden
 			select: {
 				id: true,
 				name: true,
@@ -89,8 +102,16 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				who: `${t.player.firstName} ${t.player.lastName}`,
 				date: t.date,
 				amount: (isIncome ? amount : amount.negated()).toNumber(),
-				status: "POSTED",
-				href: `/admin/players/${t.player.id}`,
+				status: "PUBLISHED",
+				href: null,
+				individual: {
+					id: t.id,
+					playerId: t.player.id,
+					direction: t.direction,
+					amount: amount.toNumber(),
+					date: t.date.toISOString().slice(0, 10),
+					description: t.description,
+				},
 			};
 		}),
 		...teamTransactions.map((t): FeedRow => {
@@ -103,7 +124,7 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				who: teamSummary(t.teams.map((x) => x.team.name), t._count.participants),
 				date: t.date,
 				amount: (isIncome ? total : total.negated()).toNumber(),
-				status: t.status,
+				status: t.status as FeedStatus, // VOIDED filtered out in the query
 				href: `/admin/transactions/team/${t.id}`,
 			};
 		}),

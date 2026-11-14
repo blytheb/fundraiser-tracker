@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
@@ -39,29 +40,34 @@ export default function NewTransactionMenu({ players }: { players: PlayerOption[
 					}
 				/>
 				<DropdownMenuContent align="end" className="w-64">
-					<DropdownMenuLabel>Individual (one player)</DropdownMenuLabel>
-					<DropdownMenuItem onClick={() => setIndividualDirection("INCOME")}>
-						<TransactionKindIcon kind="INDIVIDUAL_INCOME" className="size-7" />
-						Individual income
-					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => setIndividualDirection("EXPENSE")}>
-						<TransactionKindIcon kind="INDIVIDUAL_EXPENSE" className="size-7" />
-						Individual expense
-					</DropdownMenuItem>
+					{/* Base UI: a label must be inside a group */}
+					<DropdownMenuGroup>
+						<DropdownMenuLabel>Individual (one player)</DropdownMenuLabel>
+						<DropdownMenuItem onClick={() => setIndividualDirection("INCOME")}>
+							<TransactionKindIcon kind="INDIVIDUAL_INCOME" className="size-7" />
+							Individual income
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => setIndividualDirection("EXPENSE")}>
+							<TransactionKindIcon kind="INDIVIDUAL_EXPENSE" className="size-7" />
+							Individual expense
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
 
 					<DropdownMenuSeparator />
 
-					<DropdownMenuLabel>Team (split across players)</DropdownMenuLabel>
-					<DropdownMenuItem
-						onClick={() => router.push("/admin/transactions/team/new?direction=INCOME")}>
-						<TransactionKindIcon kind="TEAM_INCOME" className="size-7" />
-						Team income
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={() => router.push("/admin/transactions/team/new?direction=EXPENSE")}>
-						<TransactionKindIcon kind="TEAM_EXPENSE" className="size-7" />
-						Team expense
-					</DropdownMenuItem>
+					<DropdownMenuGroup>
+						<DropdownMenuLabel>Team (split across players)</DropdownMenuLabel>
+						<DropdownMenuItem
+							onClick={() => router.push("/admin/transactions/team/new?direction=INCOME")}>
+							<TransactionKindIcon kind="TEAM_INCOME" className="size-7" />
+							Team income
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => router.push("/admin/transactions/team/new?direction=EXPENSE")}>
+							<TransactionKindIcon kind="TEAM_EXPENSE" className="size-7" />
+							Team expense
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
 				</DropdownMenuContent>
 			</DropdownMenu>
 

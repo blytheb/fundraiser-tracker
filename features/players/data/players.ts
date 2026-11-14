@@ -90,3 +90,16 @@ export async function getPlayerTransactions(playerId: string) {
 		},
 	});
 }
+
+// Active players for pickers (new team, new transaction), sorted by last name.
+export async function getActivePlayerOptions() {
+	await requireAdmin();
+
+	const players = await prisma.player.findMany({
+		where: { status: true },
+		select: { id: true, firstName: true, lastName: true },
+		orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+	});
+
+	return players.map((p) => ({ ...p, name: `${p.firstName} ${p.lastName}` }));
+}

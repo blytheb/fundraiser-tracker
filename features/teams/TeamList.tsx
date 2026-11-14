@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
 import {
 	Item,
 	ItemContent,

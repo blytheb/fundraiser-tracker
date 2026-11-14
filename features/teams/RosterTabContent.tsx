@@ -1,16 +1,26 @@
-import AddPlayerToTeamDialog from "@/components/forms/teams/AddPlayerToTeamDialog";
+import ManageRosterDialog from "@/components/forms/teams/ManageRosterDialog";
 import PlayerListItem from "@/features/players/PlayerListItem";
 import { ItemGroup } from "@/components/ui/item";
 import type { Player } from "@prisma/client";
 
 type TabProps = {
 	teamId: string;
+	teamName: string;
 	players: Player[];
 	availablePlayers: Player[];
 };
 
+const toPickerPlayer = (player: Player) => ({
+	id: player.id,
+	firstName: player.firstName,
+	lastName: player.lastName,
+	name: `${player.firstName} ${player.lastName}`,
+	status: player.status,
+});
+
 export default function RosterTabContent({
 	teamId,
+	teamName,
 	players,
 	availablePlayers,
 }: TabProps) {
@@ -24,15 +34,17 @@ export default function RosterTabContent({
 					</p>
 				</div>
 
-				<AddPlayerToTeamDialog
+				<ManageRosterDialog
 					teamId={teamId}
-					availablePlayers={availablePlayers}
+					teamName={teamName}
+					roster={players.map(toPickerPlayer)}
+					available={availablePlayers.map(toPickerPlayer)}
 				/>
 			</div>
 
 			{players.length === 0 ? (
 				<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-					No players on this team yet.
+					No players on this team yet. Use Manage roster to add some.
 				</div>
 			) : (
 				<ItemGroup>

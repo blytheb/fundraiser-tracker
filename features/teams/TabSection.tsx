@@ -7,6 +7,7 @@ import type { Player, Fundraiser } from "@prisma/client";
 
 type TabProps = {
 	teamId: string;
+	teamName: string;
 	players: Player[];
 	availablePlayers: Player[];
 	fundraisers: Fundraiser[];
@@ -15,6 +16,7 @@ type TabProps = {
 
 export default function TabSection({
 	teamId,
+	teamName,
 	players,
 	availablePlayers,
 	fundraisers,
@@ -30,6 +32,7 @@ export default function TabSection({
 			<TabsContent value="roster" className="mt-4">
 				<RosterTabContent
 					teamId={teamId}
+					teamName={teamName}
 					players={players}
 					availablePlayers={availablePlayers}
 				/>

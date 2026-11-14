@@ -46,6 +46,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
 
 			<TabSection
 				teamId={team.id}
+				teamName={team.name}
 				players={players}
 				availablePlayers={availablePlayers}
 				fundraisers={fundraisers}

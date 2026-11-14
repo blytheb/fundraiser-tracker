@@ -16,6 +16,7 @@ vi.mock("@/lib/prisma", async () => {
 });
 
 import { prismaMock } from "../helpers/prisma-mock";
+import { saveTeamRoster } from "@/features/teams/actions/save-team-roster";
 
 import { createIndividualTransaction } from "@/features/transactions/actions/create-individual-transaction";
 import { saveTeamTransaction } from "@/features/transactions/actions/save-team-transaction";
@@ -51,14 +52,11 @@ import { saveFundraiserParticipants } from "@/features/fundraisers/actions/save-
 import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/remove-team-from-fundraiser";
 import { saveFundraiserTeams } from "@/features/fundraisers/actions/save-fundraiser-teams";
 import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
-import { addPlayerToTeam } from "@/features/teams/actions/add-player-to-team";
-import { removePlayerFromTeam } from "@/features/teams/actions/remove-player-from-team";
 import {
 	createTeam,
 	updateTeam,
 	deleteTeam,
 } from "@/features/teams/actions/teams";
-import { createPlayerAndAddToTeam } from "@/features/teams/actions/create-player-and-add-to-team";
 import { addPlayerPayment } from "@/features/players/actions/add-player-payment";
 import { addPlayerExpense } from "@/features/players/actions/add-player-expense";
 import {
@@ -86,6 +84,10 @@ const playerForm = { firstName: "Jane", lastName: "Doe", status: true };
 const transaction = { playerId: "p1", amount: 5, date: "2026-01-01" };
 
 const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
+	[
+		"saveTeamRoster",
+		() => saveTeamRoster("t1", { playerIds: ["p1"], newPlayers: [] }),
+	],
 	[
 		"createIndividualTransaction",
 		() =>
@@ -153,15 +155,18 @@ const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
 		() => setCustomDistribution("f1", [{ participantId: "fp1", amount: 10 }]),
 	],
 	// teams
-	["createTeam", () => createTeam({ name: "A", status: "IN_SEASON" })],
+	[
+		"createTeam",
+		() =>
+			createTeam({
+				name: "A",
+				status: "IN_SEASON",
+				playerIds: ["p1"],
+				newPlayers: [],
+			}),
+	],
 	["updateTeam", () => updateTeam("t1", { name: "A", status: "IN_SEASON" })],
 	["deleteTeam", () => deleteTeam("t1")],
-	["addPlayerToTeam", () => addPlayerToTeam("t1", "p1")],
-	["removePlayerFromTeam", () => removePlayerFromTeam("t1", "p1")],
-	[
-		"createPlayerAndAddToTeam",
-		() => createPlayerAndAddToTeam("t1", playerForm),
-	],
 	// players
 	["createPlayer", () => createPlayer(playerForm)],
 	["updatePlayer", () => updatePlayer("p1", playerForm)],

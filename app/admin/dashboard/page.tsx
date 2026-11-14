@@ -10,6 +10,7 @@ import {
 
 import { getAdminDashboardSummary } from "@/features/dashboard/data/get-admin-dashboard-summary";
 import { getAdminFundraiserOverview } from "@/features/dashboard/data/get-admin-fundraiser-overview";
+import { getActivePlayerOptions } from "@/features/players/data/players";
 
 import AddFundraiserDialog from "@/components/forms/fundraisers/AddFundraiserDialog";
 import AddTeamDialog from "@/components/forms/teams/AddTeamDialog";
@@ -17,9 +18,10 @@ import FundraiserStatusBadge from "@/components/reusable/FundraiserStatusBadge";
 import { formatCurrency } from "@/lib/format";
 
 export default async function AdminPage() {
-	const [summary, fundraisers] = await Promise.all([
+	const [summary, fundraisers, players] = await Promise.all([
 		getAdminDashboardSummary(),
 		getAdminFundraiserOverview(),
+		getActivePlayerOptions(),
 	]);
 
 	const publishedPercentage =
@@ -276,7 +278,7 @@ export default async function AdminPage() {
 							Manage teams, organize rosters, and add a new team.
 						</p>
 						<div className="mt-4 flex flex-wrap items-center gap-3">
-							<AddTeamDialog />
+							<AddTeamDialog players={players} />
 							<Link
 								href="/admin/teams"
 								className="inline-flex items-center gap-1 text-sm font-medium hover:underline">

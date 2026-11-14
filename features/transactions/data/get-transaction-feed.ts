@@ -1,5 +1,8 @@
 import { Prisma } from "@prisma/client";
-import type { TeamTransactionStatus, TransactionDirection } from "@prisma/client";
+import type {
+	TeamTransactionStatus,
+	TransactionDirection,
+} from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import type { TransactionKind } from "@/lib/labels";
@@ -38,7 +41,9 @@ const zero = new Prisma.Decimal(0);
 
 function teamSummary(teamNames: string[], playerCount: number) {
 	const players = `${playerCount} ${playerCount === 1 ? "player" : "players"}`;
-	return teamNames.length > 0 ? `${teamNames.join(", ")} · ${players}` : players;
+	return teamNames.length > 0
+		? `${teamNames.join(", ")} · ${players}`
+		: players;
 }
 
 // Every transaction an admin can see, newest first:
@@ -121,23 +126,34 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				key: `team:${t.id}`,
 				kind: isIncome ? "TEAM_INCOME" : "TEAM_EXPENSE",
 				name: t.name,
-				who: teamSummary(t.teams.map((x) => x.team.name), t._count.participants),
+				who: teamSummary(
+					t.teams.map((x) => x.team.name),
+					t._count.participants,
+				),
 				date: t.date,
 				amount: (isIncome ? total : total.negated()).toNumber(),
 				status: t.status as FeedStatus, // VOIDED filtered out in the query
 				href: `/admin/transactions/team/${t.id}`,
 			};
 		}),
-		...fundraisers.map((f): FeedRow => ({
-			key: `fundraiser:${f.id}`,
-			kind: "TEAM_INCOME",
-			name: f.name,
-			who: teamSummary(f.teams.map((x) => x.team.name), f._count.participants),
-			date: f.startDate,
-			amount: Prisma.Decimal.sum(zero, ...f.contributions.map((c) => c.amount)).toNumber(),
-			status: f.status,
-			href: `/admin/fundraisers/${f.id}`,
-		})),
+		...fundraisers.map(
+			(f): FeedRow => ({
+				key: `fundraiser:${f.id}`,
+				kind: "TEAM_INCOME",
+				name: f.name,
+				who: teamSummary(
+					f.teams.map((x) => x.team.name),
+					f._count.participants,
+				),
+				date: f.startDate,
+				amount: Prisma.Decimal.sum(
+					zero,
+					...f.contributions.map((c) => c.amount),
+				).toNumber(),
+				status: f.status,
+				href: `/admin/fundraisers/${f.id}`,
+			}),
+		),
 	];
 
 	const search = filters.search?.trim().toLowerCase();

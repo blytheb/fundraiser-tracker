@@ -32,26 +32,6 @@ import {
 	deleteTeamTransaction,
 } from "@/features/transactions/actions/team-transaction-status";
 
-import { completeFundraiser } from "@/features/fundraisers/actions/complete-fundraiser";
-import {
-	addContribution,
-	updateContribution,
-	deleteContribution,
-} from "@/features/fundraisers/actions/contributions";
-import { addTeamToFundraiser } from "@/features/fundraisers/actions/add-team-to-fundraiser";
-import { publishFundraiser } from "@/features/fundraisers/actions/publish-fundraiser";
-import {
-	createFundraiser,
-	updateFundraiser,
-	deleteFundraiser,
-} from "@/features/fundraisers/actions/fundraisers";
-import { createFundraiserAndAddToTeam } from "@/features/fundraisers/actions/create-fundraiser-and-add-to-team";
-import { reopenFundraiser } from "@/features/fundraisers/actions/reopen-fundraiser";
-import { unpublishFundraiser } from "@/features/fundraisers/actions/unpublish-fundraiser";
-import { saveFundraiserParticipants } from "@/features/fundraisers/actions/save-fundraiser-participants";
-import { removeTeamFromFundraiser } from "@/features/fundraisers/actions/remove-team-from-fundraiser";
-import { saveFundraiserTeams } from "@/features/fundraisers/actions/save-fundraiser-teams";
-import { setCustomDistribution } from "@/features/fundraisers/actions/set-custom-distribution";
 import {
 	createTeam,
 	updateTeam,
@@ -67,17 +47,6 @@ import { removePlayerFromUser } from "@/features/users/actions/remove-player";
 import { updateUserRole } from "@/features/users/actions/update-user-role";
 import { reviewPlayerAccess } from "@/features/player-access/actions/review-player-access";
 
-const contribution = {
-	amount: 10,
-	paymentMethod: "CASH" as const,
-	source: "SALES" as const,
-	date: "2026-01-01",
-};
-const fundraiserForm = {
-	name: "Car wash",
-	description: "desc",
-	startDate: new Date("2026-01-01"),
-};
 const playerForm = { firstName: "Jane", lastName: "Doe", status: true };
 
 const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
@@ -125,32 +94,6 @@ const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
 	["unpublishTeamTransaction", () => unpublishTeamTransaction("tt1")],
 	["reopenTeamTransaction", () => reopenTeamTransaction("tt1")],
 	["deleteTeamTransaction", () => deleteTeamTransaction("tt1")],
-	// fundraisers
-	["completeFundraiser", () => completeFundraiser("f1")],
-	["publishFundraiser", () => publishFundraiser("f1")],
-	["unpublishFundraiser", () => unpublishFundraiser("f1")],
-	["reopenFundraiser", () => reopenFundraiser("f1")],
-	[
-		"addContribution",
-		() => addContribution({ fundraiserId: "f1", ...contribution }),
-	],
-	["updateContribution", () => updateContribution("c1", contribution)],
-	["deleteContribution", () => deleteContribution("c1")],
-	["addTeamToFundraiser", () => addTeamToFundraiser("f1", "t1")],
-	["removeTeamFromFundraiser", () => removeTeamFromFundraiser("f1", "t1")],
-	["createFundraiser", () => createFundraiser(fundraiserForm)],
-	["updateFundraiser", () => updateFundraiser("f1", fundraiserForm)],
-	["deleteFundraiser", () => deleteFundraiser("f1")],
-	[
-		"createFundraiserAndAddToTeam",
-		() => createFundraiserAndAddToTeam("t1", fundraiserForm),
-	],
-	["saveFundraiserParticipants", () => saveFundraiserParticipants("f1", ["p1"])],
-	["saveFundraiserTeams", () => saveFundraiserTeams("f1", ["t1"])],
-	[
-		"setCustomDistribution",
-		() => setCustomDistribution("f1", [{ participantId: "fp1", amount: 10 }]),
-	],
 	// teams
 	[
 		"createTeam",

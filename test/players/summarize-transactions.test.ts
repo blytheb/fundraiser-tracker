@@ -15,7 +15,6 @@ function tx(
 		description: null,
 		date: date(1),
 		teamTransaction: null,
-		fundraiser: null,
 		...overrides,
 	};
 }
@@ -54,15 +53,6 @@ describe("summarizeTransactions", () => {
 		expect(summary.currentBalance).toBe(80);
 	});
 
-	it("counts v1 fundraiser rows as team income", () => {
-		const summary = summarizeTransactions([
-			tx({ id: "1", direction: "INCOME", amount: 100, fundraiser: { name: "Car wash" } }),
-		]);
-
-		expect(summary.teamIncome).toBe(100);
-		expect(summary.individualIncome).toBe(0);
-		expect(summary.history[0]).toMatchObject({ kind: "TEAM_INCOME", title: "Car wash" });
-	});
 
 	it("counts Final (INTERNAL) rows but reports what isn't shared with parents yet", () => {
 		const summary = summarizeTransactions([

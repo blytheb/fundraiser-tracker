@@ -33,7 +33,7 @@ export default function AddTeamDialog({ players }: Props) {
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger
 				render={
-					<Button>
+					<Button className="w-full sm:w-auto">
 						<Plus />
 						Create New Team
 					</Button>

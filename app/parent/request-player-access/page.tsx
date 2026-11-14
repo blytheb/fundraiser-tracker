@@ -26,7 +26,7 @@ export default async function RequestPlayerAccessPage() {
 			<p className="mt-2 text-sm text-muted-foreground">
 				{players.length === 0
 					? "There are no active players available right now. Please contact an administrator for assistance."
-					: "Select a player to request access to their fundraiser information. An administrator must approve your request."}
+					: "Select a player to request access to their financial information. An administrator must approve your request."}
 			</p>
 
 			<PlayerAccessRequestForm

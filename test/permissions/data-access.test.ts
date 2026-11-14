@@ -32,23 +32,10 @@ import {
 } from "@/features/teams/data/teams";
 import { getTeamPlayers } from "@/features/teams/data/get-team-players";
 import { getAvailablePlayersForTeam } from "@/features/teams/data/get-available-players-for-team";
-import {
-	getFundraisers,
-	getFundraiserById,
-} from "@/features/fundraisers/data/fundraisers";
-import {
-	getFundraiserTeams,
-	getAvailableFundraisersForTeam,
-} from "@/features/fundraisers/data/fundraiserTeams";
-import { getFundraiserFinancialSummary } from "@/features/fundraisers/data/get-fundraiser-financial-summary";
-import { getActiveFundraiserAllocations } from "@/features/fundraisers/data/get-active-fundraiser-allocations";
-import { getFundraiserContributions } from "@/features/fundraisers/data/get-fundraiser-contributions";
-import { getFundraiserParticipants } from "@/features/fundraisers/data/get-fundraiser-participants";
 import { getAdminUsers } from "@/features/users/data/get-admin-users";
 import { getAvailablePlayers } from "@/features/users/data/get-available-players";
 import { getMyLinkedPlayers } from "@/features/users/data/get-users-linked-players";
-import { getAdminDashboardSummary } from "@/features/dashboard/data/get-admin-dashboard-summary";
-import { getAdminFundraiserOverview } from "@/features/dashboard/data/get-admin-fundraiser-overview";
+import { getAdminDashboard } from "@/features/dashboard/data/get-admin-dashboard";
 import { getPendingPlayerAccessRequests } from "@/features/player-access/data/get-pending-player-access-requests";
 import { getMyAccessRequests } from "@/features/player-access/data/get-my-access-requests";
 import { getMyLinkedPlayerIds } from "@/features/player-access/data/get-my-linked-player-ids";
@@ -97,24 +84,9 @@ const ADMIN_DATA: [string, () => Promise<unknown>][] = [
 	["getActiveTeamsWithPlayers", () => getActiveTeamsWithPlayers()],
 	["getTeamPlayers", () => getTeamPlayers("t1")],
 	["getAvailablePlayersForTeam", () => getAvailablePlayersForTeam("t1")],
-	["getFundraisers", () => getFundraisers()],
-	["getFundraiserById", () => getFundraiserById("f1")],
-	["getFundraiserTeams", () => getFundraiserTeams("f1")],
-	[
-		"getAvailableFundraisersForTeam",
-		() => getAvailableFundraisersForTeam("t1"),
-	],
-	["getFundraiserFinancialSummary", () => getFundraiserFinancialSummary("f1")],
-	[
-		"getActiveFundraiserAllocations",
-		() => getActiveFundraiserAllocations("f1"),
-	],
-	["getFundraiserContributions", () => getFundraiserContributions("f1")],
-	["getFundraiserParticipants", () => getFundraiserParticipants("f1")],
 	["getAdminUsers", () => getAdminUsers()],
 	["getAvailablePlayers", () => getAvailablePlayers()],
-	["getAdminDashboardSummary", () => getAdminDashboardSummary()],
-	["getAdminFundraiserOverview", () => getAdminFundraiserOverview()],
+	["getAdminDashboard", () => getAdminDashboard()],
 	[
 		"getPendingPlayerAccessRequests",
 		() => getPendingPlayerAccessRequests(),
@@ -277,8 +249,8 @@ describe("getPlayerFinancialSummary (parent player page)", () => {
 		asParent();
 		linkParent();
 		db.playerTransaction.findMany.mockResolvedValue([
-			{ id: "1", direction: "INCOME", amount: 50, description: null, date: new Date("2026-01-10"), fundraiser: null },
-			{ id: "2", direction: "EXPENSE", amount: 30, description: null, date: new Date("2026-01-11"), fundraiser: null },
+			{ id: "1", direction: "INCOME", amount: 50, description: null, date: new Date("2026-01-10") },
+			{ id: "2", direction: "EXPENSE", amount: 30, description: null, date: new Date("2026-01-11") },
 		]);
 
 		const { summary } = await getPlayerFinancialSummary("p1");

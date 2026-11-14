@@ -15,8 +15,6 @@ export type SummaryTransaction = {
 	date: Date;
 	// set when the row is a player's share of a team transaction
 	teamTransaction?: { id?: string; name: string } | null;
-	// v1 fundraiser link, kept while fundraisers move to team transactions
-	fundraiser?: { id?: string; name: string } | null;
 };
 
 // same four kinds as the admin transactions list
@@ -37,7 +35,7 @@ const DEFAULT_DESCRIPTIONS: Record<HistoryKind, string> = {
 };
 
 function kindOf(transaction: SummaryTransaction): HistoryKind {
-	const isTeam = Boolean(transaction.teamTransaction || transaction.fundraiser);
+	const isTeam = Boolean(transaction.teamTransaction);
 	if (transaction.direction === "INCOME") {
 		return isTeam ? "TEAM_INCOME" : "INDIVIDUAL_INCOME";
 	}
@@ -75,11 +73,9 @@ export function summarizeTransactions(transactions: SummaryTransaction[]) {
 			direction: transaction.direction,
 			shared,
 			teamTransactionId: transaction.teamTransaction?.id ?? null,
-			fundraiserId: transaction.fundraiser?.id ?? null,
 			note: transaction.description, // raw note, for the edit dialog
 			title:
 				transaction.teamTransaction?.name ??
-				transaction.fundraiser?.name ??
 				DEFAULT_TITLES[kind],
 			description: transaction.description ?? DEFAULT_DESCRIPTIONS[kind],
 			date: transaction.date,

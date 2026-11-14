@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import type { TeamTransactionStatus } from "@prisma/client";
 
-import FundraiserStatusBadge from "@/components/reusable/FundraiserStatusBadge";
+import StatusBadge from "@/components/reusable/StatusBadge";
 import TransactionKindIcon from "@/components/reusable/TransactionKindIcon";
 import TeamTransactionActions from "@/features/transactions/TeamTransactionActions";
 import { getTeamTransaction } from "@/features/transactions/data/get-team-transaction";
@@ -49,7 +49,7 @@ export default async function TeamTransactionPage({ params }: PageProps) {
 							<span className="text-sm text-muted-foreground">
 								{TRANSACTION_KIND_LABELS[kind]}
 							</span>
-							<FundraiserStatusBadge status={t.status} />
+							<StatusBadge status={t.status} />
 						</div>
 						<h1 className="text-2xl font-bold tracking-tight break-words sm:text-3xl">
 							{t.name}

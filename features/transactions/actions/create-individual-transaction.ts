@@ -43,8 +43,6 @@ export async function createIndividualTransaction(
 			data: {
 				playerId: player.id,
 				direction: input.direction,
-				// legacy column, still required until PlayerTransaction.type is removed
-				type: input.direction === "INCOME" ? "PAYMENT" : "EXPENSE",
 				amount,
 				date,
 				description: input.description?.trim() || null,

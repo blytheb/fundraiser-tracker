@@ -301,15 +301,6 @@ function HistoryList({
 						</li>
 					);
 				}
-				if (isAdmin && entry.fundraiserId) {
-					return (
-						<li key={entry.id}>
-							<Link href={`/admin/fundraisers/${entry.fundraiserId}`} className={interactive}>
-								{content}
-							</Link>
-						</li>
-					);
-				}
 				if (isAdmin && entry.playerId) {
 					return (
 						<li key={entry.id}>

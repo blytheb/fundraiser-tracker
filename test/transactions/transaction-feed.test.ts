@@ -5,7 +5,6 @@ const { prismaMock } = vi.hoisted(() => ({
 	prismaMock: {
 		playerTransaction: { findMany: vi.fn() },
 		teamTransaction: { findMany: vi.fn() },
-		fundraiser: { findMany: vi.fn() },
 	},
 }));
 
@@ -47,14 +46,13 @@ beforeEach(() => {
 			teams: [{ team: { name: "U12 Boys" } }, { team: { name: "U12 Girls" } }],
 			_count: { participants: 20 },
 		},
-	]);
-	prismaMock.fundraiser.findMany.mockResolvedValue([
 		{
-			id: "f1",
+			id: "tt2",
 			name: "Car wash",
-			startDate: day(6),
+			date: day(6),
+			direction: "INCOME",
 			status: "PUBLISHED",
-			contributions: [{ amount: dec("500") }, { amount: dec("340") }],
+			items: [{ amount: dec("500") }, { amount: dec("340") }],
 			teams: [{ team: { name: "U12 Boys" } }],
 			_count: { participants: 12 },
 		},
@@ -79,7 +77,7 @@ describe("getTransactionFeed", () => {
 		const { rows } = await getTransactionFeed();
 		expect(rows.map((r) => r.href)).toEqual([
 			"/admin/transactions/team/tt1",
-			"/admin/fundraisers/f1",
+			"/admin/transactions/team/tt2",
 			null,
 			null,
 		]);
@@ -100,11 +98,11 @@ describe("getTransactionFeed", () => {
 		);
 	});
 
-	it("only loads individual rows that aren't part of a team transaction or fundraiser", async () => {
+	it("only loads individual rows that aren't part of a team transaction", async () => {
 		await getTransactionFeed();
 		expect(prismaMock.playerTransaction.findMany).toHaveBeenCalledWith(
 			expect.objectContaining({
-				where: { teamTransactionId: null, fundraiserId: null, status: { not: "VOID" } },
+				where: { teamTransactionId: null, status: { not: "VOID" } },
 			}),
 		);
 	});

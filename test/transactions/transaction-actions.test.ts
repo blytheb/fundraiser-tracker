@@ -80,7 +80,6 @@ describe("createIndividualTransaction", () => {
 			data: {
 				playerId: "p1",
 				direction: "EXPENSE",
-				type: "EXPENSE",
 				amount: new Prisma.Decimal("45.5"),
 				date: new Date("2026-11-05T00:00:00.000Z"),
 				description: "Uniform",
@@ -90,12 +89,6 @@ describe("createIndividualTransaction", () => {
 		});
 	});
 
-	it("uses the legacy PAYMENT type for income", async () => {
-		prismaMock.player.findUnique.mockResolvedValue({ id: "p1" });
-		prismaMock.playerTransaction.create.mockResolvedValue({ id: "pt1" });
-		await createIndividualTransaction({ ...input, direction: "INCOME" });
-		expect(prismaMock.playerTransaction.create.mock.calls[0][0].data.type).toBe("PAYMENT");
-	});
 
 	it.each([
 		[{ amount: 0 }, "Amount must be greater than $0."],
@@ -330,7 +323,7 @@ describe("editing and deleting individual transactions", () => {
 
 		expect(await updateIndividualTransaction("pt1", input)).toEqual({ ok: true, data: { id: "pt1" } });
 		expect(txMock.playerTransaction.findFirst).toHaveBeenCalledWith({
-			where: { id: "pt1", teamTransactionId: null, fundraiserId: null },
+			where: { id: "pt1", teamTransactionId: null },
 			select: { id: true, status: true },
 		});
 		expect(txMock.playerTransaction.update).toHaveBeenCalledWith({
@@ -338,7 +331,6 @@ describe("editing and deleting individual transactions", () => {
 			data: {
 				playerId: "p2",
 				direction: "INCOME",
-				type: "PAYMENT",
 				amount: new Prisma.Decimal("30"),
 				date: new Date("2026-11-09T00:00:00.000Z"),
 				description: "Fixed note",
@@ -346,7 +338,7 @@ describe("editing and deleting individual transactions", () => {
 		});
 	});
 
-	it("won't edit a team share or a fundraiser row through this action", async () => {
+	it("won't edit a team share through this action", async () => {
 		txMock.playerTransaction.findFirst.mockResolvedValue(null);
 		expect(await updateIndividualTransaction("share-row", input)).toEqual({
 			ok: false,

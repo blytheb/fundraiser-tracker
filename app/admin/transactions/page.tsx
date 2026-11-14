@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PageHeader from "@/components/reusable/PageHeader";
 import SearchBar from "@/components/reusable/SearchBar";
 import NewTransactionMenu from "@/features/transactions/NewTransactionMenu";
@@ -9,8 +10,19 @@ import { formatCurrency } from "@/lib/format";
 import { TRANSACTION_KIND_LABELS, type TransactionKind } from "@/lib/labels";
 
 type PageProps = {
-	searchParams: Promise<{ kind?: string; search?: string }>;
+	searchParams: Promise<{ kind?: string; search?: string; status?: string }>;
 };
+
+const STATUS_FILTERS = {
+	DRAFT: "Drafts",
+	COMPLETED: "Final, not shared with parents yet",
+	PUBLISHED: "Shared with parents",
+} as const;
+type StatusFilter = keyof typeof STATUS_FILTERS;
+
+function parseStatus(value?: string): StatusFilter | undefined {
+	return value && value in STATUS_FILTERS ? (value as StatusFilter) : undefined;
+}
 
 function parseKind(value?: string): TransactionKind | undefined {
 	return value && value in TRANSACTION_KIND_LABELS
@@ -19,11 +31,12 @@ function parseKind(value?: string): TransactionKind | undefined {
 }
 
 export default async function TransactionsPage({ searchParams }: PageProps) {
-	const { kind: kindParam, search } = await searchParams;
+	const { kind: kindParam, search, status: statusParam } = await searchParams;
 	const kind = parseKind(kindParam);
+	const status = parseStatus(statusParam);
 
 	const [{ rows, totals }, players] = await Promise.all([
-		getTransactionFeed({ kind, search }),
+		getTransactionFeed({ kind, search, status }),
 		getPlayers(),
 	]);
 
@@ -58,6 +71,17 @@ export default async function TransactionsPage({ searchParams }: PageProps) {
 				<SearchBar placeholder="Search by name, player or team..." />
 				<TransactionKindFilter active={kind} search={search} />
 			</div>
+
+			{status && (
+				<div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/50 px-3 py-2 text-sm">
+					<span>
+						Showing: <span className="font-medium">{STATUS_FILTERS[status]}</span>
+					</span>
+					<Link href="/admin/transactions" className="font-medium underline underline-offset-4">
+						Clear
+					</Link>
+				</div>
+			)}
 
 			<div className="flex items-baseline justify-between text-sm text-muted-foreground">
 				<span>

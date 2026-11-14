@@ -16,31 +16,6 @@ export type TeamWithPlayers = Prisma.TeamGetPayload<{
 	};
 }>;
 
-export type TeamWithFundraisers = Prisma.TeamGetPayload<{
-	include: {
-		fundraiserTeams: {
-			include: {
-				fundraiser: true;
-			};
-		};
-	};
-}>;
-
-export type TeamWithPlayersAndFundraisers = Prisma.TeamGetPayload<{
-	include: {
-		players: {
-			include: {
-				player: true;
-			};
-		};
-		fundraiserTeams: {
-			include: {
-				fundraiser: true;
-			};
-		};
-	};
-}>;
-
 export type TeamPlayerWithPlayer = Prisma.TeamPlayerGetPayload<{
 	include: {
 		player: true;

@@ -25,14 +25,15 @@ export type FeedRow = {
 	date: Date;
 	amount: number; // signed: income +, expense −
 	status: FeedStatus;
-	href: string | null; // team transactions and fundraisers open their page
+	href: string | null; // team transactions open their page
 	individual?: IndividualEditData; // individual transactions open the edit dialog instead
 };
 
 export type FeedFilters = {
 	kind?: TransactionKind;
 	search?: string;
-	teamId?: string; // only this team's team transactions and fundraisers (no individual rows)
+	teamId?: string; // only this team's team transactions (no individual rows)
+	status?: FeedStatus; // e.g. only drafts
 };
 
 const zero = new Prisma.Decimal(0);
@@ -43,9 +44,8 @@ function teamSummary(teamNames: string[], playerCount: number) {
 }
 
 // Every transaction an admin can see, newest first:
-// - individual income/expense (player transactions not tied to a team transaction or fundraiser)
+// - individual income/expense (player transactions not tied to a team transaction)
 // - team income/expense (team transactions, any status)
-// - v1 fundraisers, shown as team income until they're moved to team transactions
 // Merged in memory; fine at a club's scale.
 export async function getTransactionFeed(filters: FeedFilters = {}) {
 	await requireAdmin();
@@ -54,13 +54,12 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 		? { teams: { some: { teamId: filters.teamId } } }
 		: {};
 
-	const [individual, teamTransactions, fundraisers] = await Promise.all([
+	const [individual, teamTransactions] = await Promise.all([
 		filters.teamId
 			? Promise.resolve([])
 			: prisma.playerTransaction.findMany({
 					where: {
 						teamTransactionId: null,
-						fundraiserId: null,
 						status: { not: "VOID" },
 					},
 					select: {
@@ -82,18 +81,6 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				direction: true,
 				status: true,
 				items: { select: { amount: true } },
-				teams: { select: { team: { select: { name: true } } } },
-				_count: { select: { participants: true } },
-			},
-		}),
-		prisma.fundraiser.findMany({
-			where: teamFilter,
-			select: {
-				id: true,
-				name: true,
-				startDate: true,
-				status: true,
-				contributions: { select: { amount: true } },
 				teams: { select: { team: { select: { name: true } } } },
 				_count: { select: { participants: true } },
 			},
@@ -140,27 +127,12 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				href: `/admin/transactions/team/${t.id}`,
 			};
 		}),
-		...fundraisers.map((f): FeedRow => ({
-			key: `fundraiser:${f.id}`,
-			kind: "TEAM_INCOME",
-			name: f.name,
-			who: teamSummary(
-				f.teams.map((x) => x.team.name),
-				f._count.participants,
-			),
-			date: f.startDate,
-			amount: Prisma.Decimal.sum(
-				zero,
-				...f.contributions.map((c) => c.amount),
-			).toNumber(),
-			status: f.status,
-			href: `/admin/fundraisers/${f.id}`,
-		})),
 	];
 
 	const search = filters.search?.trim().toLowerCase();
 	const filtered = rows
 		.filter((row) => !filters.kind || row.kind === filters.kind)
+		.filter((row) => !filters.status || row.status === filters.status)
 		.filter(
 			(row) =>
 				!search ||

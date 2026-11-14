@@ -3,7 +3,6 @@ import type { TeamTransactionStatus } from "@prisma/client";
 
 // Shared rules for team transactions. Call these with the transaction client (tx)
 // inside prisma.$transaction: the status helpers lock the row until it ends.
-// (Same pattern as features/fundraisers/lib/fundraiser-status.ts.)
 
 type Tx = Prisma.TransactionClient;
 
@@ -152,8 +151,6 @@ export async function writeTeamLedgerRows(tx: Tx, id: string) {
 		);
 	}
 
-	const isIncome = teamTransaction.direction === "INCOME";
-
 	await tx.playerTransaction.createMany({
 		data: teamTransaction.participants.map((participant) => ({
 			playerId: participant.playerId,
@@ -161,8 +158,6 @@ export async function writeTeamLedgerRows(tx: Tx, id: string) {
 			shareId: participant.shares[0].id,
 			amount: participant.shares[0].amount,
 			direction: teamTransaction.direction,
-			// legacy column, still required until PlayerTransaction.type is removed
-			type: isIncome ? ("DISTRIBUTION" as const) : ("EXPENSE" as const),
 			status: "INTERNAL" as const, // admins only until published
 			date: teamTransaction.date,
 			description: null,

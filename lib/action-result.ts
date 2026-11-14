@@ -36,7 +36,7 @@ function toUserMessage(error: unknown): string {
 		return GENERIC_ERROR;
 	}
 
-	// Errors we throw ourselves, e.g. throw new Error("Fundraiser not found")
+	// Errors we throw ourselves, e.g. throw new Error("Team not found")
 	if (error instanceof Error && error.message) {
 		return error.message;
 	}

@@ -29,23 +29,7 @@ export async function getPlayerFinancialSummary(playerId: string) {
 			.then((rows) => rows.map((row) => row.team)),
 
 		prisma.playerTransaction.findMany({
-			where: {
-				playerId,
-				status: "PUBLISHED",
-				OR: [
-					{ type: { not: "DISTRIBUTION" } },
-					{
-						type: "DISTRIBUTION",
-						fundraiser: {
-							is: {
-								status: "PUBLISHED",
-							},
-						},
-					},
-					// shares of team transactions: PUBLISHED only once the team transaction is published
-					{ teamTransactionId: { not: null } },
-				],
-			},
+			where: { playerId, status: "PUBLISHED" }, // parents see Shared rows only
 			select: {
 				id: true,
 				amount: true,
@@ -53,9 +37,6 @@ export async function getPlayerFinancialSummary(playerId: string) {
 				description: true,
 				date: true,
 				teamTransaction: {
-					select: { name: true },
-				},
-				fundraiser: {
 					select: { name: true },
 				},
 			},

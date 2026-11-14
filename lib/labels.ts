@@ -2,27 +2,11 @@
 // `import type` keeps Prisma out of client bundles; `satisfies` makes TypeScript
 // error here if an enum value is added to the schema without a label.
 import type {
-	ContributionType,
-	FundraiserStatus,
 	PaymentMethod,
 	TeamStatus,
 	TeamTransactionStatus,
 	TransactionDirection,
 } from "@prisma/client";
-
-// Draft = not counted · Final = counted, hidden from parents · Shared = parents can see it
-export const FUNDRAISER_STATUS_LABELS = {
-	DRAFT: "Draft",
-	COMPLETED: "Final",
-	PUBLISHED: "Shared",
-} as const satisfies Record<FundraiserStatus, string>;
-
-export const CONTRIBUTION_SOURCE_LABELS = {
-	SALES: "Sales",
-	EVENT_PROFIT: "Event Profit",
-	TIPS: "Tips",
-	OTHER: "Other",
-} as const satisfies Record<ContributionType, string>;
 
 export const PAYMENT_METHOD_LABELS = {
 	CASH: "Cash",

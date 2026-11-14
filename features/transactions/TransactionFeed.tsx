@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, ReceiptText } from "lucide-react";
 
-import FundraiserStatusBadge from "@/components/reusable/FundraiserStatusBadge";
+import StatusBadge from "@/components/reusable/StatusBadge";
 import TransactionKindIcon from "@/components/reusable/TransactionKindIcon";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { TRANSACTION_KIND_LABELS } from "@/lib/labels";
@@ -96,7 +96,7 @@ export default function TransactionFeed({
 								<div
 									className={`flex shrink-0 flex-col items-end gap-1 ${compact ? "" : "md:hidden"}`}>
 									<Amount amount={row.amount} muted={isDraft} />
-									<FundraiserStatusBadge status={row.status} />
+									<StatusBadge status={row.status} />
 								</div>
 
 								{/* desktop table columns */}
@@ -109,7 +109,7 @@ export default function TransactionFeed({
 											{formatDate(row.date)}
 										</span>
 										<span className="hidden md:block">
-											<FundraiserStatusBadge status={row.status} />
+											<StatusBadge status={row.status} />
 										</span>
 										<span className="hidden text-right md:block">
 											<Amount amount={row.amount} muted={isDraft} />

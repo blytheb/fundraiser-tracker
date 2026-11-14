@@ -6,7 +6,6 @@ import type { Player } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import ManageRosterDialog from "@/components/forms/teams/ManageRosterDialog";
-import AddFundraiserToTeamDialog from "@/components/forms/teams/AddFundraiserToTeamDialog";
 import TeamActions from "@/features/teams/TeamActions";
 import TeamRosterList from "@/features/teams/TeamRosterList";
 import TransactionFeed from "@/features/transactions/TransactionFeed";
@@ -14,7 +13,6 @@ import TransactionFeed from "@/features/transactions/TransactionFeed";
 import { getTeamById } from "@/features/teams/data/teams";
 import { getTeamPlayers } from "@/features/teams/data/get-team-players";
 import { getAvailablePlayersForTeam } from "@/features/teams/data/get-available-players-for-team";
-import { getAvailableFundraisersForTeam } from "@/features/fundraisers/data/fundraiserTeams";
 import { getPlayerBalances } from "@/features/players/data/players";
 import { getTransactionFeed } from "@/features/transactions/data/get-transaction-feed";
 import { formatCurrency } from "@/lib/format";
@@ -38,11 +36,10 @@ export default async function TeamPage({ params, searchParams }: TeamPageProps) 
 	const { tab } = await searchParams;
 	const activeTab = tab === "transactions" ? "transactions" : "roster";
 
-	const [team, players, availablePlayers, availableFundraisers, feed] = await Promise.all([
+	const [team, players, availablePlayers, feed] = await Promise.all([
 		getTeamById(teamId),
 		getTeamPlayers(teamId),
 		getAvailablePlayersForTeam(teamId),
-		getAvailableFundraisersForTeam(teamId),
 		getTransactionFeed({ teamId }),
 	]);
 
@@ -158,9 +155,6 @@ export default async function TeamPage({ params, searchParams }: TeamPageProps) 
 						compact
 						emptyMessage="Add team income or a team expense for this team."
 					/>
-					<div className="flex justify-end">
-						<AddFundraiserToTeamDialog teamId={team.id} availableFundraisers={availableFundraisers} />
-					</div>
 				</section>
 			</div>
 		</main>

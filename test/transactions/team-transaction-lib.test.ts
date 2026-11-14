@@ -112,7 +112,6 @@ describe("writeTeamLedgerRows", () => {
 					shareId: "s1",
 					amount: dec("60"),
 					direction: "EXPENSE",
-					type: "EXPENSE",
 					status: "INTERNAL",
 					date: base.date,
 				}),
@@ -121,11 +120,12 @@ describe("writeTeamLedgerRows", () => {
 		});
 	});
 
-	it("uses the legacy DISTRIBUTION type for team income", async () => {
+
+	it("signs team income rows as INCOME", async () => {
 		tx.teamTransaction.findUniqueOrThrow.mockResolvedValue({ ...base, direction: "INCOME" });
 		await writeTeamLedgerRows(asTx, "tt1");
 		const rows = tx.playerTransaction.createMany.mock.calls[0][0].data;
-		expect(rows.every((r: { type: string; direction: string }) => r.type === "DISTRIBUTION" && r.direction === "INCOME")).toBe(true);
+		expect(rows.every((r: { direction: string }) => r.direction === "INCOME")).toBe(true);
 	});
 
 	it("includes $0 shares", async () => {

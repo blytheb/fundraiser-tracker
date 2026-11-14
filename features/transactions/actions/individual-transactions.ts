@@ -8,10 +8,10 @@ import { parseMoney } from "@/features/transactions/lib/team-transaction";
 import { parseDateInput } from "@/features/transactions/lib/dates";
 import type { IndividualTransactionInput } from "@/features/transactions/actions/create-individual-transaction";
 
-// Individual = not part of a team transaction or a v1 fundraiser, and not already deleted.
+// Individual = not part of a team transaction, and not already deleted.
 async function findEditableIndividual(tx: Prisma.TransactionClient, id: string) {
 	const transaction = await tx.playerTransaction.findFirst({
-		where: { id, teamTransactionId: null, fundraiserId: null },
+		where: { id, teamTransactionId: null },
 		select: { id: true, status: true },
 	});
 
@@ -56,8 +56,6 @@ export async function updateIndividualTransaction(
 				data: {
 					playerId: player.id,
 					direction: input.direction,
-					// legacy column, still required until PlayerTransaction.type is removed
-					type: input.direction === "INCOME" ? "PAYMENT" : "EXPENSE",
 					amount,
 					date,
 					description: input.description?.trim() || null,

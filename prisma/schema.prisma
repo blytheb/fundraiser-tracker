@@ -94,8 +94,7 @@ model Verification {
 // ============================================================
 // PLAYERS & TEAMS
 // ============================================================
-// Players exist independently of any fundraiser.
-// A player can participate in multiple fundraisers and belong
+// Players exist independently of teams; a player can belong
 // to multiple teams over time.
 
 model Player {
@@ -108,9 +107,8 @@ model Player {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  fundraiserParticipants FundraiserParticipant[] // fundraisers this player has participated in
-  transactions           PlayerTransaction[] //financial transactions belonging to this player
-  teams                  TeamPlayer[] //teams this player belongs to
+  transactions                PlayerTransaction[] //financial transactions belonging to this player
+  teams                       TeamPlayer[] //teams this player belongs to
   teamTransactionParticipants TeamTransactionParticipant[] //team transactions this player is participating in
 
   accessRequests PlayerAccessRequest[]
@@ -121,7 +119,6 @@ model Player {
 // Team
 // ------------------------------------------------------------
 // Represents a team/roster.
-// Teams can be used across different fundraisers.
 
 model Team {
   id       String     @id @default(cuid())
@@ -132,8 +129,7 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  fundraiserTeams FundraiserTeam[] // fundraisers that includes this team
-  players         TeamPlayer[] //players currently assiciated with team (aka roster)
+  players              TeamPlayer[] //players currently assiciated with team (aka roster)
   teamTransactionTeams TeamTransactionTeam[] //team transactions this team is participating in
 }
 
@@ -143,7 +139,7 @@ model Team {
 // Join table connecting Players and Teams.
 //
 // This allows a player to belong to multiple teams and keeps
-// team membership separate from fundraiser participation.
+// team membership separate from team transaction participation.
 
 model TeamPlayer {
   id        String   @id @default(cuid())
@@ -157,204 +153,33 @@ model TeamPlayer {
 }
 
 // ============================================================
-// FUNDRAISERS
-// ============================================================
-// A Fundraiser represents one fundraising campaign.
-//
-// Example:
-// "2026 Florida Travel Fundraiser"
-//
-// A fundraiser contains:
-// - Teams
-// - Participants
-// - Money coming into the fundraiser
-// - Money allocated to players
-// - Player financial transactions
-
-model Fundraiser {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  status        FundraiserStatus @default(DRAFT)
-  startDate   DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  contributions FundraiserContribution[] //money contributed INTO the fundraiser
-  participants  FundraiserParticipant[] //players participating in the fundraiser
-  teams         FundraiserTeam[] //teams associated with the fundraiser  
-  transactions  PlayerTransaction[] //player financial transactions associated with the fundraiser
-}
-
-enum FundraiserStatus {
-  DRAFT
-  COMPLETED
-  PUBLISHED
-}
-
-// ------------------------------------------------------------
-// FundraiserTeam
-// ------------------------------------------------------------
-// Join table connecting a fundraiser to the teams participating
-// in that fundraiser.
-//
-// A team can participate in many fundraisers.
-// A fundraiser can contain many teams.
-
-model FundraiserTeam {
-  id           String     @id @default(cuid())
-  fundraiserId String
-  teamId       String
-  createdAt    DateTime   @default(now())
-  fundraiser   Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-  team         Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([fundraiserId, teamId]) //prevent the same team from being added twice to a fundraiser
-  @@index([teamId])
-}
-
-// ------------------------------------------------------------
-// FundraiserParticipant
-// ------------------------------------------------------------
-// Connects a Player to a Fundraiser.
-//
-// This answers:
-// "Who is participating in this fundraiser?"
-//
-// It intentionally does NOT store the player's current
-// allocation amount. Allocations are stored separately so
-// allocation history can be preserved.
-
-model FundraiserParticipant {
-  id           String   @id @default(cuid())
-  fundraiserId String
-  playerId     String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
-
-  fundraiser  Fundraiser             @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-  player      Player                 @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  allocations FundraiserAllocation[] //allocations for this player in this fundraiser
-
-  @@unique([fundraiserId, playerId]) //prevent the same player from being added twice to a fundraiser
-  @@index([fundraiserId])
-}
-
-// ============================================================
-// FUNDRAISER MONEY
-// ============================================================
-// These models describe money entering the fundraiser and how
-// that money is assigned to players.
-
-// ------------------------------------------------------------
-// FundraiserContribution
-// ------------------------------------------------------------
-// Represents money coming INTO a fundraiser.
-//
-// Examples:
-// - $500 from sales
-// - $1,000 from an event
-// - $100 in tips
-//
-// This is fundraiser-level money, not money belonging to
-// an individual player.
-
-model FundraiserContribution {
-  id           String @id @default(cuid())
-  fundraiserId String
-
-  amount        Decimal          @db.Decimal(10, 2)
-  paymentMethod PaymentMethod
-  source        ContributionType
-  date          DateTime         @default(now())
-  description   String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  fundraiser Fundraiser @relation(fields: [fundraiserId], references: [id], onDelete: Cascade)
-
-  @@index([fundraiserId])
-}
-
-// ------------------------------------------------------------
-// Fundraiser Allocation
-// ------------------------------------------------------------
-// Represents how fundraiser money is assigned to a participant.
-//
-// Example:
-//
-// Fundraiser has $3,000 available.
-//
-// Jane   → $1,000
-// Sarah  → $1,000
-// Mia    → $1,000
-//
-// An allocation is NOT necessarily an actual transaction.
-// It represents what the player is allocated/entitled to.
-//
-// Allocations can be VOID when a fundraiser is unpublished,
-// allowing the history to remain in the database.
-
-model FundraiserAllocation {
-  id                      String @id @default(cuid())
-  fundraiserParticipantId String
-
-  amount Decimal          @db.Decimal(10, 2)
-  status AllocationStatus @default(ACTIVE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  fundraiserParticipant FundraiserParticipant @relation(fields: [fundraiserParticipantId], references: [id], onDelete: Cascade)
-
-  transactions PlayerTransaction[] //financial transactions created from this allocation
-
-  @@index([fundraiserParticipantId])
-}
-
-// ============================================================
 // PLAYER FINANCES
 // ============================================================
-// PlayerTransaction represents actual financial activity
-// associated with an individual player.
-//
-// This is separate from Allocation.
-//
-// Allocation:
-// "Jane is allocated $1,000."
-//
-// Transaction:
-// "Jane received/was credited $1,000."
+// PlayerTransaction is the player ledger: every change to a player's
+// balance. An individual transaction is one row with no team
+// transaction; a finalized team transaction adds one row per player
+// (teamTransactionId + shareId). Balances = income − expenses.
 
 model PlayerTransaction {
-  id       String @id @default(cuid())
-  playerId String
-  direction TransactionDirection
+  id                String               @id @default(cuid())
+  playerId          String
+  direction         TransactionDirection
   teamTransactionId String? //optional since not all transactions are associated with a team transaction
-  shareId String? //optional since not all transactions are associated with a team transaction share
-  fundraiserId String? //optional since some transactions may not be associated with a fundraiser
-  allocationId String? //optional because not every transaction comes from an allocation
+  shareId           String? //optional since not all transactions are associated with a team transaction share
 
-  amount      Decimal               @db.Decimal(10, 2)
-  type        PlayerTransactionType
+  amount      Decimal           @db.Decimal(10, 2)
   description String?
-  date        DateTime              @default(now())
-  status      TransactionStatus     
+  date        DateTime          @default(now())
+  status      TransactionStatus
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  player     Player                @relation(fields: [playerId], references: [id], onDelete: Restrict)
-  teamTransaction TeamTransaction?    @relation(fields: [teamTransactionId], references: [id], onDelete: Restrict)
+  player          Player                @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  teamTransaction TeamTransaction?      @relation(fields: [teamTransactionId], references: [id], onDelete: Restrict)
   share           TeamTransactionShare? @relation(fields: [shareId], references: [id], onDelete: SetNull)
-  fundraiser Fundraiser?          @relation(fields: [fundraiserId], references: [id], onDelete: SetNull)
-  allocation FundraiserAllocation? @relation(fields: [allocationId], references: [id], onDelete: SetNull)
 
   @@index([playerId, status])
-  @@index([fundraiserId])
-  @@index([allocationId])
   @@index([teamTransactionId])
   @@index([shareId])
 }
@@ -374,36 +199,9 @@ enum TeamStatus {
 }
 
 // ------------------------------------------------------------
-// AllocationStatus
-// ------------------------------------------------------------
-// ACTIVE:
-//   Current allocation.
-//
-// VOID:
-//   Allocation is no longer active but is kept for history.
-//   Useful when a fundraiser is unpublished or redistributed.
-
-enum AllocationStatus {
-  ACTIVE
-  VOID
-}
-
-// ------------------------------------------------------------
-// ContributionType
-// ------------------------------------------------------------
-// Describes where fundraiser money came from.
-
-enum ContributionType {
-  SALES
-  EVENT_PROFIT
-  TIPS
-  OTHER
-}
-
-// ------------------------------------------------------------
 // PaymentMethod
 // ------------------------------------------------------------
-// How a fundraiser contribution was received.
+// How money for a team transaction item was received or paid.
 
 enum PaymentMethod {
   CASH
@@ -412,32 +210,10 @@ enum PaymentMethod {
   OTHER
 }
 
-
-// EXPENSE:
-//   Money spent for/on behalf of a player.
-//
-// PAYMENT:
-//   Money paid by the player/parent toward their balance.
-//
-// ADJUSTMENT:
-//   Manual correction to a player's balance.
-//
-// DISTRIBUTION:
-//   Money allocated/distributed to the player from fundraiser
-//   proceeds.
-
-enum PlayerTransactionType {
-  EXPENSE
-  PAYMENT
-  ADJUSTMENT
-  DISTRIBUTION
-}
-
-
 enum TransactionStatus {
-  INTERNAL        //visible to admins only
-  PUBLISHED       //visible to parents and counted in player balances
-  VOID            //no longer valid but kept for history
+  INTERNAL //visible to admins only
+  PUBLISHED //visible to parents and counted in player balances
+  VOID //no longer valid but kept for history
 }
 
 model PlayerAccessRequest {
@@ -492,10 +268,10 @@ enum TransactionDirection {
 }
 
 enum TeamTransactionStatus {
-  DRAFT     // editable, not counted (UI: "Draft")
+  DRAFT // editable, not counted (UI: "Draft")
   COMPLETED // counted, hidden from parents (UI: "Final")
   PUBLISHED // counted, parents can see it (UI: "Shared")
-  VOIDED    // deleted after it had counted; kept for history (UI: "Deleted")
+  VOIDED // deleted after it had counted; kept for history (UI: "Deleted")
 }
 
 model TeamTransaction {
@@ -557,7 +333,7 @@ model TeamTransactionShare {
   updatedAt     DateTime    @default(now()) @updatedAt
 
   participant        TeamTransactionParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  playerTransactions PlayerTransaction[]        // ledger rows created from this share
+  playerTransactions PlayerTransaction[] // ledger rows created from this share
 
   @@index([participantId])
 }
@@ -567,7 +343,7 @@ model TeamTransactionItem {
   teamTransactionId String
   name              String
   amount            Decimal       @db.Decimal(10, 2) // always positive
-  date              DateTime      // when the money hit or left the bank
+  date              DateTime // when the money hit or left the bank
   paymentMethod     PaymentMethod
   description       String?
   createdAt         DateTime      @default(now())

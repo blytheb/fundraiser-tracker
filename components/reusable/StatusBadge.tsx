@@ -1,7 +1,7 @@
-import type { FundraiserStatus, TeamTransactionStatus } from "@prisma/client";
+import type { TeamTransactionStatus } from "@prisma/client";
 import { TEAM_TRANSACTION_STATUS_LABELS } from "@/lib/labels";
 
-const STATUS_STYLES: Record<FundraiserStatus | TeamTransactionStatus, string> = {
+const STATUS_STYLES: Record<TeamTransactionStatus, string> = {
 	DRAFT:
 		"border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300",
 	COMPLETED:
@@ -12,11 +12,11 @@ const STATUS_STYLES: Record<FundraiserStatus | TeamTransactionStatus, string> = 
 		"border-red-200 bg-red-50 text-red-700 line-through dark:border-red-900 dark:bg-red-950 dark:text-red-300",
 };
 
-// used for fundraisers and team transactions: Draft / Final / Shared (/ Deleted)
-export default function FundraiserStatusBadge({
+// Team transaction status: Draft / Final / Shared (/ Deleted)
+export default function StatusBadge({
 	status,
 }: {
-	status: FundraiserStatus | TeamTransactionStatus;
+	status: TeamTransactionStatus;
 }) {
 	return (
 		<span

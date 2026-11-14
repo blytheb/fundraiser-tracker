@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
 	title: "Fundraiser Tracker",
-	description: "Manage teams, players, fundraisers, and player accounts.",
+	description: "Track individual and team income and expenses for players.",
 };
 
 export default function RootLayout({

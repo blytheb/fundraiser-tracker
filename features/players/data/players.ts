@@ -76,7 +76,6 @@ export async function getPlayerLedgerForAdmin(playerId: string) {
 			date: true,
 			status: true,
 			teamTransaction: { select: { id: true, name: true } },
-			fundraiser: { select: { id: true, name: true } },
 		},
 		orderBy: { date: "desc" },
 	});

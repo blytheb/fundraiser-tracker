@@ -32,6 +32,11 @@ describe("summarizeTransactions", () => {
 			totalMoneyOut: 0,
 			currentBalance: 0,
 			notYetShared: 0,
+			pots: [
+				{ pot: "GENERAL", label: "General", balance: 0, fundraiser: 0, deposits: 0, spent: 0, movedIn: 0, movedOut: 0 },
+				{ pot: "TRAVEL", label: "Travel", balance: 0, fundraiser: 0, deposits: 0, spent: 0, movedIn: 0, movedOut: 0 },
+				{ pot: "TOURNAMENT", label: "Tournament", balance: 0, fundraiser: 0, deposits: 0, spent: 0, movedIn: 0, movedOut: 0 },
+			],
 			history: [],
 		});
 	});

@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import { getTransactionFeed } from "@/features/transactions/data/get-transaction-feed";
+import { POTS, POT_LABELS } from "@/lib/labels";
 
 const RECENT_COUNT = 8;
 const OWING_COUNT = 5;
@@ -31,6 +32,8 @@ export async function getAdminDashboard() {
 				playerId: true,
 				amount: true,
 				direction: true,
+				pot: true,
+				transferId: true,
 				player: { select: { firstName: true, lastName: true } },
 			},
 		}),
@@ -41,12 +44,18 @@ export async function getAdminDashboard() {
 	let income = zero;
 	let expenses = zero;
 	const byPlayer = new Map<string, { name: string; balance: Prisma.Decimal }>();
+	const byPot = new Map(POTS.map((pot) => [pot, zero]));
 
 	for (const row of ledger) {
 		const amount = new Prisma.Decimal(row.amount).abs();
 		const isIncome = row.direction === "INCOME";
-		if (isIncome) income = income.plus(amount);
-		else expenses = expenses.plus(amount);
+		// moves between a player's pots change pots, not totals
+		if (!row.transferId) {
+			if (isIncome) income = income.plus(amount);
+			else expenses = expenses.plus(amount);
+		}
+		const pot = byPot.get(row.pot) ?? zero;
+		byPot.set(row.pot, isIncome ? pot.plus(amount) : pot.minus(amount));
 
 		const current = byPlayer.get(row.playerId) ?? {
 			name: `${row.player.firstName} ${row.player.lastName}`,
@@ -71,6 +80,11 @@ export async function getAdminDashboard() {
 			expenses: expenses.toNumber(),
 			heldForPlayers: income.minus(expenses).toNumber(),
 		},
+		pots: POTS.map((pot) => ({
+			pot,
+			label: POT_LABELS[pot],
+			amount: (byPot.get(pot) ?? zero).toNumber(),
+		})),
 		negativeBalanceCount: negative.length,
 		mostNegative: negative.slice(0, OWING_COUNT).map(([id, p]) => ({
 			id,

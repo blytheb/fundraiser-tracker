@@ -80,6 +80,7 @@ describe("createIndividualTransaction", () => {
 			data: {
 				playerId: "p1",
 				direction: "EXPENSE",
+				pot: "GENERAL",
 				amount: new Prisma.Decimal("45.5"),
 				date: new Date("2026-11-05T00:00:00.000Z"),
 				description: "Uniform",
@@ -132,6 +133,7 @@ describe("saveTeamTransaction", () => {
 				description: null,
 				date: new Date("2026-11-08T00:00:00.000Z"),
 				direction: "EXPENSE",
+				pot: "GENERAL",
 			},
 			select: { id: true },
 		});
@@ -323,7 +325,7 @@ describe("editing and deleting individual transactions", () => {
 
 		expect(await updateIndividualTransaction("pt1", input)).toEqual({ ok: true, data: { id: "pt1" } });
 		expect(txMock.playerTransaction.findFirst).toHaveBeenCalledWith({
-			where: { id: "pt1", teamTransactionId: null },
+			where: { id: "pt1", teamTransactionId: null, transferId: null },
 			select: { id: true, status: true },
 		});
 		expect(txMock.playerTransaction.update).toHaveBeenCalledWith({
@@ -331,6 +333,7 @@ describe("editing and deleting individual transactions", () => {
 			data: {
 				playerId: "p2",
 				direction: "INCOME",
+				pot: "GENERAL",
 				amount: new Prisma.Decimal("30"),
 				date: new Date("2026-11-09T00:00:00.000Z"),
 				description: "Fixed note",

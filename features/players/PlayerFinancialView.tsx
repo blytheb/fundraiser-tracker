@@ -9,7 +9,12 @@ import {
 	IndividualRowButton,
 } from "@/features/transactions/IndividualEditContext";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type { PlayerFinancialSummary } from "@/features/players/lib/summarize-transactions";
+import type {
+	PlayerFinancialSummary,
+	PotSummary,
+} from "@/features/players/lib/summarize-transactions";
+import TransferRowButton from "@/features/players/TransferRowButton";
+import { POT_LABELS } from "@/lib/labels";
 
 export type HistoryFilter = "all" | "income" | "expenses" | "team";
 
@@ -40,6 +45,7 @@ type Props = {
 	filter: HistoryFilter;
 	basePath: string; // this page's path, for the filter links
 	actions?: ReactNode; // admin: Edit / Delete
+	moveButton?: ReactNode; // admin: Move money between pots
 	addButton?: ReactNode; // admin: Add transaction
 	editPlayers?: PlayerOption[]; // admin: lets individual rows open the edit dialog
 };
@@ -49,9 +55,9 @@ type Entry = PlayerFinancialSummary["history"][number];
 function matchesFilter(entry: Entry, filter: HistoryFilter) {
 	switch (filter) {
 		case "income":
-			return entry.direction === "INCOME";
+			return entry.direction === "INCOME" && entry.kind !== "TRANSFER";
 		case "expenses":
-			return entry.direction === "EXPENSE";
+			return entry.direction === "EXPENSE" && entry.kind !== "TRANSFER";
 		case "team":
 			return entry.kind === "TEAM_INCOME" || entry.kind === "TEAM_EXPENSE";
 		default:
@@ -71,6 +77,7 @@ export default function PlayerFinancialView({
 	basePath,
 	actions,
 	addButton,
+	moveButton,
 	editPlayers,
 }: Props) {
 	const isAdmin = mode === "admin";
@@ -147,14 +154,18 @@ export default function PlayerFinancialView({
 							</p>
 						)}
 
-						<dl className="mt-4 space-y-2 border-t pt-4 text-sm">
-							<Line label="Money in" value={summary.totalMoneyIn} tone="text-green-700" strong />
-							<Line label="Individual" value={summary.individualIncome} indent />
-							<Line label="Team" value={summary.teamIncome} indent />
-							<Line label="Money out" value={-summary.totalMoneyOut} tone="text-destructive" strong />
-							<Line label="Individual" value={-summary.individualExpenses} indent />
-							<Line label="Team" value={-summary.teamExpenses} indent />
-						</dl>
+						{/* one row per pot; a negative pot is money due */}
+						<div className="mt-4 border-t pt-4">
+							<div className="mb-2 flex items-center justify-between gap-2">
+								<h2 className="text-sm font-medium">Pots</h2>
+								{moveButton}
+							</div>
+							<ul className="space-y-3">
+								{summary.pots.map((pot) => (
+									<PotRow key={pot.pot} pot={pot} />
+								))}
+							</ul>
+						</div>
 					</section>
 				</aside>
 
@@ -205,27 +216,35 @@ export default function PlayerFinancialView({
 	);
 }
 
-function Line({
-	label,
-	value,
-	tone = "",
-	strong = false,
-	indent = false,
-}: {
-	label: string;
-	value: number;
-	tone?: string;
-	strong?: boolean;
-	indent?: boolean;
-}) {
+function PotRow({ pot }: { pot: PotSummary }) {
+	const moved = pot.movedIn - pot.movedOut;
+	const parts = [
+		pot.fundraiser && `Fundraiser +${formatCurrency(pot.fundraiser)}`,
+		pot.deposits && `Deposits +${formatCurrency(pot.deposits)}`,
+		pot.spent && `Spent −${formatCurrency(pot.spent)}`,
+		moved && `Moved ${moved > 0 ? "+" : ""}${formatCurrency(moved)}`,
+	].filter(Boolean);
+
 	return (
-		<div className={`flex justify-between gap-4 ${indent ? "pl-3 text-muted-foreground" : ""}`}>
-			<dt className={strong ? "font-medium" : ""}>{label}</dt>
-			<dd className={`tabular-nums ${strong ? `font-semibold ${tone}` : ""}`}>
-				{value > 0 ? "+" : ""}
-				{formatCurrency(value)}
-			</dd>
-		</div>
+		<li>
+			<div className="flex items-baseline justify-between gap-3">
+				<span className="text-sm font-medium">{pot.label}</span>
+				<span
+					className={`font-semibold tabular-nums ${
+						pot.balance < 0 ? "text-destructive" : pot.balance > 0 ? "" : "text-muted-foreground"
+					}`}>
+					{formatCurrency(pot.balance)}
+				</span>
+			</div>
+			{pot.balance < 0 && (
+				<p className="text-xs font-medium text-destructive">
+					{formatCurrency(-pot.balance)} due
+				</p>
+			)}
+			{parts.length > 0 && (
+				<p className="mt-0.5 text-xs text-muted-foreground">{parts.join(" · ")}</p>
+			)}
+		</li>
 	);
 }
 
@@ -262,7 +281,9 @@ function HistoryList({
 						<div className="min-w-0 flex-1">
 							<p className="truncate font-medium">{entry.title}</p>
 							<p className="truncate text-sm text-muted-foreground">{entry.description}</p>
-							<p className="mt-0.5 text-xs text-muted-foreground">{formatDate(entry.date)}</p>
+							<p className="mt-0.5 text-xs text-muted-foreground">
+								{formatDate(entry.date)} · {POT_LABELS[entry.pot]}
+							</p>
 						</div>
 						<div className="flex shrink-0 flex-col items-end gap-1">
 							<span
@@ -301,6 +322,15 @@ function HistoryList({
 						</li>
 					);
 				}
+				if (isAdmin && entry.transferId) {
+					return (
+						<li key={entry.id}>
+							<TransferRowButton transferId={entry.transferId} className={interactive}>
+								{content}
+							</TransferRowButton>
+						</li>
+					);
+				}
 				if (isAdmin && entry.playerId) {
 					return (
 						<li key={entry.id}>
@@ -310,6 +340,7 @@ function HistoryList({
 									id: entry.id,
 									playerId: entry.playerId,
 									direction: entry.direction,
+									pot: entry.pot,
 									amount: Math.abs(entry.amount),
 									date: entry.date.toISOString().slice(0, 10),
 									description: entry.note,

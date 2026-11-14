@@ -8,7 +8,7 @@ import TransactionKindIcon from "@/components/reusable/TransactionKindIcon";
 import TeamTransactionActions from "@/features/transactions/TeamTransactionActions";
 import { getTeamTransaction } from "@/features/transactions/data/get-team-transaction";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { PAYMENT_METHOD_LABELS, TRANSACTION_KIND_LABELS } from "@/lib/labels";
+import { PAYMENT_METHOD_LABELS, POT_LABELS, TRANSACTION_KIND_LABELS } from "@/lib/labels";
 
 type PageProps = {
 	params: Promise<{ id: string }>;
@@ -55,7 +55,7 @@ export default async function TeamTransactionPage({ params }: PageProps) {
 							{t.name}
 						</h1>
 						<p className="text-sm text-muted-foreground">
-							{formatDate(t.date)} · {PAYMENT_METHOD_LABELS[t.paymentMethod]}
+							{formatDate(t.date)} · {POT_LABELS[t.pot]} pot · {PAYMENT_METHOD_LABELS[t.paymentMethod]}
 							{t.teams.length > 0 && <> · {t.teams.map((team) => team.name).join(", ")}</>}
 						</p>
 						{t.description && <p className="pt-1 text-sm">{t.description}</p>}

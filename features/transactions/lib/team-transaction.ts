@@ -158,6 +158,7 @@ export async function writeTeamLedgerRows(tx: Tx, id: string) {
 			shareId: participant.shares[0].id,
 			amount: participant.shares[0].amount,
 			direction: teamTransaction.direction,
+			pot: teamTransaction.pot,
 			status: "INTERNAL" as const, // admins only until published
 			date: teamTransaction.date,
 			description: null,

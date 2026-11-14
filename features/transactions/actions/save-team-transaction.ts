@@ -1,6 +1,6 @@
 "use server";
 
-import type { PaymentMethod, TransactionDirection } from "@prisma/client";
+import type { PaymentMethod, Pot, TransactionDirection } from "@prisma/client";
 import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
@@ -11,6 +11,7 @@ import {
 	writeTeamLedgerRows,
 } from "@/features/transactions/lib/team-transaction";
 import { parseDateInput } from "@/features/transactions/lib/dates";
+import { parsePot } from "@/features/transactions/lib/pots";
 
 export type TeamTransactionInput = {
 	id?: string; // set when editing an existing draft
@@ -18,6 +19,7 @@ export type TeamTransactionInput = {
 	description?: string;
 	date: string; // YYYY-MM-DD
 	direction: TransactionDirection;
+	pot?: Pot; // defaults to GENERAL
 	paymentMethod: PaymentMethod;
 	total: number;
 	teamIds: string[];
@@ -42,6 +44,7 @@ export async function saveTeamTransaction(input: TeamTransactionInput) {
 		}
 
 		const date = parseDateInput(input.date);
+		const pot = parsePot(input.pot);
 		const total = parseMoney(input.total, "Total");
 
 		if (input.shares.length === 0) {
@@ -71,7 +74,7 @@ export async function saveTeamTransaction(input: TeamTransactionInput) {
 
 				await tx.teamTransaction.update({
 					where: { id },
-					data: { name, description, date, direction: input.direction },
+					data: { name, description, date, direction: input.direction, pot },
 				});
 
 				// a draft has no ledger rows yet, so its parts can simply be replaced
@@ -82,7 +85,7 @@ export async function saveTeamTransaction(input: TeamTransactionInput) {
 				});
 			} else {
 				const created = await tx.teamTransaction.create({
-					data: { name, description, date, direction: input.direction },
+					data: { name, description, date, direction: input.direction, pot },
 					select: { id: true },
 				});
 				id = created.id;

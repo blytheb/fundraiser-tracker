@@ -16,6 +16,7 @@ vi.mock("@/lib/prisma", async () => {
 });
 
 import { prismaMock } from "../helpers/prisma-mock";
+import { createPotTransfer, deletePotTransfer } from "@/features/transactions/actions/pot-transfers";
 import { saveTeamRoster } from "@/features/teams/actions/save-team-roster";
 
 import { createIndividualTransaction } from "@/features/transactions/actions/create-individual-transaction";
@@ -50,6 +51,18 @@ import { reviewPlayerAccess } from "@/features/player-access/actions/review-play
 const playerForm = { firstName: "Jane", lastName: "Doe", status: true };
 
 const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
+	[
+		"createPotTransfer",
+		() =>
+			createPotTransfer({
+				playerId: "p1",
+				fromPot: "GENERAL",
+				toPot: "TRAVEL",
+				amount: 5,
+				date: "2026-01-01",
+			}),
+	],
+	["deletePotTransfer", () => deletePotTransfer("t1")],
 	[
 		"saveTeamRoster",
 		() => saveTeamRoster("t1", { playerIds: ["p1"], newPlayers: [] }),

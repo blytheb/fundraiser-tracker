@@ -4,7 +4,7 @@ import { ChevronRight, ReceiptText } from "lucide-react";
 import StatusBadge from "@/components/reusable/StatusBadge";
 import TransactionKindIcon from "@/components/reusable/TransactionKindIcon";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { TRANSACTION_KIND_LABELS } from "@/lib/labels";
+import { POT_LABELS, TRANSACTION_KIND_LABELS } from "@/lib/labels";
 import type { FeedRow } from "@/features/transactions/data/get-transaction-feed";
 import {
 	IndividualEditProvider,
@@ -87,7 +87,7 @@ export default function TransactionFeed({
 										<p className="truncate text-sm text-muted-foreground">{row.who}</p>
 										<p
 											className={`mt-0.5 text-xs text-muted-foreground ${compact ? "" : "md:hidden"}`}>
-											{TRANSACTION_KIND_LABELS[row.kind]} · {formatDate(row.date)}
+											{TRANSACTION_KIND_LABELS[row.kind]} · {POT_LABELS[row.pot]} · {formatDate(row.date)}
 										</p>
 									</div>
 								</div>
@@ -104,6 +104,7 @@ export default function TransactionFeed({
 									<>
 										<span className="hidden text-sm text-muted-foreground md:block">
 											{TRANSACTION_KIND_LABELS[row.kind]}
+											<span className="block text-xs">{POT_LABELS[row.pot]} pot</span>
 										</span>
 										<span className="hidden text-sm text-muted-foreground md:block">
 											{formatDate(row.date)}

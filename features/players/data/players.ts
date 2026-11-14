@@ -72,6 +72,8 @@ export async function getPlayerLedgerForAdmin(playerId: string) {
 			playerId: true,
 			amount: true,
 			direction: true,
+			pot: true,
+			transferId: true,
 			description: true,
 			date: true,
 			status: true,

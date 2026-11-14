@@ -164,6 +164,9 @@ model PlayerTransaction {
   id                String               @id @default(cuid())
   playerId          String
   direction         TransactionDirection
+  pot               Pot                  @default(GENERAL)
+  // set on both rows of a move between pots (one out of a pot, one into another)
+  transferId        String?
   teamTransactionId String? //optional since not all transactions are associated with a team transaction
   shareId           String? //optional since not all transactions are associated with a team transaction share
 
@@ -180,6 +183,7 @@ model PlayerTransaction {
   share           TeamTransactionShare? @relation(fields: [shareId], references: [id], onDelete: SetNull)
 
   @@index([playerId, status])
+  @@index([transferId])
   @@index([teamTransactionId])
   @@index([shareId])
 }
@@ -267,6 +271,20 @@ enum TransactionDirection {
   EXPENSE
 }
 
+// ------------------------------------------------------------
+// Pot
+// ------------------------------------------------------------
+// Each player's money is split into fixed pots. Income designated for a
+// pot adds to it; expenses for a pot are taken from it; a negative pot is
+// a balance due. Money can be moved between a player's pots.
+// GENERAL: where fundraiser (team income) money goes by default.
+
+enum Pot {
+  GENERAL
+  TRAVEL
+  TOURNAMENT
+}
+
 enum TeamTransactionStatus {
   DRAFT // editable, not counted (UI: "Draft")
   COMPLETED // counted, hidden from parents (UI: "Final")
@@ -280,6 +298,7 @@ model TeamTransaction {
   description String?
   date        DateTime
   direction   TransactionDirection
+  pot         Pot                   @default(GENERAL) // pot each player's share goes to / comes from
   status      TeamTransactionStatus @default(DRAFT)
 
   createdAt DateTime @default(now())

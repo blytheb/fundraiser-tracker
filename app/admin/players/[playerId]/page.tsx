@@ -10,6 +10,7 @@ import { summarizeTransactions } from "@/features/players/lib/summarize-transact
 import PlayerFinancialView, { parseHistoryFilter } from "@/features/players/PlayerFinancialView";
 import PlayerHeaderActions from "@/features/players/PlayerHeaderActions";
 import AddPlayerTransactionButton from "@/features/players/AddPlayerTransactionButton";
+import MovePotMoneyButton from "@/features/players/MovePotMoneyButton";
 
 type PlayerPageProps = {
 	params: Promise<{ playerId: string }>;
@@ -30,16 +31,19 @@ export default async function PlayerPage({ params, searchParams }: PlayerPagePro
 
 	if (!player) notFound();
 
+	const summary = summarizeTransactions(ledger);
+
 	return (
 		<PlayerFinancialView
 			mode="admin"
 			player={player}
 			teams={teams}
-			summary={summarizeTransactions(ledger)}
+			summary={summary}
 			filter={parseHistoryFilter(show)}
 			basePath={`/admin/players/${playerId}`}
 			actions={<PlayerHeaderActions player={player} />}
 			addButton={<AddPlayerTransactionButton playerId={playerId} players={players} />}
+			moveButton={<MovePotMoneyButton playerId={playerId} pots={summary.pots} />}
 			editPlayers={players}
 		/>
 	);

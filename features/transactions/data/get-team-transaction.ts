@@ -39,6 +39,7 @@ export async function getTeamTransaction(id: string) {
 		description: teamTransaction.description,
 		date: teamTransaction.date,
 		direction: teamTransaction.direction,
+		pot: teamTransaction.pot,
 		status: teamTransaction.status,
 		paymentMethod: teamTransaction.items[0]?.paymentMethod ?? "CASH",
 		total: total.toNumber(),

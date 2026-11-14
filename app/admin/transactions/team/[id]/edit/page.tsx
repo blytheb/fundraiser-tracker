@@ -45,6 +45,7 @@ export default async function EditTeamTransactionPage({ params }: PageProps) {
 					description: teamTransaction.description,
 					date: toDateInputValue(teamTransaction.date),
 					direction: teamTransaction.direction,
+					pot: teamTransaction.pot,
 					paymentMethod: teamTransaction.paymentMethod,
 					total: teamTransaction.total,
 					teamIds: teamTransaction.teams.map((t) => t.id),

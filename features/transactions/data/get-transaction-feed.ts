@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import type { TeamTransactionStatus, TransactionDirection } from "@prisma/client";
+import type { Pot, TeamTransactionStatus, TransactionDirection } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import type { TransactionKind } from "@/lib/labels";
@@ -12,6 +12,7 @@ export type IndividualEditData = {
 	id: string;
 	playerId: string;
 	direction: TransactionDirection;
+	pot: Pot;
 	amount: number; // positive
 	date: string; // YYYY-MM-DD
 	description: string | null;
@@ -25,6 +26,7 @@ export type FeedRow = {
 	date: Date;
 	amount: number; // signed: income +, expense −
 	status: FeedStatus;
+	pot: Pot;
 	href: string | null; // team transactions open their page
 	individual?: IndividualEditData; // individual transactions open the edit dialog instead
 };
@@ -60,12 +62,14 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 			: prisma.playerTransaction.findMany({
 					where: {
 						teamTransactionId: null,
+						transferId: null, // moves between a player's pots aren't income or expense
 						status: { not: "VOID" },
 					},
 					select: {
 						id: true,
 						amount: true,
 						direction: true,
+						pot: true,
 						description: true,
 						date: true,
 						player: { select: { id: true, firstName: true, lastName: true } },
@@ -79,6 +83,7 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				name: true,
 				date: true,
 				direction: true,
+				pot: true,
 				status: true,
 				items: { select: { amount: true } },
 				teams: { select: { team: { select: { name: true } } } },
@@ -99,11 +104,13 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				date: t.date,
 				amount: (isIncome ? amount : amount.negated()).toNumber(),
 				status: "PUBLISHED",
+				pot: t.pot,
 				href: null,
 				individual: {
 					id: t.id,
 					playerId: t.player.id,
 					direction: t.direction,
+					pot: t.pot,
 					amount: amount.toNumber(),
 					date: t.date.toISOString().slice(0, 10),
 					description: t.description,
@@ -124,6 +131,7 @@ export async function getTransactionFeed(filters: FeedFilters = {}) {
 				date: t.date,
 				amount: (isIncome ? total : total.negated()).toNumber(),
 				status: t.status as FeedStatus, // VOIDED filtered out in the query
+				pot: t.pot,
 				href: `/admin/transactions/team/${t.id}`,
 			};
 		}),

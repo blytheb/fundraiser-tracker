@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Check, Users } from "lucide-react";
-import type { PaymentMethod, TransactionDirection } from "@prisma/client";
+import type { PaymentMethod, Pot, TransactionDirection } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import DirectionToggle from "@/components/forms/transactions/DirectionToggle";
+import PotSelect from "@/components/forms/transactions/PotSelect";
 import { saveTeamTransaction } from "@/features/transactions/actions/save-team-transaction";
 import { todayInputValue } from "@/features/transactions/lib/dates";
 import type { TeamOption } from "@/features/transactions/data/get-team-options";
@@ -31,6 +32,7 @@ export type TeamTransactionFormInitial = {
 	description: string | null;
 	date: string; // YYYY-MM-DD
 	direction: TransactionDirection;
+	pot: Pot;
 	paymentMethod: PaymentMethod;
 	total: number;
 	teamIds: string[];
@@ -60,6 +62,7 @@ export default function TeamTransactionForm({
 	const router = useRouter();
 
 	const [direction, setDirection] = useState(initial?.direction ?? defaultDirection);
+	const [pot, setPot] = useState<Pot>(initial?.pot ?? "GENERAL");
 	const [name, setName] = useState(initial?.name ?? "");
 	const [description, setDescription] = useState(initial?.description ?? "");
 	const [date, setDate] = useState(initial?.date ?? todayInputValue());
@@ -181,6 +184,7 @@ export default function TeamTransactionForm({
 			description,
 			date,
 			direction,
+			pot,
 			paymentMethod,
 			total: totalCents / 100,
 			teamIds: selectedTeamIds,
@@ -259,6 +263,13 @@ export default function TeamTransactionForm({
 								onChange={(event) => setDate(event.target.value)}
 								required
 							/>
+						</div>
+
+						<div className="space-y-2">
+							<Label htmlFor="team-pot">
+								{direction === "INCOME" ? "Into pot" : "From pot"}
+							</Label>
+							<PotSelect id="team-pot" value={pot} onChange={setPot} />
 						</div>
 
 						<div className="space-y-2">

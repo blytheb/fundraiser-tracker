@@ -1,35 +1,45 @@
 import {
 	ArrowDownLeft,
+	ArrowLeftRight,
 	ArrowUpRight,
 	CircleDollarSign,
 	Receipt,
 } from "lucide-react";
 import type { TransactionKind } from "@/lib/labels";
 
-// Round icon for the four kinds of transaction; green for income, red for expense.
-const ICONS: Record<TransactionKind, typeof ArrowDownLeft> = {
+type IconKind = TransactionKind | "TRANSFER";
+
+// Round icon for each kind of transaction; green for income, red for expense,
+// grey for a move between a player's pots.
+const ICONS: Record<IconKind, typeof ArrowDownLeft> = {
 	INDIVIDUAL_INCOME: ArrowDownLeft,
 	INDIVIDUAL_EXPENSE: ArrowUpRight,
 	TEAM_INCOME: CircleDollarSign,
 	TEAM_EXPENSE: Receipt,
+	TRANSFER: ArrowLeftRight,
 };
 
 export default function TransactionKindIcon({
 	kind,
 	className = "size-10",
 }: {
-	kind: TransactionKind;
+	kind: IconKind;
 	className?: string;
 }) {
 	const Icon = ICONS[kind];
-	const isIncome = kind === "INDIVIDUAL_INCOME" || kind === "TEAM_INCOME";
+	const color =
+		kind === "TRANSFER"
+			? "text-muted-foreground"
+			: kind === "INDIVIDUAL_INCOME" || kind === "TEAM_INCOME"
+				? "text-green-600"
+				: "text-destructive";
 
 	return (
 		<div
 			className={`flex shrink-0 items-center justify-center rounded-full bg-muted ${className}`}
 			aria-hidden="true">
 			<Icon
-				className={`size-5 ${isIncome ? "text-green-600" : "text-destructive"}`}
+				className={`size-5 ${color}`}
 			/>
 		</div>
 	);

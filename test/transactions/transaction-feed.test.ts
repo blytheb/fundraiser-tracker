@@ -102,7 +102,7 @@ describe("getTransactionFeed", () => {
 		await getTransactionFeed();
 		expect(prismaMock.playerTransaction.findMany).toHaveBeenCalledWith(
 			expect.objectContaining({
-				where: { teamTransactionId: null, status: { not: "VOID" } },
+				where: { teamTransactionId: null, transferId: null, status: { not: "VOID" } },
 			}),
 		);
 	});

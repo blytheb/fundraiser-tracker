@@ -1,15 +1,17 @@
 "use server";
 
-import type { TransactionDirection } from "@prisma/client";
+import type { Pot, TransactionDirection } from "@prisma/client";
 import { runAction } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import { parseMoney } from "@/features/transactions/lib/team-transaction";
 import { parseDateInput } from "@/features/transactions/lib/dates";
+import { parsePot } from "@/features/transactions/lib/pots";
 
 export type IndividualTransactionInput = {
 	playerId: string;
 	direction: TransactionDirection;
+	pot?: Pot; // defaults to GENERAL
 	amount: number;
 	date: string; // YYYY-MM-DD from a date input
 	description?: string;
@@ -29,6 +31,7 @@ export async function createIndividualTransaction(
 
 		const amount = parseMoney(input.amount, "Amount");
 		const date = parseDateInput(input.date);
+		const pot = parsePot(input.pot);
 
 		const player = await prisma.player.findUnique({
 			where: { id: input.playerId },
@@ -43,6 +46,7 @@ export async function createIndividualTransaction(
 			data: {
 				playerId: player.id,
 				direction: input.direction,
+				pot,
 				amount,
 				date,
 				description: input.description?.trim() || null,

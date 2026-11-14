@@ -3,6 +3,7 @@
 // error here if an enum value is added to the schema without a label.
 import type {
 	PaymentMethod,
+	Pot,
 	TeamStatus,
 	TeamTransactionStatus,
 	TransactionDirection,
@@ -45,3 +46,12 @@ export const TRANSACTION_KIND_LABELS = {
 	TEAM_INCOME: "Team income",
 	TEAM_EXPENSE: "Team expense",
 } as const satisfies Record<TransactionKind, string>;
+
+// Fixed pots each player's money is split into. General is where fundraiser money goes by default.
+export const POT_LABELS = {
+	GENERAL: "General",
+	TRAVEL: "Travel",
+	TOURNAMENT: "Tournament",
+} as const satisfies Record<Pot, string>;
+
+export const POTS = Object.keys(POT_LABELS) as Pot[];

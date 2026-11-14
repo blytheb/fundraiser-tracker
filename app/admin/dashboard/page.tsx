@@ -94,6 +94,19 @@ export default async function AdminDashboardPage() {
 				/>
 			</section>
 
+			{/* ---------- Held per pot ---------- */}
+			<section aria-label="Held per pot" className="flex flex-wrap gap-2 text-sm">
+				{data.pots.map((pot) => (
+					<span key={pot.pot} className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1">
+						<span className="text-muted-foreground">{pot.label}</span>
+						<span
+							className={`font-semibold tabular-nums ${pot.amount < 0 ? "text-destructive" : ""}`}>
+							{formatCurrency(pot.amount)}
+						</span>
+					</span>
+				))}
+			</section>
+
 			<div className="space-y-6 lg:grid lg:grid-cols-3 lg:items-start lg:gap-6 lg:space-y-0">
 				{/* ---------- Recent transactions ---------- */}
 				<section className="space-y-3 lg:col-span-2">

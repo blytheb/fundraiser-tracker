@@ -6,12 +6,13 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import { parseMoney } from "@/features/transactions/lib/team-transaction";
 import { parseDateInput } from "@/features/transactions/lib/dates";
+import { parsePot } from "@/features/transactions/lib/pots";
 import type { IndividualTransactionInput } from "@/features/transactions/actions/create-individual-transaction";
 
 // Individual = not part of a team transaction, and not already deleted.
 async function findEditableIndividual(tx: Prisma.TransactionClient, id: string) {
 	const transaction = await tx.playerTransaction.findFirst({
-		where: { id, teamTransactionId: null },
+		where: { id, teamTransactionId: null, transferId: null }, // moves between pots are undone, not edited
 		select: { id: true, status: true },
 	});
 
@@ -39,6 +40,7 @@ export async function updateIndividualTransaction(
 
 		const amount = parseMoney(input.amount, "Amount");
 		const date = parseDateInput(input.date);
+		const pot = parsePot(input.pot);
 
 		return prisma.$transaction(async (tx) => {
 			await findEditableIndividual(tx, id);
@@ -56,6 +58,7 @@ export async function updateIndividualTransaction(
 				data: {
 					playerId: player.id,
 					direction: input.direction,
+					pot,
 					amount,
 					date,
 					description: input.description?.trim() || null,

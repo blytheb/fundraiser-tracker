@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { TransactionDirection } from "@prisma/client";
+import type { Pot, TransactionDirection } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import DirectionToggle from "@/components/forms/transactions/DirectionToggle";
+import PotSelect from "@/components/forms/transactions/PotSelect";
 import { createIndividualTransaction } from "@/features/transactions/actions/create-individual-transaction";
 import {
 	deleteIndividualTransaction,
@@ -97,6 +98,7 @@ function IndividualTransactionForm({
 	const router = useRouter();
 	const [direction, setDirection] = useState(initialDirection);
 	const [playerId, setPlayerId] = useState(transaction?.playerId ?? initialPlayerId ?? "");
+	const [pot, setPot] = useState<Pot>(transaction?.pot ?? "GENERAL");
 	const [amount, setAmount] = useState(transaction ? transaction.amount.toFixed(2) : "");
 	const [date, setDate] = useState(transaction?.date ?? todayInputValue());
 	const [description, setDescription] = useState(transaction?.description ?? "");
@@ -121,7 +123,7 @@ function IndividualTransactionForm({
 			return;
 		}
 
-		const input = { playerId, direction, amount: Number(amount), date, description };
+		const input = { playerId, direction, pot, amount: Number(amount), date, description };
 
 		setBusy("save");
 		const result = transaction
@@ -183,6 +185,13 @@ function IndividualTransactionForm({
 						))}
 					</SelectContent>
 				</Select>
+			</div>
+
+			<div className="space-y-2">
+				<Label htmlFor="individual-pot">
+					{direction === "INCOME" ? "Into pot" : "From pot"}
+				</Label>
+				<PotSelect id="individual-pot" value={pot} onChange={setPot} />
 			</div>
 
 			<div className="grid grid-cols-2 gap-3">

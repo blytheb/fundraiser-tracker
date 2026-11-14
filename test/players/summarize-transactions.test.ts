@@ -32,6 +32,7 @@ describe("summarizeTransactions", () => {
 			totalMoneyIn: 0,
 			totalMoneyOut: 0,
 			currentBalance: 0,
+			notYetShared: 0,
 			history: [],
 		});
 	});
@@ -61,6 +62,18 @@ describe("summarizeTransactions", () => {
 		expect(summary.teamIncome).toBe(100);
 		expect(summary.individualIncome).toBe(0);
 		expect(summary.history[0]).toMatchObject({ kind: "TEAM_INCOME", title: "Car wash" });
+	});
+
+	it("counts Final (INTERNAL) rows but reports what isn't shared with parents yet", () => {
+		const summary = summarizeTransactions([
+			tx({ id: "1", direction: "INCOME", amount: 100 }), // shared
+			tx({ id: "2", direction: "EXPENSE", amount: 30, status: "INTERNAL", ...team("Fee") }),
+		]);
+
+		expect(summary.currentBalance).toBe(70);
+		expect(summary.notYetShared).toBe(-30);
+		expect(summary.history.find((e) => e.id === "2")?.shared).toBe(false);
+		expect(summary.history.find((e) => e.id === "1")?.shared).toBe(true);
 	});
 
 	it("can go negative when expenses exceed income", () => {

@@ -1,19 +1,22 @@
 import { Prisma } from "@prisma/client";
-import type { TransactionDirection } from "@prisma/client";
+import type { TransactionDirection, TransactionStatus } from "@prisma/client";
 import type { TransactionKind } from "@/lib/labels";
 
-// The fields the summary needs. Callers pass already-filtered transactions
-// (only PUBLISHED ones count toward the balance).
+// The fields the summary needs. Callers pass already-filtered transactions:
+// the parent page passes PUBLISHED rows; the admin page also passes INTERNAL
+// (Final) rows, which count but aren't shared with parents yet.
 export type SummaryTransaction = {
 	id: string;
+	playerId?: string;
+	status?: TransactionStatus; // omitted = PUBLISHED
 	amount: Prisma.Decimal | number; // stored positive; direction gives the sign
 	direction: TransactionDirection;
 	description: string | null;
 	date: Date;
 	// set when the row is a player's share of a team transaction
-	teamTransaction?: { name: string } | null;
+	teamTransaction?: { id?: string; name: string } | null;
 	// v1 fundraiser link, kept while fundraisers move to team transactions
-	fundraiser?: { name: string } | null;
+	fundraiser?: { id?: string; name: string } | null;
 };
 
 // same four kinds as the admin transactions list
@@ -53,26 +56,34 @@ export function summarizeTransactions(transactions: SummaryTransaction[]) {
 		TEAM_EXPENSE: zero,
 	};
 
+	let notYetShared = zero; // net of Final rows parents can't see yet
+
 	const history = transactions.map((transaction) => {
 		const kind = kindOf(transaction);
 		// abs() so a legacy row stored with a negative amount still counts once, in its direction
 		const amount = new Prisma.Decimal(transaction.amount).abs();
+		const signed = transaction.direction === "INCOME" ? amount : amount.negated();
 		totals[kind] = totals[kind].plus(amount);
+
+		const shared = transaction.status !== "INTERNAL";
+		if (!shared) notYetShared = notYetShared.plus(signed);
 
 		return {
 			id: transaction.id,
+			playerId: transaction.playerId,
 			kind,
 			direction: transaction.direction,
+			shared,
+			teamTransactionId: transaction.teamTransaction?.id ?? null,
+			fundraiserId: transaction.fundraiser?.id ?? null,
+			note: transaction.description, // raw note, for the edit dialog
 			title:
 				transaction.teamTransaction?.name ??
 				transaction.fundraiser?.name ??
 				DEFAULT_TITLES[kind],
 			description: transaction.description ?? DEFAULT_DESCRIPTIONS[kind],
 			date: transaction.date,
-			amount: (transaction.direction === "INCOME"
-				? amount
-				: amount.negated()
-			).toNumber(),
+			amount: signed.toNumber(),
 		};
 	});
 
@@ -89,6 +100,7 @@ export function summarizeTransactions(transactions: SummaryTransaction[]) {
 		totalMoneyIn: totalMoneyIn.toNumber(),
 		totalMoneyOut: totalMoneyOut.toNumber(),
 		currentBalance: totalMoneyIn.minus(totalMoneyOut).toNumber(),
+		notYetShared: notYetShared.toNumber(),
 		history,
 	};
 }

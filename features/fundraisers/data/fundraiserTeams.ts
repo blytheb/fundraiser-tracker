@@ -21,21 +21,6 @@ export async function getFundraiserTeams(
 	});
 }
 
-export async function getTeamFundraisers(
-	teamId: string,
-): Promise<Fundraiser[]> {
-	await requireAdmin();
-	const allFundraisers = await prisma.fundraiserTeam.findMany({
-		where: {
-			teamId,
-		},
-		include: {
-			fundraiser: true,
-		},
-	});
-
-	return allFundraisers.map((fundraiser) => fundraiser.fundraiser);
-}
 
 export async function getAvailableFundraisersForTeam(
 	teamId: string,

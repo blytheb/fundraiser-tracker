@@ -93,7 +93,13 @@ export default function AddFundraiserToTeamDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogTrigger render={<Button>Add Fundraiser</Button>}></DialogTrigger>
+			<DialogTrigger
+				render={
+					<Button variant="ghost" size="sm">
+						Add a fundraiser
+					</Button>
+				}
+			/>
 
 			<DialogContent>
 				<DialogHeader>

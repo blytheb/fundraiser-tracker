@@ -21,7 +21,6 @@ import { prismaMock } from "../helpers/prisma-mock";
 import {
 	getPlayers,
 	getPlayerById,
-	getPlayerTransactions,
 } from "@/features/players/data/players";
 import { getPlayerTeams } from "@/features/players/data/get-player-teams";
 import { getPlayerFinancialSummary } from "@/features/players/data/get-player-financial-summary";
@@ -39,7 +38,6 @@ import {
 } from "@/features/fundraisers/data/fundraisers";
 import {
 	getFundraiserTeams,
-	getTeamFundraisers,
 	getAvailableFundraisersForTeam,
 } from "@/features/fundraisers/data/fundraiserTeams";
 import { getFundraiserFinancialSummary } from "@/features/fundraisers/data/get-fundraiser-financial-summary";
@@ -59,6 +57,11 @@ import { requestPlayerAccess } from "@/features/player-access/actions/request-pl
 import { cancelPlayerAccessRequest } from "@/features/player-access/actions/cancel-player-access-request";
 
 import { getTransactionFeed } from "@/features/transactions/data/get-transaction-feed";
+import {
+	getActivePlayerOptions,
+	getPlayerBalances,
+	getPlayerLedgerForAdmin,
+} from "@/features/players/data/players";
 import { getTeamTransaction } from "@/features/transactions/data/get-team-transaction";
 import { getTeamOptions } from "@/features/transactions/data/get-team-options";
 
@@ -80,6 +83,9 @@ beforeEach(() => {
 
 const ADMIN_DATA: [string, () => Promise<unknown>][] = [
 	["getTransactionFeed", () => getTransactionFeed()],
+	["getPlayerLedgerForAdmin", () => getPlayerLedgerForAdmin("p1")],
+	["getPlayerBalances", () => getPlayerBalances(["p1"])],
+	["getActivePlayerOptions", () => getActivePlayerOptions()],
 	["getTeamTransaction", () => getTeamTransaction("tt1")],
 	["getTeamOptions", () => getTeamOptions()],
 	["getPlayers", () => getPlayers()],
@@ -94,7 +100,6 @@ const ADMIN_DATA: [string, () => Promise<unknown>][] = [
 	["getFundraisers", () => getFundraisers()],
 	["getFundraiserById", () => getFundraiserById("f1")],
 	["getFundraiserTeams", () => getFundraiserTeams("f1")],
-	["getTeamFundraisers", () => getTeamFundraisers("t1")],
 	[
 		"getAvailableFundraisersForTeam",
 		() => getAvailableFundraisersForTeam("t1"),
@@ -210,32 +215,6 @@ describe("getMyLinkedPlayerIds", () => {
 	});
 });
 
-describe("getPlayerTransactions", () => {
-	it("throws for a PARENT who is not linked to the player", async () => {
-		asParent();
-		db.parentPlayerLink.findUnique.mockResolvedValue(null);
-
-		await expect(getPlayerTransactions("p1")).rejects.toThrow(
-			"You do not have access to this player.",
-		);
-		expect(db.playerTransaction.findMany).not.toHaveBeenCalled();
-	});
-
-	it("returns transactions for a linked PARENT", async () => {
-		asParent();
-		db.parentPlayerLink.findUnique.mockResolvedValue({ id: "link-1" });
-		db.playerTransaction.findMany.mockResolvedValue([{ id: "tx-1" }]);
-
-		await expect(getPlayerTransactions("p1")).resolves.toEqual([
-			{ id: "tx-1" },
-		]);
-	});
-
-	it("redirects a logged-out user", async () => {
-		asLoggedOut();
-		await expectRedirect(() => getPlayerTransactions("p1"));
-	});
-});
 
 describe("getPlayerFinancialSummary (parent player page)", () => {
 	function linkParent() {

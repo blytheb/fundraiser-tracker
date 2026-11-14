@@ -7,13 +7,15 @@ import TeamTransactionForm from "@/components/forms/transactions/TeamTransaction
 import { getTeamOptions } from "@/features/transactions/data/get-team-options";
 
 type PageProps = {
-	searchParams: Promise<{ direction?: string }>;
+	searchParams: Promise<{ direction?: string; team?: string }>;
 };
 
 export default async function NewTeamTransactionPage({ searchParams }: PageProps) {
-	const { direction: param } = await searchParams;
+	const { direction: param, team } = await searchParams;
 	const direction: TransactionDirection = param === "EXPENSE" ? "EXPENSE" : "INCOME";
-	const teams = await getTeamOptions();
+	const teams = await getTeamOptions(team ? [team] : []);
+	// started from a team page: pre-select that team (if it exists)
+	const defaultTeamIds = team && teams.some((t) => t.id === team) ? [team] : [];
 
 	return (
 		<main className="mx-auto w-full max-w-3xl space-y-5 px-4 py-6 sm:px-6 lg:py-8">
@@ -29,7 +31,11 @@ export default async function NewTeamTransactionPage({ searchParams }: PageProps
 				subheading="Enter the total, choose the teams, and split it across their players."
 			/>
 
-			<TeamTransactionForm teams={teams} defaultDirection={direction} />
+			<TeamTransactionForm
+				teams={teams}
+				defaultDirection={direction}
+				defaultTeamIds={defaultTeamIds}
+			/>
 		</main>
 	);
 }

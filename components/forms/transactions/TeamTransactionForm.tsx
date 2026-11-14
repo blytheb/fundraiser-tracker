@@ -40,6 +40,7 @@ export type TeamTransactionFormInitial = {
 type Props = {
 	teams: TeamOption[];
 	defaultDirection: TransactionDirection;
+	defaultTeamIds?: string[]; // new transaction started from a team page
 	initial?: TeamTransactionFormInitial; // set when editing a draft
 };
 
@@ -50,7 +51,12 @@ const toCents = (value: string) => {
 	return Number.isFinite(number) ? Math.round(number * 100) : 0;
 };
 
-export default function TeamTransactionForm({ teams, defaultDirection, initial }: Props) {
+export default function TeamTransactionForm({
+	teams,
+	defaultDirection,
+	defaultTeamIds = [],
+	initial,
+}: Props) {
 	const router = useRouter();
 
 	const [direction, setDirection] = useState(initial?.direction ?? defaultDirection);
@@ -63,7 +69,9 @@ export default function TeamTransactionForm({ teams, defaultDirection, initial }
 	const [totalInput, setTotalInput] = useState(
 		initial ? initial.total.toFixed(2) : "",
 	);
-	const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>(initial?.teamIds ?? []);
+	const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>(
+		initial?.teamIds ?? defaultTeamIds,
+	);
 	const [excluded, setExcluded] = useState<Set<string>>(() => new Set());
 
 	// Players saved on a draft who aren't on a selected team's current roster stay listed.

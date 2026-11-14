@@ -39,6 +39,7 @@ type Props = {
 	onOpenChange: (open: boolean) => void;
 	players: PlayerOption[];
 	initialDirection?: TransactionDirection; // new transaction
+	initialPlayerId?: string; // new transaction for a specific player (player page)
 	transaction?: IndividualEditData; // editing an existing one
 };
 
@@ -47,6 +48,7 @@ export default function IndividualTransactionDialog({
 	onOpenChange,
 	players,
 	initialDirection = "INCOME",
+	initialPlayerId,
 	transaction,
 }: Props) {
 	const isEdit = Boolean(transaction);
@@ -68,6 +70,7 @@ export default function IndividualTransactionDialog({
 					<IndividualTransactionForm
 						key={transaction?.id ?? "new"}
 						initialDirection={transaction?.direction ?? initialDirection}
+						initialPlayerId={initialPlayerId}
 						transaction={transaction}
 						players={players}
 						onDone={() => onOpenChange(false)}
@@ -80,18 +83,20 @@ export default function IndividualTransactionDialog({
 
 function IndividualTransactionForm({
 	initialDirection,
+	initialPlayerId,
 	transaction,
 	players,
 	onDone,
 }: {
 	initialDirection: TransactionDirection;
+	initialPlayerId?: string;
 	transaction?: IndividualEditData;
 	players: PlayerOption[];
 	onDone: () => void;
 }) {
 	const router = useRouter();
 	const [direction, setDirection] = useState(initialDirection);
-	const [playerId, setPlayerId] = useState(transaction?.playerId ?? "");
+	const [playerId, setPlayerId] = useState(transaction?.playerId ?? initialPlayerId ?? "");
 	const [amount, setAmount] = useState(transaction ? transaction.amount.toFixed(2) : "");
 	const [date, setDate] = useState(transaction?.date ?? todayInputValue());
 	const [description, setDescription] = useState(transaction?.description ?? "");
@@ -100,9 +105,10 @@ function IndividualTransactionForm({
 	const [confirmingDelete, setConfirmingDelete] = useState(false);
 
 	// an inactive player on an existing transaction still needs to appear in the list
+	const currentPlayerId = transaction?.playerId ?? initialPlayerId;
 	const options =
-		transaction && !players.some((p) => p.id === transaction.playerId)
-			? [...players, { id: transaction.playerId, name: "Inactive player" }]
+		currentPlayerId && !players.some((p) => p.id === currentPlayerId)
+			? [...players, { id: currentPlayerId, name: "Inactive player" }]
 			: players;
 	const playerItems = Object.fromEntries(options.map((p) => [p.id, p.name]));
 

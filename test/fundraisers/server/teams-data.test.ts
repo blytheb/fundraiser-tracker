@@ -20,7 +20,6 @@ vi.mock("@/lib/prisma", () => ({
 
 import {
 	getFundraiserTeams,
-	getTeamFundraisers,
 	getAvailableFundraisersForTeam,
 } from "@/features/fundraisers/data/fundraiserTeams";
 
@@ -56,32 +55,6 @@ describe("getFundraiserTeams", () => {
 	});
 });
 
-describe("getTeamFundraisers", () => {
-	it("returns fundraisers associated with a team", async () => {
-		const fundraiser1 = {
-			id: "fundraiser-1",
-			name: "Cookie Sale",
-		};
-		const fundraiser2 = {
-			id: "fundraiser-2",
-			name: "Car Wash",
-		};
-
-		prismaMock.fundraiserTeam.findMany.mockResolvedValue([
-			{ fundraiser: fundraiser1 },
-			{ fundraiser: fundraiser2 },
-		]);
-
-		const result = await getTeamFundraisers("team-1");
-
-		expect(prismaMock.fundraiserTeam.findMany).toHaveBeenCalledWith({
-			where: { teamId: "team-1" },
-			include: { fundraiser: true },
-		});
-
-		expect(result).toEqual([fundraiser1, fundraiser2]);
-	});
-});
 
 describe("getAvailableFundraisersForTeam", () => {
 	it("returns incomplete fundraisers not already associated with the team", async () => {

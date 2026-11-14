@@ -57,8 +57,6 @@ import {
 	updateTeam,
 	deleteTeam,
 } from "@/features/teams/actions/teams";
-import { addPlayerPayment } from "@/features/players/actions/add-player-payment";
-import { addPlayerExpense } from "@/features/players/actions/add-player-expense";
 import {
 	createPlayer,
 	updatePlayer,
@@ -81,7 +79,6 @@ const fundraiserForm = {
 	startDate: new Date("2026-01-01"),
 };
 const playerForm = { firstName: "Jane", lastName: "Doe", status: true };
-const transaction = { playerId: "p1", amount: 5, date: "2026-01-01" };
 
 const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
 	[
@@ -171,8 +168,6 @@ const ADMIN_ACTIONS: [string, () => Promise<unknown>][] = [
 	["createPlayer", () => createPlayer(playerForm)],
 	["updatePlayer", () => updatePlayer("p1", playerForm)],
 	["deletePlayer", () => deletePlayer("p1")],
-	["addPlayerPayment", () => addPlayerPayment(transaction)],
-	["addPlayerExpense", () => addPlayerExpense(transaction)],
 	// users
 	["assignPlayerToUser", () => assignPlayerToUser("u2", "p1")],
 	["removePlayerFromUser", () => removePlayerFromUser("u2", "p1")],

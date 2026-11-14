@@ -1,7 +1,7 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/permissions";
 import type { Player } from "@prisma/client";
-import { requirePlayerAccess } from "@/features/players/lib/require-player-access";
 
 export async function getPlayers(search?: string): Promise<Player[]> {
 	await requireAdmin();
@@ -46,50 +46,6 @@ export async function getPlayerById(id: string): Promise<Player | null> {
 	});
 }
 
-export async function getPlayerTransactions(playerId: string) {
-	await requirePlayerAccess(playerId, { allowAdmins: true });
-
-	return prisma.playerTransaction.findMany({
-		where: {
-			playerId,
-			status: "PUBLISHED",
-			OR: [
-				{
-					type: {
-						not: "DISTRIBUTION",
-					},
-				},
-				{
-					type: "DISTRIBUTION",
-					fundraiser: {
-						is: {
-							status: "PUBLISHED",
-						},
-					},
-				},
-				// shares of team transactions: PUBLISHED only once the team transaction is published
-				{ teamTransactionId: { not: null } },
-			],
-		},
-		orderBy: {
-			date: "desc",
-		},
-		include: {
-			teamTransaction: {
-				select: {
-					id: true,
-					name: true,
-				},
-			},
-			fundraiser: {
-				select: {
-					id: true,
-					name: true,
-				},
-			},
-		},
-	});
-}
 
 // Active players for pickers (new team, new transaction), sorted by last name.
 export async function getActivePlayerOptions() {
@@ -102,4 +58,50 @@ export async function getActivePlayerOptions() {
 	});
 
 	return players.map((p) => ({ ...p, name: `${p.firstName} ${p.lastName}` }));
+}
+
+// Admin view of a player's ledger: Shared and Final rows (Final counts toward the
+// balance but parents can't see it yet). Deleted (VOID) rows are left out.
+export async function getPlayerLedgerForAdmin(playerId: string) {
+	await requireAdmin();
+
+	return prisma.playerTransaction.findMany({
+		where: { playerId, status: { in: ["PUBLISHED", "INTERNAL"] } },
+		select: {
+			id: true,
+			playerId: true,
+			amount: true,
+			direction: true,
+			description: true,
+			date: true,
+			status: true,
+			teamTransaction: { select: { id: true, name: true } },
+			fundraiser: { select: { id: true, name: true } },
+		},
+		orderBy: { date: "desc" },
+	});
+}
+
+// Admin balances for several players at once (Shared + Final rows), as numbers.
+export async function getPlayerBalances(playerIds: string[]) {
+	await requireAdmin();
+
+	const rows = await prisma.playerTransaction.findMany({
+		where: { playerId: { in: playerIds }, status: { in: ["PUBLISHED", "INTERNAL"] } },
+		select: { playerId: true, amount: true, direction: true },
+	});
+
+	const balances = new Map<string, Prisma.Decimal>(
+		playerIds.map((id) => [id, new Prisma.Decimal(0)]),
+	);
+	for (const row of rows) {
+		const amount = new Prisma.Decimal(row.amount).abs();
+		const current = balances.get(row.playerId) ?? new Prisma.Decimal(0);
+		balances.set(
+			row.playerId,
+			row.direction === "INCOME" ? current.plus(amount) : current.minus(amount),
+		);
+	}
+
+	return new Map([...balances].map(([id, value]) => [id, value.toNumber()]));
 }
